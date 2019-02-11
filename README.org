@@ -1,3 +1,32 @@
 #+TITLE: Project README
 
 This is a fun project for playing around with my strava data.
+
+* Possible outputs
+** Graphics
+Chart maps and other fun graphs with various summary statistics (and routes)
+** Maintenance 
+Create an app that will keep track of wear and tear on components
+
+* Installation/Usage Requirements
+** swagger_client 
+The app uses a package to connect to the strava api that hasn't been neatly bundled and is kind of a pain to install:
+1. Make sure Java 7.1+ is installed
+2. Make sure swagger and maven are installed
+3. Generate the package using swagger
+4. Install the package
+
+#+BEGIN_SRC bash
+  # java
+  brew cask install caskroom/versions/java8
+
+  # swagger and maven
+  brew install swagger-codegen maven
+
+  # create the package
+  swagger-codegen generate -i https://developers.strava.com/swagger/swagger.json -l python -o python_strava_package
+
+  # install the thing
+  cd python_strava_package && python3 setup.py install
+#+END_SRC
+
