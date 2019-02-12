@@ -21,7 +21,7 @@ create table bikes (
 );
 
 -- Rides record data about a bike ride
-create table ride (
+create table rides (
     id           integer primary key,
     bike         text not null references bike(id),
     distance     integer,
@@ -40,20 +40,18 @@ create table parts (
     id           integer primary key autoincrement not null,
     type         text,
     purchased    date,
-    distance     integer,
-    last_service date,
     brand        text,
     price        real,
     weight       real,
     size         text,
     model        text,
-    bike         text not null references bikes(id)
+    bike         text not null references bikes(name)
 );
 
 -- Maintenance tasks record things that happen to parts
 create table maintenance (
     id           integer primary key autoincrement not null,
-    part         text not null references parts(id),
+    part         integer not null references parts(id),
     work         text,
     date         date
 );

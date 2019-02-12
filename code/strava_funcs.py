@@ -1,70 +1,46 @@
 # modules
-import time
-import swagger_client, configparser, os
-from swagger_client.rest import ApiException
-from pprint import pprint
-
-# get session set up
-# Configure OAuth2 access token for authorization: strava_oauth
-config = configparser.ConfigParser()
-cpfp = os.path.expanduser('~/strava/code/config_path.txt')
-with open(cpfp, 'r') as my_path:
-    cpath = my_path.readline()
-    cpath = cpath.rstrip()
-config.read(cpath)
-
-my_access_token = config['strava']['access_token']
-swagger_client.configuration.access_token = my_access_token
-
-# create an instance of the API class
-api_instance = swagger_client.ActivitiesApi()
-
-before = 56 # Integer | An epoch timestamp to use for filtering activities that have taken place before a certain time. (optional)
-after = 56 # Integer | An epoch timestamp to use for filtering activities that have taken place after a certain time. (optional)
-page = 56 # Integer | Page number. (optional)
-perPage = 56 # Integer | Number of items per page. Defaults to 30. (optional) (default to 30)
-
-# functions
-
-# get athlete activities
-def get_activities():
-    try: 
-        # List Athlete Activities
-        api_response = api_instance.getLoggedInAthleteActivities(before=before, after=after, page=page, perPage=perPage)
-        pprint(api_response)
-    except ApiException as e:
-        print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
-
-# get activity details
-id = 789 # Long | The identifier of the activity.
-includeAllEfforts = true # Boolean | To include all segments efforts. (optional)
-
-def get_activity():
-    try: 
-        # Get Activity
-        api_response = api_instance.getActivityById(id,
-                                                includeAllEfforts=includeAllEfforts)
-        pprint(api_response)
-    except ApiException as e:
-        print("Exception when calling ActivitiesApi->getActivityById: %s\n" % e)
-
-
-# a different approach
 from stravalib.client import Client
+import configparser
 
 client = Client()
-authorize_url = client.authorization_url(
-    client_id=10185,
-    redirect_uri='http://127.0.0.1:8001/authorized')
-authorize_url
-# Have the user click the authorization URL, a 'code' param will be added to the redirect_uri
-# .....
 
-# Extract the code from your webapp response
-code = request.get('code') # or whatever your framework does
-access_token = client.exchange_code_for_token(client_id=1234, client_secret='asdf1234', code=code)
+# Run this, then paste the resulting url into a browser
+# I think it's only necessary to do this once...
+url = client.authorization_url(client_id=10185,
+                               redirect_uri='http://127.0.0.1:5000/authorization')
 
-# Now store that access token somewhere (a database?)
+# the redirect will fail, but grab the new 'code' param from within the url
+
+config = configparser.ConfigParser()
+config.read('/home/bapfeld/strava/code/strava.ini')
+
+code = config['Strava']['code']
+
+token_response = client.exchange_code_for_token(client_id=10185, client_secret=config['Strava']['client_secret'], code=code)
+
+access_token = token_response['access_token']
+refresh_token = token_response['refresh_token']
+expires_at = token_response['expires_at']
+
+# Now store that short-lived access token somewhere (a database?)
 client.access_token = access_token
+# You must also store the refresh token to be used later on to obtain another valid access token 
+# in case the current is already expired
+client.refresh_token = refresh_token
+
+# An access_token is only valid for 6 hours, store expires_at somewhere and
+# check it before making an API call.
+ 
 athlete = client.get_athlete()
-print("For {id}, I now have an access token {token}".format(id=athlete.id, token=access_token))
+
+# Get all activities:
+activity_list = client.get_activities()
+activity_id_list = [x.id for x in activity_list]
+
+# Get a single activity
+activity = client.get_activity(2122867341)
+
+# Get the list of gear
+g1 = client.get_gear('b3671458')
+g1.name
+g1.distance

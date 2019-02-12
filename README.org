@@ -8,25 +8,13 @@ Chart maps and other fun graphs with various summary statistics (and routes)
 ** Maintenance 
 Create an app that will keep track of wear and tear on components
 
+* Maintenance App
+The idea here is to create a lightweight way to track maintenance. I want to limit external dependencies and basically just get the minimum info from the activities and log it, with the ability then to see wear and tear by part, last time various maintenance tasks were performed, etc. 
+
+** Things I need to figure out here:
+- what's the best way to summarize the data?
+- do i need to define all the parts of a bike somewhere? maybe there's a bike class? then when the db is loaded, it generates objects for existing bikes, riders, etc.?
+
 * Installation/Usage Requirements
-** swagger_client 
-The app uses a package to connect to the strava api that hasn't been neatly bundled and is kind of a pain to install:
-1. Make sure Java 7.1+ is installed
-2. Make sure swagger and maven are installed
-3. Generate the package using swagger
-4. Install the package
-
-#+BEGIN_SRC bash
-  # java
-  brew cask install caskroom/versions/java8
-
-  # swagger and maven
-  brew install swagger-codegen maven
-
-  # create the package
-  swagger-codegen generate -i https://developers.strava.com/swagger/swagger.json -l python -o python_strava_package
-
-  # install the thing
-  cd python_strava_package && python3 setup.py install
-#+END_SRC
-
+** stravalib
+Just a good old =pip3.6 install --user stravalib=

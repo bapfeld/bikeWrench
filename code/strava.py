@@ -11,41 +11,44 @@ class my_db():
     def __init__(self, db_path):
         self.db_path = db_path
 
-    def insert_to_db(self, table, tb_dict):
-        # construct the command
-        command = 'insert into ' + table + '('
-        for k, v in tb_dict.items():
-            command += k + ' '
-        command = command.rstrip()
-        command += ')\nvalues('
-        for k, v in tb_dict.items():
-            command += v + ' '
-        command = command.rstrip()
-        command += ')'
-        # run the command
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(command)
-
     def strava_activity_to_db(self, activity):
-        tbl = {'id': activity.id,
-               'bike': activity.gear.id,
-               'distance': float(activity.distance),
-               'name': activity.name,
-               'moving_time': activity.moving_time.seconds,
-               'elapsed_time': activity.elapsed_time.seconds,
-               'elev': float(activity.total_elevation_gain),
-               'type': activity.type,
-               'avg_speed': float(activity.average_speed),
-               'max_speed': float(activity.max_speed),
-               'calories': float(activity.calories)}
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('insert into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories) values (?,?,?,?,?,?,?,?,?,?,?)', (activity.id, activity.gear.id, float(activity.distance), activity.name, activity.moving_time.seconds, activity.elapsed_time.seconds, float(activity.total_elevation_gain), activity.type, float(activity.average_speed), float(activity.max_speed), float(activity.calories), ))
+
+    def initialize_rides(self, activity_list):
+        a_list = [(a.id, a.gear.id, float(a.distance), a.name, a.moving_time.seconds, a.elapsed_time.seconds, float(a.total_elevation_gain), a.type, float(a.average_speed), float(a.max_speed), float(a.calories), ) for a in activity_list]
+        with sqlite3.connect(self.db_path) as conn:
+            conn.executemany('insert into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories) values (?,?,?,?,?,?,?,?,?,?,?)', a_list)
+
+    def initialize_rider(self, rider_values):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('insert into riders (name, dob, weight, fthr) values (?, ?, ?, ?)',
+                         rider_values)
+
+    def add_part(self, part_values):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('insert into parts (type, purchased, brand, price, weight, size, model, bike) values (?, ?, ?, ?, ?, ?, ?, ?)', part_values)
+
+    def add_maintenance(self, main_values):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('insert into maintenance (part, work, date) values (?, ?, ?)', main_values)
 
     def get_from_db(self, query):
         # execute the command
         with sqlite3.connect(db_filename) as conn:
             self.res = pd.read_sql_query(query, conn)
             
+    def update_rider(self):
+        # want to calculate max and avg speeds
+        pass
 
-        
+    def get_maintenance_logs(self, part, bike):
+        # get the maintenance record for a part or bike
+        pass
+
+    def calculate_totals(self, bike):
+        # calculate some summary stats for a given bike
+        pass
         
 # Let's start by building up a temporary database
 db_file = 'strava.db'
@@ -77,7 +80,22 @@ with sqlite3.connect(db_path) as conn:
         print('Database exists, assume schema does, too.')
 
 
-# Functions to interact!
-# start by creating our object
+# Try this out!
 db = my_db(db_path)
+db.strava_activity_to_db(activity)
 
+# A full path:
+db = my_db(db_path)
+# test if the database exists and if not, initialize it
+def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
+    if not os.path.exists(db_path):
+        with sqlite3.connect(db_path) as conn:
+            with open(schema_path, 'rt') as f:
+                schema = f.read()
+            conn.executescript(schema)
+    else:
+        print("It appears that a database already exists there. No action taken.")
+        return
+    rider_info = (rider_name, rider_dob, rider_weight, rider_fthr)
+    db.initialize_rider(rider_info)
+    db.initialize_rides(all_activities)
