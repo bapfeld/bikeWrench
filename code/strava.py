@@ -11,14 +11,14 @@ class my_db():
     def __init__(self, db_path):
         self.db_path = db_path
 
-    def strava_activity_to_db(self, activity):
+    def strava_activity_to_db(self, activity, rider_name):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('insert into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories) values (?,?,?,?,?,?,?,?,?,?,?)', (activity.id, activity.gear.id, float(activity.distance), activity.name, activity.moving_time.seconds, activity.elapsed_time.seconds, float(activity.total_elevation_gain), activity.type, float(activity.average_speed), float(activity.max_speed), float(activity.calories), ))
+            conn.execute('insert into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', (activity.id, activity.gear.id, float(activity.distance), activity.name, activity.moving_time.seconds, activity.elapsed_time.seconds, float(activity.total_elevation_gain), activity.type, float(activity.average_speed), float(activity.max_speed), float(activity.calories), rider_name, ))
 
-    def initialize_rides(self, activity_list):
-        a_list = [(a.id, a.gear.id, float(a.distance), a.name, a.moving_time.seconds, a.elapsed_time.seconds, float(a.total_elevation_gain), a.type, float(a.average_speed), float(a.max_speed), float(a.calories), ) for a in activity_list]
+    def initialize_rides(self, activity_list, rider_name):
+        a_list = [(a.id, a.gear.id, float(a.distance), a.name, a.moving_time.seconds, a.elapsed_time.seconds, float(a.total_elevation_gain), a.type, float(a.average_speed), float(a.max_speed), float(a.calories), rider_name, ) for a in activity_list]
         with sqlite3.connect(self.db_path) as conn:
-            conn.executemany('insert into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories) values (?,?,?,?,?,?,?,?,?,?,?)', a_list)
+            conn.executemany('insert into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
 
     def initialize_rider(self, rider_values):
         with sqlite3.connect(self.db_path) as conn:
@@ -35,12 +35,21 @@ class my_db():
 
     def get_from_db(self, query):
         # execute the command
-        with sqlite3.connect(db_filename) as conn:
+        with sqlite3.connect(db_path) as conn:
             self.res = pd.read_sql_query(query, conn)
             
-    def update_rider(self):
+    def get_all_ride_data(self, rider_id):
+        query = "select * from rides where rider=%s" % rider_id
+        with sqlite3.connect(self.db_path) as conn:
+            self.all_rides = pd.read_sql_query(query, conn)
+            
+    def update_rider(self, rider_id):
         # want to calculate max and avg speeds
-        pass
+        self.get_all_ride_data(rider_id)
+        ms = self.all_rides['max_speed'].max()
+        av = self.all_rides['avg_speed'].max()
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('update riders set max_speed = ?, avg_speed = ? where name = ?', (ms, av, rider_id))
 
     def get_maintenance_logs(self, part, bike):
         # get the maintenance record for a part or bike
@@ -86,6 +95,7 @@ db.strava_activity_to_db(activity)
 
 # A full path:
 db = my_db(db_path)
+rider_name = "Brendan"
 # test if the database exists and if not, initialize it
 def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
     if not os.path.exists(db_path):
@@ -98,4 +108,4 @@ def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
         return
     rider_info = (rider_name, rider_dob, rider_weight, rider_fthr)
     db.initialize_rider(rider_info)
-    db.initialize_rides(all_activities)
+    db.initialize_rides(all_activities, rider_name)
