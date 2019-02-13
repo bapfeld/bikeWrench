@@ -27,7 +27,13 @@ class my_db():
 
     def add_part(self, part_values):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('insert into parts (type, purchased, brand, price, weight, size, model, bike) values (?, ?, ?, ?, ?, ?, ?, ?)', part_values)
+            conn.execute('insert into parts (type, purchased, brand, price, weight, size, model, bike, inuse) values (?, ?, ?, ?, ?, ?, ?, ?, True)', part_values)
+
+    def replace_part(self, part_values, old_part=None):
+        self.add_part(part_values)
+        if old_part is not None:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute('update parts set inuse = False where id=old_part')
 
     def add_maintenance(self, main_values):
         with sqlite3.connect(self.db_path) as conn:
@@ -51,13 +57,28 @@ class my_db():
         with sqlite3.connect(self.db_path) as conn:
             conn.execute('update riders set max_speed = ?, avg_speed = ? where name = ?', (ms, av, rider_id))
 
-    def get_maintenance_logs(self, part, bike):
+    def get_maintenance_logs(self, part=None, bike=None, date=None):
         # get the maintenance record for a part or bike
-        pass
+        if part is not None:
+            if date is not None:
+                query = "select * from parts where part=%s and date>=%s" %(part, date)
+            else:
+                query = "select * from parts where part=%s" %part
+        else if bike is not None:
+            if date is not None:
+                query = "select * from parts where bike=%s and date>=%s" %(bike, date)
+            else:
+                query = "select * from parts where bike=%s" %bike
+        else if date is not None:
+            query = "select * from parts where date >= %s" %date
+        with sqlite3.connect(self.db_path) as conn:
+            self.maintenance = pd.read_sql_query(query, conn)
 
     def calculate_totals(self, bike):
         # calculate some summary stats for a given bike
-        pass
+        q1 = "select * from parts where bike=%s" %bike
+        q2 = "select * from maintenance where bike=%s" %bike
+        q3 = "select distance, elev, moving_time, elapsed_time from rides where bike=%s"
         
 # Let's start by building up a temporary database
 db_file = 'strava.db'
