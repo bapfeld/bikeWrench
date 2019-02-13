@@ -41,8 +41,9 @@ class my_db():
 
     def get_from_db(self, query):
         # execute the command
-        with sqlite3.connect(db_path) as conn:
-            self.res = pd.read_sql_query(query, conn)
+        with sqlite3.connect(self.db_path) as conn:
+            res = pd.read_sql_query(query, conn)
+        return res
             
     def get_all_ride_data(self, rider_id):
         query = "select * from rides where rider=%s" % rider_id
@@ -56,6 +57,14 @@ class my_db():
         av = self.all_rides['avg_speed'].max()
         with sqlite3.connect(self.db_path) as conn:
             conn.execute('update riders set max_speed = ?, avg_speed = ? where name = ?', (ms, av, rider_id))
+
+    def update_bike(self, bike):
+        query = 'select distance, elev from rides where bike=%s' %bike
+        r = get_from_db(query)
+        dist = r['distance'].sum()
+        elev = r['elev'].sum()
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('update bikes set total_mi = ?, total_elev = ? where name=?', (dist, elev, bike))
 
     def get_maintenance_logs(self, part=None, bike=None, date=None):
         # get the maintenance record for a part or bike
@@ -79,6 +88,20 @@ class my_db():
         q1 = "select * from parts where bike=%s" %bike
         q2 = "select * from maintenance where bike=%s" %bike
         q3 = "select distance, elev, moving_time, elapsed_time from rides where bike=%s"
+
+    def add_bike(self, bike_values):
+        # add a new bike manually
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('insert into bikes (id, name, color, purchased, price, rider) values (?, ?, ?, ?, ?, ?)' bike_values)
+
+    def auto_add_bikes(self):
+        with sqlite3.connect(self.db_path) as conn:
+            bike_list = pd.read_sql_query('select distinct bike from rides', conn)
+            current_bike_list = pd.read_sql_query('select id from bikes', conn)
+            new_bikes = [x for x in bike_list not in current_bike_list]
+            if len(new_bikes) > 0:
+                for bike in new_bikes:
+                    conn.execute('insert into bikes (id) values (?)', (bike))
         
 # Let's start by building up a temporary database
 db_file = 'strava.db'
