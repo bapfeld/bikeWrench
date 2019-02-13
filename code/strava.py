@@ -11,11 +11,11 @@ class my_db():
     def __init__(self, db_path):
         self.db_path = db_path
 
-    def strava_activity_to_db(self, activity, rider_name):
+    def add_ride(self, activity, rider_name):
         with sqlite3.connect(self.db_path) as conn:
             conn.execute('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', (activity.id, activity.gear.id, float(activity.distance), activity.name, activity.moving_time.seconds, activity.elapsed_time.seconds, float(activity.total_elevation_gain), activity.type, float(activity.average_speed), float(activity.max_speed), float(activity.calories), rider_name, ))
 
-    def initialize_rides(self, activity_list, rider_name):
+    def add_multiple_rides(self, activity_list, rider_name):
         a_list = [(a.id, a.gear.id, float(a.distance), a.name, a.moving_time.seconds, a.elapsed_time.seconds, float(a.total_elevation_gain), a.type, float(a.average_speed), float(a.max_speed), float(a.calories), rider_name, ) for a in activity_list]
         with sqlite3.connect(self.db_path) as conn:
             conn.executemany('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
@@ -44,6 +44,10 @@ class my_db():
         with sqlite3.connect(self.db_path) as conn:
             res = pd.read_sql_query(query, conn)
         return res
+    
+    def edit_entry(self, sql, values):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(sql, values)
             
     def get_all_ride_data(self, rider_id):
         query = "SELECT * from rides WHERE rider=%s" % rider_id
@@ -152,4 +156,4 @@ def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
         return
     rider_info = (rider_name, rider_dob, rider_weight, rider_fthr)
     db.initialize_rider(rider_info)
-    db.initialize_rides(all_activities, rider_name)
+    db.add_multiple_rides_rides(all_activities, rider_name)
