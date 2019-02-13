@@ -46,7 +46,8 @@ create table parts (
     weight       real,
     size         text,
     model        text,
-    bike         text not null references bikes(name)
+    bike         text not null references bikes(name),
+    inuse        text
 );
 
 -- Maintenance tasks record things that happen to parts
