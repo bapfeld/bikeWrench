@@ -17,7 +17,9 @@ create table bikes (
     color       text,
     purchased   date,
     price       real,
-    rider       text not null references rider(name)
+    rider       text not null references rider(name),
+    total_mi    real,
+    total_elev  real
 );
 
 -- Rides record data about a bike ride
