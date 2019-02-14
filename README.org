@@ -11,9 +11,21 @@ Create an app that will keep track of wear and tear on components
 * Maintenance App
 The idea here is to create a lightweight way to track maintenance. I want to limit external dependencies and basically just get the minimum info from the activities and log it, with the ability then to see wear and tear by part, last time various maintenance tasks were performed, etc. 
 
-** Things I need to figure out here:
-- what's the best way to summarize the data?
-- do i need to define all the parts of a bike somewhere? maybe there's a bike class? then when the db is loaded, it generates objects for existing bikes, riders, etc.?
+** List of functions to include
+- [X] Add/edit rider 
+- [X] Add/edit bike
+- [X] Add ride
+- [X] Add/replace part
+- [X] Add maintenance record
+- [ ] Calculate miles on individual parts
+- [ ] Calculate miles on bike as a whole
+- [X] Calculate total miles for a rider
+- [X] Fetch new rides from strava 
+
+** Other concerns
+- [ ] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
+- [ ] time format for testing if activities are new
+- [ ] How best to store the secret stuff?
 
 * Installation/Usage Requirements
 ** stravalib

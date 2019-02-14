@@ -10,6 +10,7 @@ class my_db():
     """
     def __init__(self, db_path):
         self.db_path = db_path
+        self.get_all_ride_ids()
 
     def add_ride(self, activity, rider_name):
         with sqlite3.connect(self.db_path) as conn:
@@ -52,6 +53,10 @@ class my_db():
         query = "SELECT * from rides WHERE rider=%s" % rider_id
         with sqlite3.connect(self.db_path) as conn:
             self.all_rides = pd.read_sql_query(query, conn)
+
+    def get_all_ride_ids(self, rider_id):
+        query = "SELECT id from rides WHERE rider=%s" % rider_id
+        self.all_ride_ids = get_from_db(query)
             
     def update_rider(self, rider_id):
         # want to calculate max and avg speeds
@@ -106,6 +111,40 @@ class my_db():
                 for bike in new_bikes:
                     conn.execute('INSERT into bikes (id) values (?)', (bike))
         
+# And a class to connect to strava and get that data
+class strava(stravalib.client.Client):
+    """Class to connect to strava using stravalib and update ride data. Inherits from stravalib.client.Client
+
+    """
+    def __init__(self, id_list, ini_path):
+        super(strava, self).__init__()
+        self.id_list = id_list
+        self.ini_path = ini_path
+        self.client = Client()
+        self.gen_secrets()
+
+    def gen_secrets(self):
+        config = configparser.ConfigParser()
+        config.read(ini_path)
+        code = config['Strava']['code']
+        token_response = self.client.exchange_code_for_token(client_id=10185,
+                                                        client_secret=config['Strava']['client_secret'],
+                                                        code=code)
+        self.client.access_token = token_response['access_token']
+        self.client.refresh_token = token_response['refresh_token']
+        self.client.expires_at = token_response['expires_at']
+
+    def fetch_new_activities(self):
+        activity_list = self.client.get_activities()
+        if self.id_list is not None:
+            self.new_id_list = [x.id for x in activity_list if x.id not in self.id_list]
+        else:
+            self.new_id_list = [x.id for x in activity_list]
+        if len(self.new_id_list) > 0:
+            self.new_activities = [self.client.get_activity(id) for id in self.new_id_list]
+        else:
+            self.new_activities = None
+
 # Let's start by building up a temporary database
 db_file = 'strava.db'
 db_path = os.path.expanduser('~/strava/data/' + db_file)
@@ -156,3 +195,13 @@ def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
     rider_info = (rider_name, rider_dob, rider_weight, rider_fthr)
     db.initialize_rider(rider_info)
     db.add_multiple_rides_rides(all_activities, rider_name)
+
+def main():
+    # Initialize everything
+    db = my_db(db_path)
+    st = strava(db.all_ride_ids['id'], ini_path) # need to define ini_path somewhere
+
+    # Now update
+    st.fetch_new_activities()
+    if st.new_activities is not None:
+        db.add_multiple_rides(st.new_activities, rider_name) # need to define rider_name somewhere
