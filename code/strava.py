@@ -58,8 +58,9 @@ class my_db():
         self.get_all_ride_data(rider_id)
         ms = self.all_rides['max_speed'].max()
         av = self.all_rides['avg_speed'].max()
-        sql = 'UPDATE riders SET max_speed = ?, avg_speed = ? WHERE name = ?'
-        self.edit_entry(sql, (ms, av, rider_id))
+        tot = self.all_rides['distance'].sum()
+        sql = 'UPDATE riders SET max_speed = ?, avg_speed = ?, total_dist = ? WHERE name = ?'
+        self.edit_entry(sql, (ms, av, tot, rider_id))
         
     def update_bike(self, bike):
         query = 'SELECT distance, elev from rides WHERE bike=%s' %bike

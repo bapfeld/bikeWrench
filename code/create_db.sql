@@ -7,7 +7,8 @@ create table riders (
     weight     integer,
     fthr       integer,
     max_speed  real,
-    avg_speed  real
+    avg_speed  real,
+    total_dist real
 );
 
 -- Bikes belong to riders
