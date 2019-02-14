@@ -40,7 +40,6 @@ class my_db():
             conn.execute('INSERT into maintenance (part, work, date) values (?, ?, ?)', main_values)
 
     def get_from_db(self, query):
-        # execute the command
         with sqlite3.connect(self.db_path) as conn:
             res = pd.read_sql_query(query, conn)
         return res
@@ -59,17 +58,17 @@ class my_db():
         self.get_all_ride_data(rider_id)
         ms = self.all_rides['max_speed'].max()
         av = self.all_rides['avg_speed'].max()
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute('UPDATE riders SET max_speed = ?, avg_speed = ? WHERE name = ?', (ms, av, rider_id))
-
+        sql = 'UPDATE riders SET max_speed = ?, avg_speed = ? WHERE name = ?'
+        self.edit_entry(sql, (ms, av, rider_id))
+        
     def update_bike(self, bike):
         query = 'SELECT distance, elev from rides WHERE bike=%s' %bike
         r = get_from_db(query)
         dist = r['distance'].sum()
         elev = r['elev'].sum()
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute('UPDATE bikes SET total_mi = ?, total_elev = ? WHERE name=?', (dist, elev, bike))
-
+        sql = 'UPDATE bikes SET total_mi = ?, total_elev = ? WHERE name=?'
+        self.edit_entry(sql, (dist, elev, bike))
+        
     def get_maintenance_logs(self, part=None, bike=None, date=None):
         # get the maintenance record for a part or bike
         if part is not None:
@@ -84,8 +83,7 @@ class my_db():
                 query = "SELECT * from parts WHERE bike=%s" %bike
         else if date is not None:
             query = "SELECT * from parts WHERE date >= %s" %date
-        with sqlite3.connect(self.db_path) as conn:
-            self.maintenance = pd.read_sql_query(query, conn)
+        self.maintenance = self.get_from_db(query)
 
     def calculate_totals(self, bike):
         # calculate some summary stats for a given bike
