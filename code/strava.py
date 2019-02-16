@@ -124,7 +124,7 @@ class strava():
 
     def gen_secrets(self):
         config = configparser.ConfigParser()
-        config.read(ini_path)
+        config.read(self.ini_path)
         code = config['Strava']['code']
         token_response = self.client.exchange_code_for_token(client_id=10185,
                                                         client_secret=config['Strava']['client_secret'],
@@ -181,6 +181,7 @@ db.strava_activity_to_db(activity)
 # A full path:
 db = my_db(db_path)
 rider_name = "Brendan"
+ini_path = os.path.expanduser('~/strava/code/strava.ini')
 # test if the database exists and if not, initialize it
 def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
     if not os.path.exists(db_path):
@@ -198,7 +199,8 @@ def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
 def main():
     # Initialize everything
     db = my_db(db_path, rider_name)
-    st = strava(db.all_ride_ids['id'], ini_path) # need to define ini_path somewhere
+    cl = Client()
+    st = strava(cl, db.all_ride_ids['id'], ini_path) # need to define ini_path somewhere
 
     # Now update
     st.fetch_new_activities()
