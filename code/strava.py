@@ -8,9 +8,9 @@ class my_db():
     """Class to operate on a database
 
     """
-    def __init__(self, db_path):
+    def __init__(self, db_path, rider_id):
         self.db_path = db_path
-        self.get_all_ride_ids()
+        self.get_all_ride_ids(rider_id)
 
     def add_ride(self, activity, rider_name):
         with sqlite3.connect(self.db_path) as conn:
@@ -56,7 +56,7 @@ class my_db():
 
     def get_all_ride_ids(self, rider_id):
         query = "SELECT id from rides WHERE rider=%s" % rider_id
-        self.all_ride_ids = get_from_db(query)
+        self.all_ride_ids = self.get_from_db(query)
             
     def update_rider(self, rider_id):
         # want to calculate max and avg speeds
@@ -69,7 +69,7 @@ class my_db():
         
     def update_bike(self, bike):
         query = 'SELECT distance, elev from rides WHERE bike=%s' %bike
-        r = get_from_db(query)
+        r = self.get_from_db(query)
         dist = r['distance'].sum()
         elev = r['elev'].sum()
         sql = 'UPDATE bikes SET total_mi = ?, total_elev = ? WHERE name=?'
@@ -117,7 +117,6 @@ class strava():
 
     """
     def __init__(self, stravalib_client, id_list, ini_path):
-        super(strava, self).__init__()
         self.id_list = id_list
         self.ini_path = ini_path
         self.client = stravalib_client
@@ -198,7 +197,7 @@ def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
 
 def main():
     # Initialize everything
-    db = my_db(db_path)
+    db = my_db(db_path, rider_name)
     st = strava(db.all_ride_ids['id'], ini_path) # need to define ini_path somewhere
 
     # Now update
