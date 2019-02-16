@@ -21,7 +21,7 @@ class my_db():
             try:
                 out = x.gear.id
             except AttributeError:
-                out = None
+                out = 'Unknown'
             return out
         a_list = [(a.id, gear_try(a), float(a.distance), a.name, a.moving_time.seconds, a.elapsed_time.seconds, float(a.total_elevation_gain), a.type, float(a.average_speed), float(a.max_speed), float(a.calories), rider_name, ) for a in activity_list]
         with sqlite3.connect(self.db_path) as conn:
