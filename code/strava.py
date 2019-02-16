@@ -34,7 +34,7 @@ class my_db():
         self.add_part(part_values)
         if old_part is not None:
             with sqlite3.connect(self.db_path) as conn:
-                conn.execute('UPDATE parts SET inuse = False WHERE id=old_part')
+                conn.execute('UPDATE parts SET inuse = False WHERE id=?', (old_part))
 
     def add_maintenance(self, main_values):
         with sqlite3.connect(self.db_path) as conn:
@@ -50,12 +50,12 @@ class my_db():
             conn.execute(sql, values)
             
     def get_all_ride_data(self, rider_id):
-        query = "SELECT * from rides WHERE rider=%s" % rider_id
+        query = "SELECT * from rides WHERE rider='%s'" % rider_id
         with sqlite3.connect(self.db_path) as conn:
             self.all_rides = pd.read_sql_query(query, conn)
 
     def get_all_ride_ids(self, rider_id):
-        query = "SELECT id from rides WHERE rider=%s" % rider_id
+        query = "SELECT id from rides WHERE rider='%s'" % rider_id
         self.all_ride_ids = self.get_from_db(query)
             
     def update_rider(self, rider_id):
@@ -68,7 +68,7 @@ class my_db():
         self.edit_entry(sql, (ms, av, tot, rider_id))
         
     def update_bike(self, bike):
-        query = 'SELECT distance, elev from rides WHERE bike=%s' %bike
+        query = "SELECT distance, elev from rides WHERE bike='%s'" %bike
         r = self.get_from_db(query)
         dist = r['distance'].sum()
         elev = r['elev'].sum()
@@ -79,23 +79,23 @@ class my_db():
         # get the maintenance record for a part or bike
         if part is not None:
             if date is not None:
-                query = "SELECT * from parts WHERE part=%s AND date>=%s" %(part, date)
+                query = "SELECT * from parts WHERE part='%s' AND date>='%s'" %(part, date)
             else:
-                query = "SELECT * from parts WHERE part=%s" %part
+                query = "SELECT * from parts WHERE part='%s'" %part
         elif bike is not None:
             if date is not None:
-                query = "SELECT * from parts WHERE bike=%s AND date>=%s" %(bike, date)
+                query = "SELECT * from parts WHERE bike='%s' AND date>='%s'" %(bike, date)
             else:
-                query = "SELECT * from parts WHERE bike=%s" %bike
+                query = "SELECT * from parts WHERE bike='%s'" %bike
         elif date is not None:
-            query = "SELECT * from parts WHERE date >= %s" %date
+            query = "SELECT * from parts WHERE date >= '%s'" %date
         self.maintenance = self.get_from_db(query)
 
     def calculate_totals(self, bike):
         # calculate some summary stats for a given bike
-        q1 = "SELECT * from parts WHERE bike=%s" %bike
-        q2 = "SELECT * from maintenance WHERE bike=%s" %bike
-        q3 = "SELECT distance, elev, moving_time, elapsed_time from rides WHERE bike=%s"
+        q1 = "SELECT * from parts WHERE bike='%s'" %bike
+        q2 = "SELECT * from maintenance WHERE bike='%s'" %bike
+        q3 = "SELECT distance, elev, moving_time, elapsed_time from rides WHERE bike='%s'"
 
     def add_bike(self, bike_values):
         # add a new bike manually
