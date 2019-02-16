@@ -82,12 +82,12 @@ class my_db():
                 query = "SELECT * from parts WHERE part=%s AND date>=%s" %(part, date)
             else:
                 query = "SELECT * from parts WHERE part=%s" %part
-        else if bike is not None:
+        elif bike is not None:
             if date is not None:
                 query = "SELECT * from parts WHERE bike=%s AND date>=%s" %(bike, date)
             else:
                 query = "SELECT * from parts WHERE bike=%s" %bike
-        else if date is not None:
+        elif date is not None:
             query = "SELECT * from parts WHERE date >= %s" %date
         self.maintenance = self.get_from_db(query)
 
@@ -100,7 +100,7 @@ class my_db():
     def add_bike(self, bike_values):
         # add a new bike manually
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('INSERT into bikes (id, name, color, purchased, price, rider) values (?, ?, ?, ?, ?, ?)' bike_values)
+            conn.execute('INSERT into bikes (id, name, color, purchased, price, rider) values (?, ?, ?, ?, ?, ?)', bike_values)
 
     def auto_add_bikes(self):
         with sqlite3.connect(self.db_path) as conn:
