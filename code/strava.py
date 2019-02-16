@@ -112,15 +112,15 @@ class my_db():
                     conn.execute('INSERT into bikes (id) values (?)', (bike))
         
 # And a class to connect to strava and get that data
-class strava(stravalib.client.Client):
+class strava():
     """Class to connect to strava using stravalib and update ride data. Inherits from stravalib.client.Client
 
     """
-    def __init__(self, id_list, ini_path):
+    def __init__(self, stravalib_client, id_list, ini_path):
         super(strava, self).__init__()
         self.id_list = id_list
         self.ini_path = ini_path
-        self.client = Client()
+        self.client = stravalib_client
         self.gen_secrets()
 
     def gen_secrets(self):
