@@ -5,7 +5,7 @@
 from stravalib.client import Client
 import configparser
 import sqlite3
-import os, sys
+import os, sys, re
 import pandas as pd
 
 ###########################################
@@ -19,9 +19,9 @@ class my_db():
         self.db_path = db_path
         self.get_all_ride_ids(rider_id)
 
-    def add_ride(self, activity, rider_name):
+    def add_ride(self, ride_info):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', (activity.id, activity.gear.id, float(activity.distance), activity.name, activity.moving_time.seconds, activity.elapsed_time.seconds, float(activity.total_elevation_gain), activity.type, float(activity.average_speed), float(activity.max_speed), float(activity.calories), rider_name, ))
+            conn.execute('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', ride_info)
 
     def add_multiple_rides(self, activity_list, rider_name):
         def gear_try(x):
@@ -70,6 +70,10 @@ class my_db():
     def get_all_ride_ids(self, rider_id):
         query = "SELECT id from rides WHERE rider='%s'" % rider_id
         self.all_ride_ids = self.get_from_db(query)
+
+    def get_all_bike_ids(self):
+        query = "SELECT id, name from bikes"
+        self.all_bike_ids = self.get_from_db(query)
             
     def update_rider(self, rider_id):
         # want to calculate max and avg speeds
@@ -123,6 +127,23 @@ class my_db():
             if len(new_bikes) > 0:
                 for bike in new_bikes:
                     conn.execute('INSERT into bikes (id) values (?)', (bike))
+
+    def get_rider_name(self):
+        query = 'select name from riders'
+        rider_name = self.get_from_db(query)
+        rider_name = rider_name['name']
+
+    def gen_ride_id(self):
+        self.get_all_ride_ids()
+        ride_ids = [str(x) for x in self.all_ride_ids]
+        ride_ids = '--'.join(ride_ids)
+        ids = re.findall(r'(?:^|-)(\d{1,3})(?:-|$)', ride_ids)
+        if len(ids) > 0:
+            ids = [int(x) for x in ids]
+            new_id = max(ids) + 1
+            return new_id
+        else:
+            return 1
         
 ###########################################
 # Strava class
@@ -164,18 +185,83 @@ class strava():
 # Create the database
 ###########################################
 def create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_fthr):
-    db_is_new = not os.path.exists(db_path)
-    if not os.path.exists(db_path):
-        with sqlite3.connect(db_path) as conn:
-            with open(schema_path, 'rt') as f:
-                schema = f.read()
-            conn.executescript(schema)
-    else:
-        print("It appears that a database already exists there. No action taken.")
-        return
+    with sqlite3.connect(db_path) as conn:
+        with open(schema_path, 'rt') as f:
+            schema = f.read()
+        conn.executescript(schema)
     rider_info = (rider_name, rider_dob, rider_weight, rider_fthr)
     db.initialize_rider(rider_info)
-    db.add_multiple_rides_rides(all_activities, rider_name)
+
+###########################################
+# Main interaction functions
+###########################################
+def selection_function(list_options):
+    while True:
+        try:
+            global selection
+            selection = int(input('Make a selection: '))
+            if selection not in list_options:
+                raise ValueError()
+            break
+        except ValueError:
+            print("Invalid selection. You must enter an integer from the menu list")
+    return
+
+def subselection_function(list_options):
+    while True:
+        try:
+            global subselection
+            subselection = int(input('Make a selection: '))
+            if subselection not in list_options:
+                raise ValueError()
+            break
+        except ValueError:
+            print("Invalid selection. You must enter an integer from the menu list")
+    return
+
+def show_main_menu():
+    print('Actions: ')
+    print('(1): Get new rides')
+    print('(2): Rider actions')
+    print('(3): Bike actions')
+    print('(4): Parts actions')
+    print('(5): Ride actions')
+    print('(6): Exit')
+
+def show_rider_menu():
+    print('Rider actions: ')
+    print('(1): Update rider stats')
+    print('(2): Edit rider')
+    print('(3): Return to main menu')
+
+def show_bike_menu():
+    print('Bike menu: ')
+    print('(1): Update bike stats')
+    print('(2): Edit bike')
+    print('(3): Return to main menu')
+
+def show_parts_menu():
+    print('Parts actions: ')
+    print('(1): Get part stats')
+    print('(2): Maintain part')
+    print('(3): Replace part')
+    print('(4): Return to main menu')
+
+def show_ride_menu():
+    print('Ride actions: ')
+    print('(1): Add manual ride')
+    print('(2): Return to main menu')
+
+def startup(db_path, schema_path):
+    db_is_new = not os.path.exists(db_path)
+    if db_is_new:
+        print("Initializing a new database")
+        rider_name = input('Rider name: ')
+        rider_dob = input('Rider DOB: ')
+        rider_weight = input('Rider weight: ')
+        rider_fthr = input('Rider Functional Threshold Heart Rate: ')
+        create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_fthr)
+
 
 ###########################################
 # Main
@@ -183,14 +269,117 @@ def create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_f
 
 def main():
     # Initialize everything
+    startup(db_path, schema_path)
     db = my_db(db_path, rider_name)
     cl = Client()
     st = strava(cl, db.all_ride_ids['id'], ini_path) # need to define ini_path somewhere
-
-    # Now update
-    st.fetch_new_activities()
-    if st.new_activities is not None:
-        db.add_multiple_rides(st.new_activities, rider_name) # need to define rider_name somewhere
+    while True:
+        # Fetch rider name
+        rider_name = db.get_rider_name()
+        show_main_menu()
+        selection_function(list(range(1, 7)))
+        # take action based on input
+        if selection == 1:
+            # Option 1: update rides from strava
+            # Update the ride database
+            st.fetch_new_activities()
+            if st.new_activities is not None:
+                db.add_multiple_rides(st.new_activities, rider_name)
+        elif selection == 2:
+            # Rider actions
+            show_rider_menu()
+            subselection_function(list(range(1, 4)))
+            if subselection == 1:
+                # update rider stats
+                db.update_rider(rider_name)
+                print("New Rider Info: ")
+                rd = db.get_from_db('select * from riders')
+                rd = rd.to_dict('records')[0]
+                print('Name: ', rd['name'])
+                print('Global Max Speed: ', rd['max_speed'])
+                print('Global Average Speed: ', rd['avg_speed'])
+                print('Global Total Distance: ', rd['total_dist'])
+            elif subselection == 2:
+                # edit rider
+                rd = db.get_from_db('select * from riders')
+                rd = rd.to_dict('records')[0]
+                print("Current rider info: ")
+                print("Name: ", rd['name'])
+                print("DOB: ", rd['dob'])
+                print("Weight: ", rd['weight'])
+                print("Functional Threshold Heart Rate: ", rd['fthr'])
+                nm = input("New name: ")
+                if nm == '':
+                    nm = rd['name']
+                dob = input("New DOB: ")
+                if dob == '':
+                    dob = rd['dob']
+                wt = input("New weight: ")
+                if wt == '':
+                    wt = rd['weight']
+                hr = input("New Functional Threshold Heart Rate: ")
+                if hr == '':
+                    hr = rd['fthr']
+                db.edit_entry('UPDATE riders SET name = ?, dob = ?, weight = ?, fthr = ? WHERE name = ?', (nm, dob, wt, fthr, rider_name))
+            elif subselection == 3:
+                # return to main menu
+                pass
+        elif selection == 3:
+            # Bike actions
+            show_bike_menu()
+            subselection_function(list(range(1, 4)))
+            if subselection == 1:
+                # update bike stats
+                pass
+            elif subselection == 2:
+                # edit bike
+                pass
+            elif subselection == 3:
+                # exit to main menu
+                pass
+        elif selection == 4:
+            # Parts actions
+            show_parts_menu()
+            subselection_function(list(range(5)))
+            # i will need to do some general printing of part ids here, i think
+            if subselection == 1:
+                # get part stats
+                pass
+            elif subselection == 2:
+                # maintain parts
+                pass
+            elif subselection == 3:
+                # replace parts
+                pass
+            elif subselection == 4:
+                # return to main menu
+                pass
+        elif selection == 5:
+            # Ride options
+            show_ride_menu()
+            subselection_function(list(range(1, 3)))
+            if subselection == 1:
+                print("Adding a new manual entry. Input required.")
+                ride_id = db.gen_ride_id()
+                bike = input('Bike used: ')
+                distance = int(input('Distance: '))
+                name = input('Ride name: ')
+                moving_time = float(input('Moving time: '))
+                elapsed_time = float(input('Elapsed time: '))
+                elev = float(input('Elevation gain: '))
+                ride_type = input('Ride type: ')
+                avg_speed = distance / moving_time
+                max_speed = 0
+                calories = 0
+                ride_info = (ride_id, bike, distance, name, moving_time, elapsed_time, elev, ride_type, avg_speed, max_speed, calories, rider_name)
+                db.add_ride(ride_info)
+            elif subselection == 2:
+                # return to the main menu
+                pass
+        elif selection == 6:
+            # exit option
+            break
+    
 
 ###########################################
 # Temporary values
