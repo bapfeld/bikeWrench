@@ -21,12 +21,15 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [ ] Calculate miles on bike as a whole
 - [X] Calculate total miles for a rider
 - [X] Fetch new rides from strava 
+- [ ] Calculate wear on parts not in use
 
 ** Other concerns
 - [ ] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
 - [ ] time format for testing if activities are new
 - [ ] How best to store the secret stuff?
 - [ ] How to deal with alphanumeric ids and something intelligible?
+- [ ] Now that I've switched to a single rider database, do i need the link to bikes?
+- [ ] Rides don't currently have dates
 
 * Installation/Usage Requirements
 ** stravalib

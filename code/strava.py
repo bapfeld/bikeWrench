@@ -242,10 +242,11 @@ def show_bike_menu():
 
 def show_parts_menu():
     print('Parts actions: ')
-    print('(1): Get part stats')
-    print('(2): Maintain part')
-    print('(3): Replace part')
-    print('(4): Return to main menu')
+    print('(1): Get individual part stats')
+    print('(2): Get all parts stats')
+    print('(3): Maintain part')
+    print('(4): Replace part')
+    print('(5): Return to main menu')
 
 def show_ride_menu():
     print('Ride actions: ')
@@ -372,19 +373,47 @@ def main():
                 pass
         elif selection == 4:
             # Parts actions
+            # first, show bike list and ask which bike to list parts for
+            db.get_all_bike_ids()
+            print('Current list of bikes in database: ', ' '.join(db.all_bike_ids['name']))
+            b = input("Which bike do you want to see parts for? Enter 'all' for all bike parts: ")
+            u = input("Do you want to see all bike parts (a) or only those current in use (c)?")
+            if b == 'all':
+                if u == "a":
+                    parts = db.get_from_db('SELECT * from parts')
+                else:
+                    parts = db.get_from_db('SELECT * from parts WHERE inuse=True')
+            else:
+                if u == "a":
+                    parts = db.get_from_db('SELECT * from parts WHERE bike = ?', (b))
+                else:
+                    parts = db.get_from_db('SELECT * from parts WHERE bike=? AND inuse=True', (b))
+            if parts.shape[0] == 0:
+                print("No parts found")
+            else:
+                print("The following parts meet your search: ")
+                for index, row in parts.iterrows():
+                    print(row['id'], ": ", row['type'])
+            
             show_parts_menu()
-            subselection_function(list(range(5)))
-            # i will need to do some general printing of part ids here, i think
+            subselection_function(list(range(1, 6)))
             if subselection == 1:
                 # get part stats
-                pass
+                p = int(input("Part id: "))
+                b = parts['bike'].where(id == p)
+                # need to generate some dates here
+                # this is where i left off
+                pt = db.get_from_db('SELECT distance, elapsed_time, elev from rides WHERE bike=? AND date IN ?', (b, dates))
             elif subselection == 2:
-                # maintain parts
+                # get all parts stats
                 pass
             elif subselection == 3:
-                # replace parts
+                # maintain parts
                 pass
             elif subselection == 4:
+                # replace parts
+                pass
+            elif subselection == 5:
                 # return to main menu
                 pass
         elif selection == 5:
