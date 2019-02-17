@@ -1,9 +1,16 @@
+###########################################
+# Imports
+###########################################
+
 from stravalib.client import Client
 import configparser
 import sqlite3
 import os, sys
 import pandas as pd
 
+###########################################
+# Database Class
+###########################################
 class my_db():
     """Class to operate on a database
 
@@ -117,7 +124,10 @@ class my_db():
                 for bike in new_bikes:
                     conn.execute('INSERT into bikes (id) values (?)', (bike))
         
-# And a class to connect to strava and get that data
+###########################################
+# Strava class
+###########################################
+
 class strava():
     """Class to connect to strava using stravalib and update ride data. Inherits from stravalib.client.Client
 
@@ -150,46 +160,11 @@ class strava():
         else:
             self.new_activities = None
 
-# Let's start by building up a temporary database
-db_file = 'strava.db'
-db_path = os.path.expanduser('~/strava/data/' + db_file)
-schema_file = 'create_db.sql'
-schema_path = os.path.expanduser('~/strava/code/' + schema_file)
-db_is_new = not os.path.exists(db_path)
-
-with sqlite3.connect(db_path) as conn:
-    if db_is_new:
-        print('Creating schema')
-        with open(schema_path, 'rt') as f:
-            schema = f.read()
-        conn.executescript(schema)
-
-        print('inserting initial data')
-        
-        conn.execute("""
-        INSERT into riders (name, dob, weight, fthr)
-        values ('Brendan', '1988-06-06', '165', '190')
-        """)
-        
-        conn.execute("""
-        INSERT into bikes (id, name, color, purchased, price, rider)
-        values ('b3671458', 'SuperSix Evo', 'Black and Green', '2016-01-03', '1800', 'Brendan')
-        """)
-        
-    else:
-        print('Database exists, assume schema does, too.')
-
-
-# Try this out!
-db = my_db(db_path)
-db.strava_activity_to_db(activity)
-
-# A full path:
-db = my_db(db_path)
-rider_name = "Brendan"
-ini_path = os.path.expanduser('~/strava/code/strava.ini')
-# test if the database exists and if not, initialize it
-def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
+###########################################
+# Create the database
+###########################################
+def create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_fthr):
+    db_is_new = not os.path.exists(db_path)
     if not os.path.exists(db_path):
         with sqlite3.connect(db_path) as conn:
             with open(schema_path, 'rt') as f:
@@ -202,6 +177,10 @@ def initialize_db(db_path, rider_name, rider_dob, rider_weight, rider_fthr):
     db.initialize_rider(rider_info)
     db.add_multiple_rides_rides(all_activities, rider_name)
 
+###########################################
+# Main
+###########################################
+
 def main():
     # Initialize everything
     db = my_db(db_path, rider_name)
@@ -212,3 +191,14 @@ def main():
     st.fetch_new_activities()
     if st.new_activities is not None:
         db.add_multiple_rides(st.new_activities, rider_name) # need to define rider_name somewhere
+
+###########################################
+# Temporary values
+###########################################
+# Let's start by building up a temporary database
+db_file = 'strava.db'
+db_path = os.path.expanduser('~/strava/data/' + db_file)
+schema_file = 'create_db.sql'
+schema_path = os.path.expanduser('~/strava/code/' + schema_file)
+initial_rider_vals = ('Brendan', '6-6-88', '165', '190')
+ini_path = os.path.expanduser('~/strava/code/strava.ini')
