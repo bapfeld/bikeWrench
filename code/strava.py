@@ -330,10 +330,43 @@ def main():
             subselection_function(list(range(1, 4)))
             if subselection == 1:
                 # update bike stats
-                pass
+                db.get_all_bike_ids()
+                print('Current list of bikes in database: ', ' '.join(db.all_bike_ids['name']))
+                b = input("Name of bike to update: ")
+                db.update_bike(b)
+                # show the results from the update
+                bk = db.get_from_db('select * from bikes where name=?', (b))
+                bk = rd.to_dict('records')[0]
+                print("Name: ", bk['name'])
+                print("Total Distance Ridden: ", bk['total_mi'])
+                print("Total Elevation Climbed: ", bk['total_elev'])
             elif subselection == 2:
                 # edit bike
-                pass
+                db.get_all_bike_ids()
+                print('Current list of bikes in database: ', ' '.join(db.all_bike_ids['name']))
+                b = input("Name of bike to edit: ")
+                # report current bike info
+                bk = db.get_from_db('select * from bikes where name=?', (b))
+                bk = rd.to_dict('records')[0]
+                print("Name: ", bk['name'])
+                print("Color: ", bk['color'])
+                print("Purchased: ", bk['purchased'])
+                print("Price: ", bk['price'])
+                # ask for new info
+                nm = input("New bike name: ")
+                if nm == '':
+                    nm = bk['name']
+                cl = input("New color: ")
+                if cl == '':
+                    cl = bk['color']
+                pur = input("New purchase date: ")
+                if pur == '':
+                    pur = bk['purchased']
+                pr = float(input("New price: "))
+                if pr == '':
+                    pr = bk['price']
+                db.edit_entry('UPDATE bikes SET name = ?, color = ?, purchased = ?, price = ? WHERE name = ?', (nm, cl, pur, pr, b))
+                # run an update function
             elif subselection == 3:
                 # exit to main menu
                 pass
