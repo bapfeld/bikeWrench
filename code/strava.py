@@ -154,7 +154,7 @@ class strava():
 
     """
     def __init__(self, stravalib_client, id_list, ini_path):
-        self.id_list = id_list
+        self.id_list = [str(x) for x in id_list]
         self.ini_path = ini_path
         self.client = stravalib_client
         self.gen_secrets()
@@ -173,7 +173,7 @@ class strava():
     def fetch_new_activities(self):
         activity_list = self.client.get_activities()
         if self.id_list is not None:
-            self.new_id_list = [x.id for x in activity_list if x.id not in self.id_list]
+            self.new_id_list = [str(x.id) for x in activity_list if str(x.id) not in self.id_list]
         else:
             self.new_id_list = [x.id for x in activity_list]
         if len(self.new_id_list) > 0:
