@@ -1,5 +1,3 @@
--- Schema for to-do application examples.
-
 -- Riders are top level
 create table riders (
     name       text primary key,
@@ -8,7 +6,8 @@ create table riders (
     fthr       integer,
     max_speed  real,
     avg_speed  real,
-    total_dist real
+    total_dist real,
+    units      text
 );
 
 -- Bikes belong to riders

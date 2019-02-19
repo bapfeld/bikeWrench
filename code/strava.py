@@ -19,6 +19,11 @@ class my_db():
     def __init__(self, db_path, rider_id):
         self.db_path = db_path
         self.get_all_ride_ids(rider_id)
+        self.get_units(rider_id)
+
+    def get_units(self):
+        u = self.get_from_db('select units from riders')
+        self.units = u['units']
 
     def add_ride(self, ride_info):
         with sqlite3.connect(self.db_path) as conn:
@@ -31,18 +36,52 @@ class my_db():
             except AttributeError:
                 out = 'Unknown'
             return out
-        a_list = [(a.id, gear_try(a), float(unithelper.miles(a.distance)), a.name, a.moving_time.seconds / 3600, a.elapsed_time.seconds / 3600, float(unithelper.feet(a.total_elevation_gain)), a.type, float(unithelper.mph(a.average_speed)), float(unithelper.mph(a.max_speed)), float(a.calories), rider_name, ) for a in activity_list]
+        if self.units == 'imperial':
+            a_list = [(a.id, gear_try(a),
+                       float(unithelper.miles(a.distance)),
+                       a.name,
+                       a.moving_time.seconds / 3600,
+                       a.elapsed_time.seconds / 3600,
+                       float(unithelper.feet(a.total_elevation_gain)),
+                       a.type,
+                       float(unithelper.mph(a.average_speed)),
+                       float(unithelper.mph(a.max_speed)),
+                       float(a.calories),
+                       rider_name, ) for a in activity_list]
+        else:
+            a_list = [(a.id, gear_try(a),
+                       float(unithelper.kilometers(a.distance)),
+                       a.name,
+                       a.moving_time.seconds / 3600,
+                       a.elapsed_time.seconds / 3600,
+                       float(unithelper.meters(a.total_elevation_gain)),
+                       a.type,
+                       float(unithelper.kph(a.average_speed)),
+                       float(unithelper.kph(a.max_speed)),
+                       float(a.calories),
+                       rider_name, ) for a in activity_list]
         with sqlite3.connect(self.db_path) as conn:
             conn.executemany('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
 
     def initialize_rider(self, rider_values):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('INSERT into riders (name, dob, weight, fthr) values (?, ?, ?, ?)',
+            conn.execute("""INSERT into riders (name, dob, weight, fthr, units) 
+                            values (?, ?, ?, ?, ?)""",
                          rider_values)
 
     def add_part(self, part_values):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('INSERT into parts (type, purchased, brand, price, weight, size, model, bike, inuse) values (?, ?, ?, ?, ?, ?, ?, ?, True)', part_values)
+            conn.execute("""INSERT into parts (
+                                type, 
+                                purchased, 
+                                brand, 
+                                price, 
+                                weight, 
+                                size, 
+                                model, 
+                                bike, 
+                                inuse) 
+                            values (?, ?, ?, ?, ?, ?, ?, ?, True)""", part_values)
 
     def replace_part(self, part_values, old_part=None):
         self.add_part(part_values)
@@ -185,12 +224,12 @@ class strava():
 ###########################################
 # Create the database
 ###########################################
-def create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_fthr):
+def create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_fthr, preferred_units):
     with sqlite3.connect(db_path) as conn:
         with open(schema_path, 'rt') as f:
             schema = f.read()
         conn.executescript(schema)
-    rider_info = (rider_name, rider_dob, rider_weight, rider_fthr)
+    rider_info = (rider_name, rider_dob, rider_weight, rider_fthr, preferred_units)
     db.initialize_rider(rider_info)
 
 ###########################################
@@ -262,7 +301,18 @@ def startup(db_path, schema_path):
         rider_dob = input('Rider DOB: ')
         rider_weight = input('Rider weight: ')
         rider_fthr = input('Rider Functional Threshold Heart Rate: ')
-        create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_fthr)
+        preferred_units = input('Imperial (i) or Metric (m)?: ')
+        if preferred_units == "i":
+            preferred_units = "imperial"
+        else:
+            preferred_units = "metric"
+        create_db(db_path,
+                  schema_path,
+                  rider_name,
+                  rider_dob,
+                  rider_weight,
+                  rider_fthr,
+                  preferred_units)
 
 
 ###########################################
@@ -310,6 +360,7 @@ def main():
                 print("DOB: ", rd['dob'])
                 print("Weight: ", rd['weight'])
                 print("Functional Threshold Heart Rate: ", rd['fthr'])
+                print("Preferred units: ", rd['units'])
                 nm = input("New name: ")
                 if nm == '':
                     nm = rd['name']
@@ -322,7 +373,13 @@ def main():
                 hr = input("New Functional Threshold Heart Rate: ")
                 if hr == '':
                     hr = rd['fthr']
-                db.edit_entry('UPDATE riders SET name = ?, dob = ?, weight = ?, fthr = ? WHERE name = ?', (nm, dob, wt, fthr, rider_name))
+                u = input("New preferred units: ")
+                if u == '':
+                    u = rd['units']
+                db.edit_entry("""UPDATE riders 
+                                 SET name = ?, dob = ?, weight = ?, fthr = ?, units = ? 
+                                 WHERE name = ?""",
+                              (nm, dob, wt, fthr, u, rider_name))
             elif subselection == 3:
                 # return to main menu
                 pass
@@ -367,7 +424,10 @@ def main():
                 pr = float(input("New price: "))
                 if pr == '':
                     pr = bk['price']
-                db.edit_entry('UPDATE bikes SET name = ?, color = ?, purchased = ?, price = ? WHERE name = ?', (nm, cl, pur, pr, b))
+                db.edit_entry("""UPDATE bikes 
+                                 SET name = ?, color = ?, purchased = ?, price = ? 
+                                 WHERE name = ?""",
+                              (nm, cl, pur, pr, b))
                 # run an update function
             elif subselection == 3:
                 # exit to main menu
