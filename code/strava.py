@@ -3,6 +3,7 @@
 ###########################################
 
 from stravalib.client import Client
+from stravalib import unithelper
 import configparser
 import sqlite3
 import os, sys, re
@@ -30,7 +31,7 @@ class my_db():
             except AttributeError:
                 out = 'Unknown'
             return out
-        a_list = [(a.id, gear_try(a), float(a.distance), a.name, a.moving_time.seconds, a.elapsed_time.seconds, float(a.total_elevation_gain), a.type, float(a.average_speed), float(a.max_speed), float(a.calories), rider_name, ) for a in activity_list]
+        a_list = [(a.id, gear_try(a), float(unithelper.miles(a.distance)), a.name, a.moving_time.seconds / 3600, a.elapsed_time.seconds / 3600, float(unithelper.feet(a.total_elevation_gain)), a.type, float(unithelper.mph(a.average_speed)), float(unithelper.mph(a.max_speed)), float(a.calories), rider_name, ) for a in activity_list]
         with sqlite3.connect(self.db_path) as conn:
             conn.executemany('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
 
