@@ -24,7 +24,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [ ] Calculate wear on parts not in use
 
 ** Other concerns
-- [ ] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
+- [X] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
 - [ ] time format for testing if activities are new
 - [ ] How best to store the secret stuff?
 - [ ] How to deal with alphanumeric ids and something intelligible?
