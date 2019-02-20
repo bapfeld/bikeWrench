@@ -355,9 +355,9 @@ def main():
     # Initialize everything
     args_parser = argparse.ArgumentParser()
     params = initialize_params(args_parser)
-    db_path = params.db_path
-    schema_path = params.schema_path
-    ini_path = params.ini_path
+    db_path = os.path.expanduser(params.db_path)
+    schema_path = os.path.expanduser(params.schema_path)
+    ini_path = os.path.expanduser(params.ini_path)
     rider_name = params.rider_name
     startup(db_path, schema_path)
     db = my_db(db_path, rider_name)
