@@ -479,7 +479,21 @@ def main():
                 db.add_maintenance((part_id, work, d))
             elif subselection == 4:
                 # replace parts
-                pass
+                old_part_id = input("Part id: ")
+                if old_part_id == '':
+                    old_part_id = None
+                else:
+                    old_part_id = int(old_part_id)
+                new_part = input("New part type: ")
+                pur = input("Date added: ")
+                br = input("Brand: ")
+                pr = float(input("Price: "))
+                wt = float(input("Weight (g): "))
+                size = input("Size: ")
+                model = input("Model: ")
+                bike = input("Which bike? ")
+                db.replace_part((new_part, pur, br, pr, wt, size, model, bike), old_part_id)
+                    
             elif subselection == 5:
                 # return to main menu
                 pass
