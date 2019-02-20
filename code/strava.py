@@ -286,7 +286,8 @@ def show_parts_menu():
     print('(2): Get all parts stats')
     print('(3): Maintain part')
     print('(4): Replace part')
-    print('(5): Return to main menu')
+    print('(5): Add part')
+    print('(6): Return to main menu')
 
 def show_ride_menu():
     print('Ride actions: ')
@@ -485,16 +486,26 @@ def main():
                 else:
                     old_part_id = int(old_part_id)
                 new_part = input("New part type: ")
-                pur = input("Date added: ")
                 br = input("Brand: ")
                 pr = float(input("Price: "))
                 wt = float(input("Weight (g): "))
                 size = input("Size: ")
                 model = input("Model: ")
                 bike = input("Which bike? ")
+                pur = input("Date added: ")
                 db.replace_part((new_part, pur, br, pr, wt, size, model, bike), old_part_id)
-                    
             elif subselection == 5:
+                # replace parts
+                new_part = input("New part type: ")
+                br = input("Brand: ")
+                pr = float(input("Price: "))
+                wt = float(input("Weight (g): "))
+                size = input("Size: ")
+                model = input("Model: ")
+                bike = input("Which bike? ")
+                pur = input("Date added: ")
+                db.add_part((new_part, pur, br, pr, wt, size, model, bike))
+            elif subselection == 6:
                 # return to main menu
                 pass
         elif selection == 5:
