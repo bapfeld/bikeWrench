@@ -4,9 +4,7 @@
 
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser
-import sqlite3
-import os, sys, re
+import configparser, argparse, sqlite3, os, sys, re
 import pandas as pd
 
 ###########################################
@@ -355,6 +353,12 @@ def part_summary_func(switch, b, p):
 
 def main():
     # Initialize everything
+    args_parser = argparse.ArgumentParser()
+    params = initialize_params(args_parser)
+    db_path = params.db_path
+    schema_path = params.schema_path
+    ini_path = params.ini_path
+    rider_name = params.rider_name
     startup(db_path, schema_path)
     db = my_db(db_path, rider_name)
     cl = Client()
@@ -568,6 +572,32 @@ def main():
             # exit option
             break
     
+def initialize_params(args_parser):
+    args_parser.add_argument(
+        '--db_file',
+        help='Path to a local database',
+        required=True
+    )
+    args_parser.add_argument(
+        '--rider_name',
+        help='Name of the rider',
+        required=True
+    )
+    args_parser.add_argument(
+        '--ini_path',
+        help='Path to the local ini file containing secrets',
+        required=True
+    )
+    args_parser.add_argument(
+        '--schema_path',
+        help='Path to the db schema file',
+        required=True
+    )
+    return args_parser.parse_args()
+
+
+if __name__ == '__main__':
+    main()
 
 ###########################################
 # Temporary values
