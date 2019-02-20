@@ -464,13 +464,19 @@ def main():
                 b = parts['bike'].where(id == p)
                 # need to generate some dates here
                 # this is where i left off
-                pt = db.get_from_db('SELECT distance, elapsed_time, elev from rides WHERE bike=? AND date IN ?', (b, dates))
+                pt = db.get_from_db("""SELECT distance, elapsed_time, elev from rides 
+                                       WHERE bike = ? 
+                                       AND date 
+                                       BETWEEN date(?) AND date(?)""", (b, dates))
             elif subselection == 2:
                 # get all parts stats
                 pass
             elif subselection == 3:
                 # maintain parts
-                pass
+                part_id = int(input("Part id: "))
+                work = input("Work performed: ")
+                d = input("Date work performed (YYYY-MM-DD): ")
+                db.add_maintenance((part_id, work, d))
             elif subselection == 4:
                 # replace parts
                 pass
