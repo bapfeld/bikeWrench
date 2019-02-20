@@ -315,6 +315,39 @@ def startup(db_path, schema_path):
                   rider_fthr,
                   preferred_units)
 
+def part_summary_func(switch, b, p):
+    if switch == "a":
+        pt = db.get_from_db("""SELECT distance, elapsed_time, elev 
+                               FROM rides
+                               WHERE bike = ? AND part = ?""", (b, p))
+        mrld = "purchase date"
+    elif switch == "l":
+        logs = db.get_from_db("""SELECT * from maintenance
+                                 WHERE id = ?""", (p))
+        if logs.shape[0] > 0:
+            mrld = logs['date'].max()
+        else:
+            print("No maintenance logs found for %s. Setting date to Jan 1, 1900" %p)
+            mrld = '1900-01-01'
+        pt = db.get_from_db("""SELECT distance, elapsed_time, elev from rides
+                               WHERE bike = ?
+                               AND id = ?
+                               AND date >= date(?)""", (b, p, mrld))
+    elif switch == "d":
+        dt = input("Date (YYYY-MM-DD): ")
+        # need to generate some dates here
+        # this is where i left off
+        pt = db.get_from_db("""SELECT distance, elapsed_time, elev from rides 
+                               WHERE bike = ? 
+                               AND id = ?
+                               AND date >= date(?)""", (b, p, dt))
+    dist = pt['distance'].sum()
+    time = pt['elapsed_time'].sum()
+    elev = pt['elev'].sum()
+    print("Since %s" %(str(mrld)))
+    print("Total distance: %f" %dist)
+    print("Total time: %f" %time)
+    print("Total elevation: %f" %elev)
 
 ###########################################
 # Main
@@ -463,15 +496,16 @@ def main():
                 # get part stats
                 p = int(input("Part id: "))
                 b = parts['bike'].where(id == p)
-                # need to generate some dates here
-                # this is where i left off
-                pt = db.get_from_db("""SELECT distance, elapsed_time, elev from rides 
-                                       WHERE bike = ? 
-                                       AND date 
-                                       BETWEEN date(?) AND date(?)""", (b, dates))
+                switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
+                part_summary_func(switch, b, p)
             elif subselection == 2:
                 # get all parts stats
-                pass
+                b = input("Which bike do you want to see records for? ")
+                switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
+                all_parts = db.get_from_db("SELECT id from parts WHERE bike = ?", (b))
+                if all_parts.shape[0] > 0:
+                    for index, row in all_parts.iterrows:
+                        part_summary_func(switch, b, row['id'])
             elif subselection == 3:
                 # maintain parts
                 part_id = int(input("Part id: "))
