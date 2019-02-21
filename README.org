@@ -30,6 +30,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [ ] How to deal with alphanumeric ids and something intelligible?
 - [ ] Now that I've switched to a single rider database, do i need the link to bikes?
 - [ ] Rides don't currently have dates
+- [ ] Need to filter only rides when querying strava (i.e. eliminate runs and other types of activities)
 
 * Installation/Usage Requirements
 ** stravalib
