@@ -157,7 +157,7 @@ class my_db():
     def add_bike(self, bike_values):
         # add a new bike manually
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('INSERT into bikes (id, name, color, purchased, price, rider) values (?, ?, ?, ?, ?, ?)', bike_values)
+            conn.execute('INSERT into bikes (id, name, color, purchased, price) values (?, ?, ?, ?, ?)', bike_values)
 
     def auto_add_bikes(self):
         with sqlite3.connect(self.db_path) as conn:
