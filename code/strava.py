@@ -65,8 +65,8 @@ class my_db():
 
     def initialize_rider(self, rider_values):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""INSERT into riders (name, dob, weight, fthr, units) 
-                            values (?, ?, ?, ?, ?)""",
+            conn.execute("""INSERT into riders (name, units) 
+                            values (?, ?)""",
                          rider_values)
 
     def add_part(self, part_values):
@@ -224,12 +224,12 @@ class strava():
 ###########################################
 # Create the database
 ###########################################
-def create_db(db_path, schema_path, rider_name, rider_dob, rider_weight, rider_fthr, preferred_units):
+def create_db(db_path, schema_path, rider_name, preferred_units):
     with sqlite3.connect(db_path) as conn:
         with open(schema_path, 'rt') as f:
             schema = f.read()
         conn.executescript(schema)
-    rider_info = (rider_name, rider_dob, rider_weight, rider_fthr, preferred_units)
+    rider_info = (rider_name, preferred_units)
     db.initialize_rider(rider_info)
 
 ###########################################
@@ -299,9 +299,6 @@ def startup(db_path, schema_path):
     if db_is_new:
         print("Initializing a new database")
         rider_name = input('Rider name: ')
-        rider_dob = input('Rider DOB: ')
-        rider_weight = input('Rider weight: ')
-        rider_fthr = input('Rider Functional Threshold Heart Rate: ')
         preferred_units = input('Imperial (i) or Metric (m)?: ')
         if preferred_units == "i":
             preferred_units = "imperial"
@@ -310,9 +307,6 @@ def startup(db_path, schema_path):
         create_db(db_path,
                   schema_path,
                   rider_name,
-                  rider_dob,
-                  rider_weight,
-                  rider_fthr,
                   preferred_units)
 
 def part_summary_func(switch, b, p):
@@ -397,29 +391,17 @@ def main():
                 rd = rd.to_dict('records')[0]
                 print("Current rider info: ")
                 print("Name: ", rd['name'])
-                print("DOB: ", rd['dob'])
-                print("Weight: ", rd['weight'])
-                print("Functional Threshold Heart Rate: ", rd['fthr'])
                 print("Preferred units: ", rd['units'])
                 nm = input("New name: ")
                 if nm == '':
                     nm = rd['name']
-                dob = input("New DOB: ")
-                if dob == '':
-                    dob = rd['dob']
-                wt = input("New weight: ")
-                if wt == '':
-                    wt = rd['weight']
-                hr = input("New Functional Threshold Heart Rate: ")
-                if hr == '':
-                    hr = rd['fthr']
                 u = input("New preferred units: ")
                 if u == '':
                     u = rd['units']
                 db.edit_entry("""UPDATE riders 
-                                 SET name = ?, dob = ?, weight = ?, fthr = ?, units = ? 
+                                 SET name = ?, units = ? 
                                  WHERE name = ?""",
-                              (nm, dob, wt, fthr, u, rider_name))
+                              (nm, u, rider_name))
             elif subselection == 3:
                 # return to main menu
                 pass
@@ -609,5 +591,4 @@ db_file = 'strava.db'
 db_path = os.path.expanduser('~/strava/data/' + db_file)
 schema_file = 'create_db.sql'
 schema_path = os.path.expanduser('~/strava/code/' + schema_file)
-initial_rider_vals = ('Brendan', '6-6-88', '165', '190')
 ini_path = os.path.expanduser('~/strava/code/strava.ini')

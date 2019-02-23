@@ -31,7 +31,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [ ] Now that I've switched to a single rider database, do i need the link to bikes?
 - [X] Rides don't currently have dates
 - [X] Need to filter only rides when querying strava (i.e. eliminate runs and other types of activities)
-- [ ] Don't need so much info for the rider
+- [X] Don't need so much info for the rider
 
 * Installation/Usage Requirements
 ** stravalib

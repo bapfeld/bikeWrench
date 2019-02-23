@@ -1,9 +1,6 @@
 -- Riders are top level
 create table riders (
     name       text primary key,
-    dob        date,
-    weight     integer,
-    fthr       integer,
     max_speed  real,
     avg_speed  real,
     total_dist real,
