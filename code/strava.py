@@ -211,7 +211,7 @@ class strava():
     def fetch_new_activities(self):
         activity_list = self.client.get_activities()
         if self.id_list is not None:
-            self.new_id_list = [str(x.id) for x in activity_list if str(x.id) not in self.id_list]
+            self.new_id_list = [str(x.id) for x in activity_list if str(x.id) not in self.id_list and x.type == "Ride"]
         else:
             self.new_id_list = [x.id for x in activity_list]
         if len(self.new_id_list) > 0:
