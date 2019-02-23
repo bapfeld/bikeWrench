@@ -25,7 +25,7 @@ class my_db():
 
     def add_ride(self, ride_info):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', ride_info)
+            conn.execute("""INSERT into rides (id, bike, distance, name, date, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?,?)""", ride_info)
 
     def add_multiple_rides(self, activity_list, rider_name):
         def gear_try(x):
@@ -38,6 +38,7 @@ class my_db():
             a_list = [(a.id, gear_try(a),
                        float(unithelper.miles(a.distance)),
                        a.name,
+                       a.start_date.strftime("%Y-%M-%d"), 
                        a.moving_time.seconds / 3600,
                        a.elapsed_time.seconds / 3600,
                        float(unithelper.feet(a.total_elevation_gain)),
@@ -50,6 +51,7 @@ class my_db():
             a_list = [(a.id, gear_try(a),
                        float(unithelper.kilometers(a.distance)),
                        a.name,
+                       a.start_date.strftime("%Y-%M-%d"), 
                        a.moving_time.seconds / 3600,
                        a.elapsed_time.seconds / 3600,
                        float(unithelper.meters(a.total_elevation_gain)),
@@ -59,7 +61,7 @@ class my_db():
                        float(a.calories),
                        rider_name, ) for a in activity_list]
         with sqlite3.connect(self.db_path) as conn:
-            conn.executemany('INSERT into rides (id, bike, distance, name, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
+            conn.executemany('INSERT into rides (id, bike, distance, name, date, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
 
     def initialize_rider(self, rider_values):
         with sqlite3.connect(self.db_path) as conn:

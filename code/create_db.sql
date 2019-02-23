@@ -28,6 +28,7 @@ create table rides (
     bike         text not null references bike(id),
     distance     integer,
     name         text,
+    date         date,
     moving_time  integer,
     elapsed_time integer,
     elev         real,
