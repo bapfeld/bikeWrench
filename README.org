@@ -23,6 +23,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Fetch new rides from strava 
 - [ ] Calculate wear on parts not in use
 - [ ] Add a new bike to the db
+- [ ] Export capabilities (e.g. export an entire maintenance log to csv)
 
 ** Other concerns
 - [X] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
