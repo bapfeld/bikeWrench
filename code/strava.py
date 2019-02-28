@@ -278,7 +278,8 @@ def show_bike_menu():
     print('Bike menu: ')
     print('(1): Update bike stats')
     print('(2): Edit bike')
-    print('(3): Return to main menu')
+    print('(3): Add new bike')
+    print('(4): Return to main menu')
 
 def show_parts_menu():
     print('Parts actions: ')
@@ -450,8 +451,15 @@ def main():
                                  SET name = ?, color = ?, purchased = ?, price = ? 
                                  WHERE name = ?""",
                               (nm, cl, pur, pr, b))
-                # run an update function
             elif subselection == 3:
+                # Add a new bike
+                b = input("Name of new bike: ")
+                c = input("Color of new bike: ")
+                p = input("Purchase date of new bike: ")
+                pr = input("Price of new bike: ")
+                i = input("Strava identifier of new bike: ")
+                db.add_bike((i, b, c, p, pr))
+            elif subselection == 4:
                 # exit to main menu
                 pass
         elif selection == 4:
