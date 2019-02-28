@@ -17,11 +17,11 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Add ride
 - [X] Add/replace part
 - [X] Add maintenance record
-- [ ] Calculate miles on individual parts
-- [ ] Calculate miles on bike as a whole
+- [X] Calculate miles on individual parts
+- [X] Calculate miles on bike as a whole
 - [X] Calculate total miles for a rider
 - [X] Fetch new rides from strava 
-- [ ] Calculate wear on parts not in use
+- [X] Calculate wear on parts not in use
 - [X] Add a new bike to the db
 - [ ] Export capabilities (e.g. export an entire maintenance log to csv)
 
