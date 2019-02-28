@@ -16,8 +16,11 @@ class my_db():
     """
     def __init__(self, db_path, rider_id):
         self.db_path = db_path
-        self.get_all_ride_ids(rider_id)
-        self.get_units(rider_id)
+        self.rider_id = rider_id
+
+    def secondary_init(self):
+        self.get_all_ride_ids(self.rider_id)
+        self.get_units(self.rider_id)
 
     def get_units(self):
         u = self.get_from_db('select units from riders')
@@ -63,7 +66,8 @@ class my_db():
         with sqlite3.connect(self.db_path) as conn:
             conn.executemany('INSERT into rides (id, bike, distance, name, date, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
 
-    def initialize_rider(self, rider_values):
+    def initialize_rider(self, units):
+        rider_values = (self.rider_id, units)
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""INSERT into riders (name, units) 
                             values (?, ?)""",
@@ -197,6 +201,7 @@ class strava():
         self.id_list = [str(x) for x in id_list]
         self.secrets_path = secrets_path
         self.client = stravalib_client
+        self.client_id = client_id
         self.gen_secrets()
 
     def gen_secrets(self):
@@ -205,9 +210,10 @@ class strava():
             config.read(self.ini_path)
             code = config['Strava']['code']
             client_secret = config['Strava']['client_secret']
+            client_id = config['Strava']['client_id']
         elif self.secrets_path.endswith(".gpg"):
-            code, client_secret = self.get_encrypted_secrets()
-        token_response = self.client.exchange_code_for_token(client_id=10185,
+            code, client_secret, client_id = self.get_encrypted_secrets()
+        token_response = self.client.exchange_code_for_token(client_id=client_id,
                                                         client_secret=client_secret,
                                                         code=code)
         self.client.access_token = token_response['access_token']
@@ -216,8 +222,8 @@ class strava():
 
     def get_encrypted_secrets(self):
         secrets = os.popen("gpg -q --no-tty -d %s" %self.secrets_path).read()
-        s = re.search("code (.*?) client_secret (.*?)\n", secrets)
-        return (s.group(1), s.group(2))
+        s = re.search("code (.*?) client_secret (.*?) client_id (.*?)\n", secrets)
+        return (s.group(1), s.group(2), s.group(3))
 
     def fetch_new_activities(self):
         activity_list = self.client.get_activities()
@@ -233,13 +239,9 @@ class strava():
 ###########################################
 # Create the database
 ###########################################
-def create_db(db_path, schema_path, rider_name, preferred_units):
+def create_db(db_path, schema):
     with sqlite3.connect(db_path) as conn:
-        with open(schema_path, 'rt') as f:
-            schema = f.read()
         conn.executescript(schema)
-    rider_info = (rider_name, preferred_units)
-    db.initialize_rider(rider_info)
 
 ###########################################
 # Main interaction functions
@@ -304,20 +306,20 @@ def show_ride_menu():
     print('(1): Add manual ride')
     print('(2): Return to main menu')
 
-def startup(db_path, schema_path):
+def startup(db_path, schema, rider_name):
+    db = my_db(db_path, rider_name)
     db_is_new = not os.path.exists(db_path)
     if db_is_new:
-        print("Initializing a new database")
-        rider_name = input('Rider name: ')
+        print("Initializing a new database for %s" %rider_name)
         preferred_units = input('Imperial (i) or Metric (m)?: ')
         if preferred_units == "i":
             preferred_units = "imperial"
         else:
             preferred_units = "metric"
-        create_db(db_path,
-                  schema_path,
-                  rider_name,
-                  preferred_units)
+        create_db(db_path, schema)
+        db.initialize_rider(preferred_units)
+    db.secondary_init()
+    return db
 
 def part_summary_func(switch, b, p):
     if switch == "a":
@@ -362,11 +364,9 @@ def main():
     args_parser = argparse.ArgumentParser()
     params = initialize_params(args_parser)
     db_path = os.path.expanduser(params.db_path)
-    schema_path = os.path.expanduser(params.schema_path)
     secrets_path = os.path.expanduser(params.secrets_path)
     rider_name = params.rider_name
-    startup(db_path, schema_path)
-    db = my_db(db_path, rider_name)
+    db = startup(db_path, strava_db_schema, rider_name)
     cl = Client()
     st = strava(cl, db.all_ride_ids['id'], secrets_path)
     while True:
@@ -589,12 +589,68 @@ def initialize_params(args_parser):
         help='Path to the local secrets file.',
         required=True
     )
-    args_parser.add_argument(
-        '--schema_path',
-        help='Path to the db schema file',
-        required=True
-    )
     return args_parser.parse_args()
+
+strava_db_schema = """
+-- Riders are top level
+create table riders (
+    name       text primary key,
+    max_speed  real,
+    avg_speed  real,
+    total_dist real,
+    units      text
+);
+
+-- Bikes belong to riders
+create table bikes (
+    id          text primary key,
+    name        text,
+    color       text,
+    purchased   date,
+    price       real,
+    total_mi    real,
+    total_elev  real
+);
+
+-- Rides record data about a bike ride
+create table rides (
+    id           integer primary key,
+    bike         text not null references bike(id),
+    distance     integer,
+    name         text,
+    date         date,
+    moving_time  integer,
+    elapsed_time integer,
+    elev         real,
+    type         text,
+    avg_speed    real,
+    max_speed    real,
+    calories     real,
+    rider        text not null references rider(name)
+);
+
+-- Parts belong to bikes
+create table parts (
+    id           integer primary key autoincrement not null,
+    type         text,
+    purchased    date,
+    brand        text,
+    price        real,
+    weight       real,
+    size         text,
+    model        text,
+    bike         text not null references bikes(name),
+    inuse        text
+);
+
+-- Maintenance tasks record things that happen to parts
+create table maintenance (
+    id           integer primary key autoincrement not null,
+    part         integer not null references parts(id),
+    work         text,
+    date         date
+);
+"""
 
 
 if __name__ == '__main__':
@@ -606,6 +662,4 @@ if __name__ == '__main__':
 # Let's start by building up a temporary database
 db_file = 'strava.db'
 db_path = os.path.expanduser('~/strava/data/' + db_file)
-schema_file = 'create_db.sql'
-schema_path = os.path.expanduser('~/strava/code/' + schema_file)
 secrets_path = os.path.expanduser('~/strava/code/strava.ini')

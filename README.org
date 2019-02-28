@@ -34,23 +34,25 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Rides don't currently have dates
 - [X] Need to filter only rides when querying strava (i.e. eliminate runs and other types of activities)
 - [X] Don't need so much info for the rider
-- [ ] Need client_id to be an input variable
+- [X] Need client_id to be an input variable
+- [X] Maybe the schema should be included in the code?
 
 * Installation/Usage Requirements
 ** stravalib
 Just a good old =pip3.6 install --user stravalib=
 
 ** Secrets!
-You can use either an =ini= file or an encrypted =.gpg= file for storing your API code and client secret. 
+You can use either an =ini= file or an encrypted =.gpg= file for storing your API code and client secret. Note that the client_id is not a secret (I believe), but this is a convenient place to store and access that.
 
 If you use a =.ini= file it must look like this:
 #+BEGIN_EXAMPLE
 [Strava]
 code=SomeRandomStringFromStrava
 client_secret=AnotherRandomStringFromStrava
+client_id=YourClientID
 #+END_EXAMPLE
 
-And if you use a =.gpg= file, it must look like this:
+And if you use a =.gpg= file, it must look like this (it should be all one line):
 #+BEGIN_EXAMPLE
-code SomeRandomStringFromStrava client_secret AnotherRandomStringFromStrava
+code SomeRandomStringFromStrava client_secret AnotherRandomStringFromStrava client_id YourClientID
 #+END_EXAMPLE
