@@ -193,22 +193,31 @@ class strava():
     """Class to connect to strava using stravalib and update ride data. Inherits from stravalib.client.Client
 
     """
-    def __init__(self, stravalib_client, id_list, ini_path):
+    def __init__(self, stravalib_client, id_list, secrets_path):
         self.id_list = [str(x) for x in id_list]
-        self.ini_path = ini_path
+        self.secrets_path = secrets_path
         self.client = stravalib_client
         self.gen_secrets()
 
     def gen_secrets(self):
-        config = configparser.ConfigParser()
-        config.read(self.ini_path)
-        code = config['Strava']['code']
+        if self.secrets_path.endswith(".ini"):
+            config = configparser.ConfigParser()
+            config.read(self.ini_path)
+            code = config['Strava']['code']
+            client_secret = config['Strava']['client_secret']
+        elif self.secrets_path.endswith(".gpg"):
+            code, client_secret = self.get_encrypted_secrets()
         token_response = self.client.exchange_code_for_token(client_id=10185,
-                                                        client_secret=config['Strava']['client_secret'],
+                                                        client_secret=client_secret,
                                                         code=code)
         self.client.access_token = token_response['access_token']
         self.client.refresh_token = token_response['refresh_token']
         self.client.expires_at = token_response['expires_at']
+
+    def get_encrypted_secrets(self):
+        secrets = os.popen("gpg -q --no-tty -d %s" %self.secrets_path).read()
+        s = re.search("code (.*?) client_secret (.*?)\n", secrets)
+        return (s.group(1), s.group(2))
 
     def fetch_new_activities(self):
         activity_list = self.client.get_activities()
@@ -354,12 +363,12 @@ def main():
     params = initialize_params(args_parser)
     db_path = os.path.expanduser(params.db_path)
     schema_path = os.path.expanduser(params.schema_path)
-    ini_path = os.path.expanduser(params.ini_path)
+    secrets_path = os.path.expanduser(params.secrets_path)
     rider_name = params.rider_name
     startup(db_path, schema_path)
     db = my_db(db_path, rider_name)
     cl = Client()
-    st = strava(cl, db.all_ride_ids['id'], ini_path) # need to define ini_path somewhere
+    st = strava(cl, db.all_ride_ids['id'], secrets_path)
     while True:
         # Fetch rider name
         rider_name = db.get_rider_name()
@@ -576,8 +585,8 @@ def initialize_params(args_parser):
         required=True
     )
     args_parser.add_argument(
-        '--ini_path',
-        help='Path to the local ini file containing secrets',
+        '--secrets_path',
+        help='Path to the local secrets file.',
         required=True
     )
     args_parser.add_argument(
@@ -599,4 +608,4 @@ db_file = 'strava.db'
 db_path = os.path.expanduser('~/strava/data/' + db_file)
 schema_file = 'create_db.sql'
 schema_path = os.path.expanduser('~/strava/code/' + schema_file)
-ini_path = os.path.expanduser('~/strava/code/strava.ini')
+secrets_path = os.path.expanduser('~/strava/code/strava.ini')

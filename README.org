@@ -27,14 +27,30 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 
 ** Other concerns
 - [X] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
-- [ ] time format for testing if activities are new
-- [ ] How best to store the secret stuff?
+- [X] time format for testing if activities are new
+- [X] How best to store the secret stuff?
 - [ ] How to deal with alphanumeric ids and something intelligible?
 - [X] Now that I've switched to a single rider database, do i need the link to bikes?
 - [X] Rides don't currently have dates
 - [X] Need to filter only rides when querying strava (i.e. eliminate runs and other types of activities)
 - [X] Don't need so much info for the rider
+- [ ] Need client_id to be an input variable
 
 * Installation/Usage Requirements
 ** stravalib
 Just a good old =pip3.6 install --user stravalib=
+
+** Secrets!
+You can use either an =ini= file or an encrypted =.gpg= file for storing your API code and client secret. 
+
+If you use a =.ini= file it must look like this:
+#+BEGIN_EXAMPLE
+[Strava]
+code=SomeRandomStringFromStrava
+client_secret=AnotherRandomStringFromStrava
+#+END_EXAMPLE
+
+And if you use a =.gpg= file, it must look like this:
+#+BEGIN_EXAMPLE
+code SomeRandomStringFromStrava client_secret AnotherRandomStringFromStrava
+#+END_EXAMPLE
