@@ -20,7 +20,7 @@ class my_db():
 
     def secondary_init(self):
         self.get_all_ride_ids(self.rider_id)
-        self.get_units(self.rider_id)
+        self.get_units()
 
     def get_units(self):
         u = self.get_from_db('select units from riders')
@@ -201,7 +201,6 @@ class strava():
         self.id_list = [str(x) for x in id_list]
         self.secrets_path = secrets_path
         self.client = stravalib_client
-        self.client_id = client_id
         self.gen_secrets()
 
     def gen_secrets(self):
@@ -363,7 +362,7 @@ def main():
     # Initialize everything
     args_parser = argparse.ArgumentParser()
     params = initialize_params(args_parser)
-    db_path = os.path.expanduser(params.db_path)
+    db_path = os.path.expanduser(params.db_file)
     secrets_path = os.path.expanduser(params.secrets_path)
     rider_name = params.rider_name
     db = startup(db_path, strava_db_schema, rider_name)
