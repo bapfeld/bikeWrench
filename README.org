@@ -38,8 +38,23 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Maybe the schema should be included in the code?
 
 * Installation/Usage Requirements
-** stravalib
-Just a good old =pip3.6 install --user stravalib=
+** Python requirements
+Just a good old =pip3.6 install --user stravalib= (or however you normally install packages from PyPi)
+
+** Strava API
+The first step is to create an "app" with strava in order to access the API. Go to [[https://www.strava.com/settings/api][https://www.strava.com/settings/api]] and follow the directions for creating an application. Choose any name you want and set the callback domain to =localhost=. You'll need the client id and client secret later in this process.
+
+You will also need to get a special authorization code for your application. Assuming you've already installed stravalib, run the following code (replacing the client_id with your application's client_id), then paste the url it generates into a browser and hit enter. This will "fail" in that you'll end up with an angry looking webpage. You need to grab the "code" parameter from within the url of the page that loads --- the url should contain something like =?code=StringOfNumbersAndLetters=. 
+
+#+BEGIN_EXAMPLE python
+  from stravalib.client import Client
+
+  client= Client()
+
+  url = client.authorization_url(client_id=YourClientID,
+                                 redirect_uri='http://127.0.0.1:5000/authorization')
+  url
+#+END_EXAMPLE
 
 ** Secrets!
 You can use either an =ini= file or an encrypted =.gpg= file for storing your API code and client secret. Note that the client_id is not a secret (I believe), but this is a convenient place to store and access that.
@@ -56,3 +71,6 @@ And if you use a =.gpg= file, it must look like this (it should be all one line)
 #+BEGIN_EXAMPLE
 code SomeRandomStringFromStrava client_secret AnotherRandomStringFromStrava client_id YourClientID
 #+END_EXAMPLE
+
+** A convenient way to run 
+The most convenient way to run the function is to edit the strava.sh script and make an alias for it. Change the input variables as appropriate there (paths to the desired database, secrets file, and rider name) and then add something like =alias bike=~/strava/code/strava.sh=. The first time you run this command you will be prompted for your preferred units. 
