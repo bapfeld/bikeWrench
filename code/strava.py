@@ -175,7 +175,7 @@ class my_db():
     def get_rider_name(self):
         query = 'select name from riders'
         rider_name = self.get_from_db(query)
-        rider_name = rider_name['name']
+        rider_name = rider_name['name'][0]
 
     def gen_ride_id(self):
         self.get_all_ride_ids()
