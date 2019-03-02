@@ -24,14 +24,14 @@ class my_db():
 
     def get_units(self):
         u = self.get_from_db('select units from riders')
-        self.units = u['units']
+        self.units = u['units'][0]
 
     def add_ride(self, ride_info):
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""INSERT into rides (id, bike, distance, name, date, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?,?)""", ride_info)
 
     def add_multiple_rides(self, activity_list, rider_name):
-        def gear_try(x):
+        def gear_try(self, x):
             try:
                 out = x.gear.id
             except AttributeError:
@@ -206,7 +206,7 @@ class strava():
     def gen_secrets(self):
         if self.secrets_path.endswith(".ini"):
             config = configparser.ConfigParser()
-            config.read(self.ini_path)
+            config.read(self.secrets_path)
             code = config['Strava']['code']
             client_secret = config['Strava']['client_secret']
             client_id = config['Strava']['client_id']
