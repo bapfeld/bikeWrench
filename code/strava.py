@@ -31,7 +31,7 @@ class my_db():
             conn.execute("""INSERT into rides (id, bike, distance, name, date, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?,?)""", ride_info)
 
     def add_multiple_rides(self, activity_list, rider_name):
-        def gear_try(self, x):
+        def gear_try(x):
             try:
                 out = x.gear.id
             except AttributeError:
