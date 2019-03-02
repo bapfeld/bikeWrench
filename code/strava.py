@@ -423,7 +423,7 @@ def main():
         elif selection == 3:
             # Bike actions
             show_bike_menu()
-            subselection_function(list(range(1, 4)))
+            subselection_function(list(range(1, 5)))
             if subselection == 1:
                 # update bike stats
                 db.get_all_bike_ids()
