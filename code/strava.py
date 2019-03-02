@@ -125,7 +125,9 @@ class my_db():
         ms = self.all_rides['max_speed'].max()
         av = self.all_rides['avg_speed'].mean()
         tot = self.all_rides['distance'].sum()
-        sql = 'UPDATE riders SET max_speed = ?, avg_speed = ?, total_dist = ? WHERE name = ?'
+        sql = """UPDATE riders 
+                 SET max_speed = ?, avg_speed = ?, total_dist = ? 
+                 WHERE name = ?"""
         self.edit_entry(sql, (ms, av, tot, rider_id))
         
     def update_bike(self, bike):
@@ -176,6 +178,7 @@ class my_db():
         query = 'select name from riders'
         rider_name = self.get_from_db(query)
         rider_name = rider_name['name'][0]
+        return rider_name
 
     def gen_ride_id(self):
         self.get_all_ride_ids()
