@@ -368,6 +368,7 @@ def main():
     db = startup(db_path, strava_db_schema, rider_name)
     cl = Client()
     st = strava(cl, db.all_ride_ids['id'], secrets_path)
+    u = db.units
     while True:
         # Fetch rider name
         rider_name = db.get_rider_name()
@@ -391,9 +392,14 @@ def main():
                 rd = db.get_from_db('select * from riders')
                 rd = rd.to_dict('records')[0]
                 print('Name: ', rd['name'])
-                print('Global Max Speed: ', rd['max_speed'])
-                print('Global Average Speed: ', rd['avg_speed'])
-                print('Global Total Distance: ', rd['total_dist'])
+                if u == 'imperial':
+                    print('Global Max Speed: ', rd['max_speed'], " mph")
+                    print('Global Average Speed: ', rd['avg_speed'], " mph")
+                    print('Global Total Distance: ', rd['total_dist'], " miles")
+                else:
+                    print('Global Max Speed: ', rd['max_speed'], " kph")
+                    print('Global Average Speed: ', rd['avg_speed'], " kph")
+                    print('Global Total Distance: ', rd['total_dist'], " kilometers")
             elif subselection == 2:
                 # edit rider
                 rd = db.get_from_db('select * from riders')
@@ -404,11 +410,8 @@ def main():
                 nm = input("New name: ")
                 if nm == '':
                     nm = rd['name']
-                u = input("New preferred units: ")
-                if u == '':
-                    u = rd['units']
                 db.edit_entry("""UPDATE riders 
-                                 SET name = ?, units = ? 
+                                 SET name = ?
                                  WHERE name = ?""",
                               (nm, u, rider_name))
             elif subselection == 3:
@@ -428,8 +431,12 @@ def main():
                 bk = db.get_from_db('select * from bikes where name=?', (b))
                 bk = rd.to_dict('records')[0]
                 print("Name: ", bk['name'])
-                print("Total Distance Ridden: ", bk['total_mi'])
-                print("Total Elevation Climbed: ", bk['total_elev'])
+                if u == "imperial":
+                    print("Total Distance Ridden: ", bk['total_mi'], " miles")
+                    print("Total Elevation Climbed: ", bk['total_elev'], " feet")
+                else:
+                    print("Total Distance Ridden: ", bk['total_mi'], " kilometers")
+                    print("Total Elevation Climbed: ", bk['total_elev'], " meters")
             elif subselection == 2:
                 # edit bike
                 db.get_all_bike_ids()
