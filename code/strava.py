@@ -273,6 +273,7 @@ def subselection_function(list_options):
     return
 
 def show_main_menu():
+    os.system('clear')
     print('Actions: ')
     print('(1): Get new rides')
     print('(2): Rider actions')
@@ -282,12 +283,14 @@ def show_main_menu():
     print('(6): Exit')
 
 def show_rider_menu():
+    os.system('clear')
     print('Rider actions: ')
     print('(1): Update rider stats')
     print('(2): Edit rider name')
     print('(3): Return to main menu')
 
 def show_bike_menu():
+    os.system('clear')
     print('Bike menu: ')
     print('(1): Update bike stats')
     print('(2): Edit bike')
@@ -295,6 +298,7 @@ def show_bike_menu():
     print('(4): Return to main menu')
 
 def show_parts_menu():
+    os.system('clear')
     print('Parts actions: ')
     print('(1): Get individual part stats')
     print('(2): Get all parts stats')
@@ -304,6 +308,7 @@ def show_parts_menu():
     print('(6): Return to main menu')
 
 def show_ride_menu():
+    os.system('clear')
     print('Ride actions: ')
     print('(1): Add manual ride')
     print('(2): Return to main menu')
@@ -505,7 +510,7 @@ def main():
                     print(row['id'], ": ", row['type'])
             
             show_parts_menu()
-            subselection_function(list(range(1, 6)))
+            subselection_function(list(range(1, 7)))
             if subselection == 1:
                 # get part stats
                 p = int(input("Part id: "))
