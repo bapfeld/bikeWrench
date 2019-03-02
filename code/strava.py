@@ -21,6 +21,7 @@ class my_db():
     def secondary_init(self):
         self.get_all_ride_ids(self.rider_id)
         self.get_units()
+        self.auto_add_bikes()
 
     def get_units(self):
         u = self.get_from_db('select units from riders')
@@ -169,10 +170,15 @@ class my_db():
         with sqlite3.connect(self.db_path) as conn:
             bike_list = pd.read_sql_query('SELECT distinct bike from rides', conn)
             current_bike_list = pd.read_sql_query('SELECT id from bikes', conn)
-            new_bikes = [x for x in bike_list not in current_bike_list]
-            if len(new_bikes) > 0:
-                for bike in new_bikes:
-                    conn.execute('INSERT into bikes (id) values (?)', (bike))
+        bike_list = list(bike_list['bike'])
+        current_bike_list = list(current_bike_list['id'])
+        new_bikes = [x for x in bike_list if x not in current_bike_list]
+        if len(new_bikes) > 0:
+            print('New bikes detected.')
+            print('You can edit the bike info from the bike menu')
+            print('New bike ids: %s' %', '.join(new_bikes))
+            for bike in new_bikes:
+                conn.execute('INSERT into bikes (id) values (?)', (bike))
 
     def get_rider_name(self):
         query = 'select name from riders'
