@@ -284,7 +284,7 @@ def show_main_menu():
 def show_rider_menu():
     print('Rider actions: ')
     print('(1): Update rider stats')
-    print('(2): Edit rider')
+    print('(2): Edit rider name')
     print('(3): Return to main menu')
 
 def show_bike_menu():
@@ -416,7 +416,7 @@ def main():
                 db.edit_entry("""UPDATE riders 
                                  SET name = ?
                                  WHERE name = ?""",
-                              (nm, u, rider_name))
+                              (nm, rider_name))
             elif subselection == 3:
                 # return to main menu
                 pass
