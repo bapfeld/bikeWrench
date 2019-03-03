@@ -24,6 +24,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Calculate wear on parts not in use
 - [X] Add a new bike to the db
 - [ ] Export capabilities (e.g. export an entire maintenance log to csv)
+- [ ] Show basic rider/bike info (e.g. name, bike color, etc.)
 
 ** Other concerns
 - [X] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
@@ -38,7 +39,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Maybe the schema should be included in the code?
 - [X] Should auto_add_bikes trigger a warning if new bikes are added?
 - [ ] Printing numbers should be rounded to logical places
-- [ ] How to identify which bike is which per strava ids
+- [X] How to identify which bike is which per strava ids
 
 * Installation/Usage Requirements
 ** Python requirements

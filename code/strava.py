@@ -131,13 +131,18 @@ class my_db():
                  WHERE name = ?"""
         self.edit_entry(sql, (ms, av, tot, rider_id))
         
-    def update_bike(self, bike):
-        query = "SELECT distance, elev from rides WHERE bike='%s'" %bike
-        r = self.get_from_db(query)
-        dist = r['distance'].sum()
-        elev = r['elev'].sum()
-        sql = 'UPDATE bikes SET total_mi = ?, total_elev = ? WHERE name=?'
-        self.edit_entry(sql, (dist, elev, bike))
+    def update_bike(self, bike_name):
+        try:
+            bike_id = self.get_from_db("SELECT id from bikes WHERE name='%s'" %bike_name)
+            bike_id = bike_id['id'][0]
+            query = "SELECT distance, elev from rides WHERE bike='%s'" %bike_id
+            r = self.get_from_db(query)
+            dist = r['distance'].sum()
+            elev = r['elev'].sum()
+            sql = 'UPDATE bikes SET total_mi = ?, total_elev = ? WHERE name=?'
+            self.edit_entry(sql, (dist, elev, bike_name))
+        except:
+            print("No bike found for that name")
         
     def get_maintenance_logs(self, part=None, bike=None, date=None):
         # get the maintenance record for a part or bike
@@ -170,15 +175,35 @@ class my_db():
         with sqlite3.connect(self.db_path) as conn:
             bike_list = pd.read_sql_query('SELECT distinct bike from rides', conn)
             current_bike_list = pd.read_sql_query('SELECT id from bikes', conn)
-        bike_list = list(bike_list['bike'])
-        current_bike_list = list(current_bike_list['id'])
-        new_bikes = [x for x in bike_list if x not in current_bike_list]
-        if len(new_bikes) > 0:
-            print('New bikes detected.')
-            print('You can edit the bike info from the bike menu')
-            print('New bike ids: %s' %', '.join(new_bikes))
-            for bike in new_bikes:
-                conn.execute('INSERT into bikes (id) values (?)', (bike))
+            bike_list = list(bike_list['bike'])
+            current_bike_list = list(current_bike_list['id'])
+            new_bikes = [x for x in bike_list if x not in current_bike_list]
+            if len(new_bikes) > 0:
+                print('New bikes detected.')
+                print('You can edit the bike info from the bike menu')
+                print('New bike ids: %s' %', '.join(new_bikes))
+                for bike in new_bikes:
+                    conn.execute('INSERT into bikes (id) values (?)', (bike, ))
+
+    def auto_get_bike_names(self, strava_object):
+        self.get_all_bike_ids()
+        sql = """UPDATE bikes 
+                 SET (name) = (?) 
+                 WHERE id = ?"""
+        if self.all_bike_ids.shape[0] > 0:
+            new_ids = list(self.all_bike_ids['id'][self.all_bike_ids['name'].isnull()])
+            new_ids = [x for x in new_ids if x != 'Unknown']
+            if len(new_ids) > 0:
+                for bike in new_ids:
+                    try:
+                        b = strava_object.client.get_gear(bike)
+                        nm = b.name
+                    except:
+                        nm = None
+                    if nm is not None:
+                        vals = (nm, bike)
+                        with sqlite3.connect(self.db_path) as conn:
+                            conn.execute(sql, vals)
 
     def get_rider_name(self):
         query = 'select name from riders'
@@ -301,7 +326,8 @@ def show_bike_menu():
     print('(1): Update bike stats')
     print('(2): Edit bike')
     print('(3): Add new bike')
-    print('(4): Return to main menu')
+    print('(4): Automatically get bike names from Strava')
+    print('(5): Return to main menu')
 
 def show_parts_menu():
     os.system('clear')
@@ -336,30 +362,34 @@ def startup(db_path, schema, rider_name):
 
 def part_summary_func(switch, b, p):
     if switch == "a":
-        pt = db.get_from_db("""SELECT distance, elapsed_time, elev 
-                               FROM rides
-                               WHERE bike = ? AND part = ?""", (b, p))
+        q = """SELECT distance, elapsed_time, elev 
+               FROM rides
+               WHERE bike = '%s' AND part = '%s'""" %(b, p)
+        pt = db.get_from_db(q)
         mrld = "purchase date"
     elif switch == "l":
-        logs = db.get_from_db("""SELECT * from maintenance
-                                 WHERE id = ?""", (p))
+        q = """SELECT * from maintenance
+               WHERE id = '%s'""" %p
+        logs = db.get_from_db(q)
         if logs.shape[0] > 0:
             mrld = logs['date'].max()
         else:
             print("No maintenance logs found for %s. Setting date to Jan 1, 1900" %p)
             mrld = '1900-01-01'
-        pt = db.get_from_db("""SELECT distance, elapsed_time, elev from rides
-                               WHERE bike = ?
-                               AND id = ?
-                               AND date >= date(?)""", (b, p, mrld))
+        q2 = """SELECT distance, elapsed_time, elev from rides
+                WHERE bike = '%s'
+                AND id = '%s'
+                AND date >= date(%s)""" % (b, p, mrld)
+        pt = db.get_from_db(q2)
     elif switch == "d":
         dt = input("Date (YYYY-MM-DD): ")
         # need to generate some dates here
         # this is where i left off
-        pt = db.get_from_db("""SELECT distance, elapsed_time, elev from rides 
-                               WHERE bike = ? 
-                               AND id = ?
-                               AND date >= date(?)""", (b, p, dt))
+        q = """SELECT distance, elapsed_time, elev from rides 
+               WHERE bike = '%s' 
+               AND id = '%s'
+               AND date >= date(%s)""" % (b, p, dt)
+        pt = db.get_from_db(q)
     dist = pt['distance'].sum()
     time = pt['elapsed_time'].sum()
     elev = pt['elev'].sum()
@@ -367,6 +397,14 @@ def part_summary_func(switch, b, p):
     print("Total distance: %f" %dist)
     print("Total time: %f" %time)
     print("Total elevation: %f" %elev)
+
+def bike_list_func(db):
+    db.get_all_bike_ids()
+    blist = list(db.all_bike_ids['name'])
+    blist_clean = [x for x in blist if x is not None]
+    if len(blist_clean) < len(blist):
+        print("NOTE: Not all bikes in database have a name. These will not appear in the list below.")
+    return blist_clean
 
 ###########################################
 # Main
@@ -414,6 +452,7 @@ def main():
                     print('Global Max Speed: ', rd['max_speed'], " kph")
                     print('Global Average Speed: ', rd['avg_speed'], " kph")
                     print('Global Total Distance: ', rd['total_dist'], " kilometers")
+                input("Press any key to continue")
             elif subselection == 2:
                 # edit rider
                 rd = db.get_from_db('select * from riders')
@@ -433,17 +472,21 @@ def main():
                 pass
         elif selection == 3:
             # Bike actions
+            blist = bike_list_func(db)
+            if len(blist) == 0:
+                print("No bikes found in database. Try updating bike lists first.")
+                pass
             show_bike_menu()
-            subselection_function(list(range(1, 5)))
+            subselection_function(list(range(1, 6)))
             if subselection == 1:
                 # update bike stats
-                db.get_all_bike_ids()
-                print('Current list of bikes in database: ', ' '.join(db.all_bike_ids['name']))
+                print('Current list of bikes in database: ', ' '.join(blist))
                 b = input("Name of bike to update: ")
                 db.update_bike(b)
                 # show the results from the update
-                bk = db.get_from_db('select * from bikes where name=?', (b))
-                bk = rd.to_dict('records')[0]
+                q = "SELECT * from bikes WHERE name = '%s'" %b
+                bk = db.get_from_db(q)
+                bk = bk.to_dict('records')[0]
                 print("Name: ", bk['name'])
                 if u == "imperial":
                     print("Total Distance Ridden: ", bk['total_mi'], " miles")
@@ -451,14 +494,15 @@ def main():
                 else:
                     print("Total Distance Ridden: ", bk['total_mi'], " kilometers")
                     print("Total Elevation Climbed: ", bk['total_elev'], " meters")
+                input("Press any key to continue")
             elif subselection == 2:
                 # edit bike
-                db.get_all_bike_ids()
-                print('Current list of bikes in database: ', ' '.join(db.all_bike_ids['name']))
+                print('Current list of bikes in database: ', ' '.join(blist))
                 b = input("Name of bike to edit: ")
                 # report current bike info
-                bk = db.get_from_db('select * from bikes where name=?', (b))
-                bk = rd.to_dict('records')[0]
+                q = "SELECT * from bikes WHERE name = '%s'" %b
+                bk = db.get_from_db(q)
+                bk = bk.to_dict('records')[0]
                 print("Name: ", bk['name'])
                 print("Color: ", bk['color'])
                 print("Purchased: ", bk['purchased'])
@@ -489,6 +533,9 @@ def main():
                 i = input("Strava identifier of new bike: ")
                 db.add_bike((i, b, c, p, pr))
             elif subselection == 4:
+                # automatically get the bike names from strava
+                db.auto_get_bike_names(st)
+            elif subselection == 5:
                 # exit to main menu
                 pass
         elif selection == 4:
@@ -505,9 +552,11 @@ def main():
                     parts = db.get_from_db('SELECT * from parts WHERE inuse=True')
             else:
                 if u == "a":
-                    parts = db.get_from_db('SELECT * from parts WHERE bike = ?', (b))
+                    q = "SELECT * from parts WHERE bike = '%s'" %b
+                    parts = db.get_from_db(q)
                 else:
-                    parts = db.get_from_db('SELECT * from parts WHERE bike=? AND inuse=True', (b))
+                    q = "SELECT * from parts WHERE bike='%s' AND inuse=True" %b
+                    parts = db.get_from_db(q)
             if parts.shape[0] == 0:
                 print("No parts found")
             else:
@@ -527,7 +576,8 @@ def main():
                 # get all parts stats
                 b = input("Which bike do you want to see records for? ")
                 switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
-                all_parts = db.get_from_db("SELECT id from parts WHERE bike = ?", (b))
+                q = "SELECT id from parts WHERE bike = '%s'" %b
+                all_parts = db.get_from_db(q)
                 if all_parts.shape[0] > 0:
                     for index, row in all_parts.iterrows:
                         part_summary_func(switch, b, row['id'])
