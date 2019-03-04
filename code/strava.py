@@ -403,7 +403,7 @@ def bike_list_func(db):
     blist = list(db.all_bike_ids['name'])
     blist_clean = [x for x in blist if x is not None]
     if len(blist_clean) < len(blist):
-        print("NOTE: Not all bikes in database have a name. These will not appear in the list below.")
+        print("NOTE: Not all bikes in database have a name. These will not appear in the list below.")    
     return blist_clean
 
 ###########################################
@@ -517,9 +517,11 @@ def main():
                 pur = input("New purchase date: ")
                 if pur == '':
                     pur = bk['purchased']
-                pr = float(input("New price: "))
+                pr = input("New price: ")
                 if pr == '':
                     pr = bk['price']
+                else:
+                    pr = float(pr)
                 db.edit_entry("""UPDATE bikes 
                                  SET name = ?, color = ?, purchased = ?, price = ? 
                                  WHERE name = ?""",
@@ -541,8 +543,11 @@ def main():
         elif selection == 4:
             # Parts actions
             # first, show bike list and ask which bike to list parts for
-            db.get_all_bike_ids()
-            print('Current list of bikes in database: ', ' '.join(db.all_bike_ids['name']))
+            blist = bike_list_func(db)
+            if len(blist) == 0:
+                print("No bikes found in database. Try updating bike lists first.")
+                pass
+            print('Current list of bikes in database: ', ' '.join(blist))
             b = input("Which bike do you want to see parts for? Enter 'all' for all bike parts: ")
             u = input("Do you want to see all bike parts (a) or only those current in use (c)?")
             if b == 'all':
@@ -559,10 +564,12 @@ def main():
                     parts = db.get_from_db(q)
             if parts.shape[0] == 0:
                 print("No parts found")
+                input("Press any key to continue")
             else:
                 print("The following parts meet your search: ")
                 for index, row in parts.iterrows():
                     print(row['id'], ": ", row['type'])
+                input("Press any key to continue")
             
             show_parts_menu()
             subselection_function(list(range(1, 7)))
