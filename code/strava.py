@@ -480,7 +480,7 @@ def main():
             subselection_function(list(range(1, 6)))
             if subselection == 1:
                 # update bike stats
-                print('Current list of bikes in database: ', ' '.join(blist))
+                print('Current list of bikes in database: ', ', '.join(blist))
                 b = input("Name of bike to update: ")
                 db.update_bike(b)
                 # show the results from the update
