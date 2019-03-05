@@ -360,7 +360,7 @@ def startup(db_path, schema, rider_name):
     db.secondary_init()
     return db
 
-def part_summary_func(switch, b, p):
+def part_summary_func(db, switch, b, p):
     if switch == "a":
         q = """SELECT distance, elapsed_time, elev 
                FROM rides
@@ -578,7 +578,7 @@ def main():
                 p = int(input("Part id: "))
                 b = parts.loc[parts['id'] == p, :]['bike'][0]
                 switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
-                part_summary_func(switch, b, p)
+                part_summary_func(db, switch, b, p)
             elif subselection == 2:
                 # get all parts stats
                 b = input("Which bike do you want to see records for? ")
@@ -587,7 +587,7 @@ def main():
                 all_parts = db.get_from_db(q)
                 if all_parts.shape[0] > 0:
                     for index, row in all_parts.iterrows:
-                        part_summary_func(switch, b, row['id'])
+                        part_summary_func(db, switch, b, row['id'])
             elif subselection == 3:
                 # maintain parts
                 part_id = int(input("Part id: "))
