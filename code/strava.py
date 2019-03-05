@@ -360,16 +360,20 @@ def startup(db_path, schema, rider_name):
     db.secondary_init()
     return db
 
-def part_summary_func(db, switch, b, p):
+def part_summary_func(db, switch, b, p, u):
+    # start by getting the bike id based on the name
+    db.get_all_bike_ids()
+    bikes = db.all_bike_ids
+    bid = bikes.loc[bikes['name'] == b, :]['id'].values[0]
     if switch == "a":
         q = """SELECT distance, elapsed_time, elev 
                FROM rides
-               WHERE bike = '%s' AND part = '%s'""" %(b, p)
+               WHERE bike = '%s'""" %bid
         pt = db.get_from_db(q)
         mrld = "purchase date"
     elif switch == "l":
         q = """SELECT * from maintenance
-               WHERE id = '%s'""" %p
+               WHERE id = %i""" %p
         logs = db.get_from_db(q)
         if logs.shape[0] > 0:
             mrld = logs['date'].max()
@@ -378,8 +382,8 @@ def part_summary_func(db, switch, b, p):
             mrld = '1900-01-01'
         q2 = """SELECT distance, elapsed_time, elev from rides
                 WHERE bike = '%s'
-                AND id = '%s'
-                AND date >= date(%s)""" % (b, p, mrld)
+                AND id = %i
+                AND date >= date(%s)""" % (bid, p, mrld)
         pt = db.get_from_db(q2)
     elif switch == "d":
         dt = input("Date (YYYY-MM-DD): ")
@@ -387,16 +391,21 @@ def part_summary_func(db, switch, b, p):
         # this is where i left off
         q = """SELECT distance, elapsed_time, elev from rides 
                WHERE bike = '%s' 
-               AND id = '%s'
-               AND date >= date(%s)""" % (b, p, dt)
+               AND id = %i
+               AND date >= date(%s)""" % (bid, p, dt)
         pt = db.get_from_db(q)
     dist = pt['distance'].sum()
     time = pt['elapsed_time'].sum()
     elev = pt['elev'].sum()
     print("Since %s" %(str(mrld)))
-    print("Total distance: %f" %dist)
-    print("Total time: %f" %time)
-    print("Total elevation: %f" %elev)
+    if u == "imperial":
+        print("Total distance: %f miles" %dist)
+        print("Total time: %f hours" %time)
+        print("Total elevation: %f feet" %elev)
+    else:
+        print("Total distance: %f kilometers" %dist)
+        print("Total time: %f hours" %time)
+        print("Total elevation: %f meters" %elev)
 
 def bike_list_func(db):
     db.get_all_bike_ids()
@@ -578,7 +587,8 @@ def main():
                 p = int(input("Part id: "))
                 b = parts.loc[parts['id'] == p, :]['bike'][0]
                 switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
-                part_summary_func(db, switch, b, p)
+                part_summary_func(db, switch, b, p, u)
+                input("Press any key to continue")
             elif subselection == 2:
                 # get all parts stats
                 b = input("Which bike do you want to see records for? ")
@@ -587,7 +597,8 @@ def main():
                 all_parts = db.get_from_db(q)
                 if all_parts.shape[0] > 0:
                     for index, row in all_parts.iterrows:
-                        part_summary_func(db, switch, b, row['id'])
+                        part_summary_func(db, switch, b, row['id'], u)
+                    input("Press any key to continue")
             elif subselection == 3:
                 # maintain parts
                 part_id = int(input("Part id: "))

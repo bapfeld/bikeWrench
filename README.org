@@ -41,6 +41,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [ ] Printing numbers should be rounded to logical places
 - [X] How to identify which bike is which per strava ids
 - [ ] Need to consider what happens if this is run without the internet
+- [ ] Parts function needs to get the original part date for all stats option
 
 * Installation/Usage Requirements
 ** Python requirements
