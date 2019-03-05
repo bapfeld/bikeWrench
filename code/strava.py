@@ -549,7 +549,7 @@ def main():
                 pass
             print('Current list of bikes in database: ', ' '.join(blist))
             b = input("Which bike do you want to see parts for? Enter 'all' for all bike parts: ")
-            u = input("Do you want to see all bike parts (a) or only those current in use (c)?")
+            u = input("Do you want to see all bike parts (a) or only those current in use (c)? ")
             if b == 'all':
                 if u == "a":
                     parts = db.get_from_db('SELECT * from parts')
