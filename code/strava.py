@@ -576,7 +576,7 @@ def main():
             if subselection == 1:
                 # get part stats
                 p = int(input("Part id: "))
-                b = parts['bike'].where(id == p)
+                b = parts.loc[parts['id'] == p, :]['bike'][0]
                 switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
                 part_summary_func(switch, b, p)
             elif subselection == 2:
@@ -611,7 +611,7 @@ def main():
                 pur = input("Date added: ")
                 db.replace_part((new_part, pur, br, pr, wt, size, model, bike), old_part_id)
             elif subselection == 5:
-                # replace parts
+                # add new
                 new_part = input("New part type: ")
                 br = input("Brand: ")
                 model = input("Model: ")
