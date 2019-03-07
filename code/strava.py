@@ -330,7 +330,7 @@ def show_bike_menu():
     print('(5): Return to main menu')
 
 def show_parts_menu():
-    os.system('clear')
+    # os.system('clear')
     print('Parts actions: ')
     print('(1): Get individual part stats')
     print('(2): Get all parts stats')
