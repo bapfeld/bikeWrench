@@ -559,14 +559,14 @@ def main():
                 pass
             print('Current list of bikes in database: ', ' '.join(blist))
             b = input("Which bike do you want to see parts for? Enter 'all' for all bike parts: ")
-            u = input("Do you want to see all bike parts (a) or only those current in use (c)? ")
+            inuse = input("Do you want to see all bike parts (a) or only those current in use (c)? ")
             if b == 'all':
-                if u == "a":
+                if inuse == "a":
                     parts = db.get_from_db('SELECT * from parts')
                 else:
                     parts = db.get_from_db('SELECT * from parts WHERE inuse=True')
             else:
-                if u == "a":
+                if inuse == "a":
                     q = "SELECT * from parts WHERE bike = '%s'" %b
                     parts = db.get_from_db(q)
                 else:
@@ -579,7 +579,7 @@ def main():
                 print("The following parts meet your search: ")
                 for index, row in parts.iterrows():
                     print(row['id'], ": ", row['type'])
-                input("Press any key to continue")
+                print("\n")
             
             show_parts_menu()
             subselection_function(list(range(1, 7)))
