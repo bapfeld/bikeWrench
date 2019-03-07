@@ -586,7 +586,7 @@ def main():
             if subselection == 1:
                 # get part stats
                 p = int(input("Part id: "))
-                b = parts.loc[parts['id'] == p, :]['bike'][0]
+                b = parts.loc[parts['id'] == p, :]['bike'].iloc[0]
                 switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
                 part_summary_func(db, switch, b, p, u)
                 input("Press any key to continue")
