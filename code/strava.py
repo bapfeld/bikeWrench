@@ -368,7 +368,10 @@ def part_summary_func(db, switch, b, p, u):
     if switch == "a":
         q = """SELECT distance, elapsed_time, elev 
                FROM rides
-               WHERE bike = '%s'""" %bid
+               WHERE bike = '%s'
+               AND date >= (SELECT purchased 
+                            FROM parts
+                            WHERE id = %i)""" %(bid, p)
         pt = db.get_from_db(q)
         mrld = "purchase date"
     elif switch == "l":
@@ -382,8 +385,7 @@ def part_summary_func(db, switch, b, p, u):
             mrld = '1900-01-01'
         q2 = """SELECT distance, elapsed_time, elev from rides
                 WHERE bike = '%s'
-                AND id = %i
-                AND date >= date(%s)""" % (bid, p, mrld)
+                AND date >= date(%s)""" % (bid, mrld)
         pt = db.get_from_db(q2)
     elif switch == "d":
         dt = input("Date (YYYY-MM-DD): ")
@@ -391,8 +393,7 @@ def part_summary_func(db, switch, b, p, u):
         # this is where i left off
         q = """SELECT distance, elapsed_time, elev from rides 
                WHERE bike = '%s' 
-               AND id = %i
-               AND date >= date(%s)""" % (bid, p, dt)
+               AND date >= date(%s)""" % (bid, dt)
         pt = db.get_from_db(q)
     dist = pt['distance'].sum()
     time = pt['elapsed_time'].sum()
