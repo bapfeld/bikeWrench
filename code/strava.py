@@ -399,13 +399,13 @@ def part_summary_func(db, switch, b, p, u):
     elev = pt['elev'].sum()
     print("Since %s" %(str(mrld)))
     if u == "imperial":
-        print("Total distance: %f miles" %dist)
-        print("Total time: %f hours" %time)
-        print("Total elevation: %f feet" %elev)
+        print("Total distance: %.1f miles" %dist)
+        print("Total time: %.1f hours" %time)
+        print("Total elevation: %.0f feet" %elev)
     else:
-        print("Total distance: %f kilometers" %dist)
-        print("Total time: %f hours" %time)
-        print("Total elevation: %f meters" %elev)
+        print("Total distance: %.1f kilometers" %dist)
+        print("Total time: %.1f hours" %time)
+        print("Total elevation: %.0f meters" %elev)
 
 def bike_list_func(db):
     db.get_all_bike_ids()
@@ -454,13 +454,13 @@ def main():
                 rd = rd.to_dict('records')[0]
                 print('Name: ', rd['name'])
                 if u == 'imperial':
-                    print('Global Max Speed: ', rd['max_speed'], " mph")
-                    print('Global Average Speed: ', rd['avg_speed'], " mph")
-                    print('Global Total Distance: ', rd['total_dist'], " miles")
+                    print('Global Max Speed: %.2f mph' %rd['max_speed'])
+                    print('Global Average Speed: %.2f mph' %rd['avg_speed'])
+                    print('Global Total Distance: %.1f miles' %rd['total_dist'])
                 else:
-                    print('Global Max Speed: ', rd['max_speed'], " kph")
-                    print('Global Average Speed: ', rd['avg_speed'], " kph")
-                    print('Global Total Distance: ', rd['total_dist'], " kilometers")
+                    print('Global Max Speed: %.2f kph' %rd['max_speed'])
+                    print('Global Average Speed: %.2 kph' %rd['avg_speed'])
+                    print('Global Total Distance: %.1f kilometers' %rd['total_dist'])
                 input("Press any key to continue")
             elif subselection == 2:
                 # edit rider
@@ -498,11 +498,11 @@ def main():
                 bk = bk.to_dict('records')[0]
                 print("Name: ", bk['name'])
                 if u == "imperial":
-                    print("Total Distance Ridden: ", bk['total_mi'], " miles")
-                    print("Total Elevation Climbed: ", bk['total_elev'], " feet")
+                    print("Total Distance Ridden: %.2f miles" %bk['total_mi'])
+                    print("Total Elevation Climbed: %.0f feet" %bk['total_elev'])
                 else:
-                    print("Total Distance Ridden: ", bk['total_mi'], " kilometers")
-                    print("Total Elevation Climbed: ", bk['total_elev'], " meters")
+                    print("Total Distance Ridden: %.2f kilometers" %bk['total_mi'])
+                    print("Total Elevation Climbed: %.0f meters" %bk['total_elev'])
                 input("Press any key to continue")
             elif subselection == 2:
                 # edit bike
