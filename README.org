@@ -30,7 +30,7 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Units need to be converted to miles/ft (maybe? or at least km and m) (also seconds are not a good unit of time)
 - [X] time format for testing if activities are new
 - [X] How best to store the secret stuff?
-- [ ] How to deal with alphanumeric ids and something intelligible?
+- [X] How to deal with alphanumeric ids and something intelligible?
 - [X] Now that I've switched to a single rider database, do i need the link to bikes?
 - [X] Rides don't currently have dates
 - [X] Need to filter only rides when querying strava (i.e. eliminate runs and other types of activities)
@@ -40,9 +40,9 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [X] Should auto_add_bikes trigger a warning if new bikes are added?
 - [X] Printing numbers should be rounded to logical places
 - [X] How to identify which bike is which per strava ids
-- [ ] Need to consider what happens if this is run without the internet
-- [ ] Parts function needs to get the original part date for all stats option
-- [ ] Throws an error if no input is supplied when prompted
+- [X] Need to consider what happens if this is run without the internet
+- [X] Parts function needs to get the original part date for all stats option
+- [X] Throws an error if no input is supplied when prompted
 
 * Installation/Usage Requirements
 ** Python requirements
