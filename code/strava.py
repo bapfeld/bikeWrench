@@ -212,7 +212,7 @@ class my_db():
         return rider_name
 
     def gen_ride_id(self):
-        self.get_all_ride_ids()
+        self.get_all_ride_ids(self.rider_id)
         ride_ids = [str(x) for x in self.all_ride_ids]
         ride_ids = '--'.join(ride_ids)
         ids = re.findall(r'(?:^|-)(\d{1,3})(?:-|$)', ride_ids)
@@ -704,6 +704,7 @@ def main():
                 bike = str_input_func('Bike used: ')
                 distance = int_input_func('Distance: ')
                 name = str_input_func('Ride name: ')
+                date = str_input_func('Ride date (YYYY-MM-DD): ')
                 moving_time = float_input_func('Moving time: ')
                 elapsed_time = float_input_func('Elapsed time: ')
                 elev = float_input_func('Elevation gain: ')
@@ -711,7 +712,7 @@ def main():
                 avg_speed = distance / moving_time
                 max_speed = 0
                 calories = 0
-                ride_info = (ride_id, bike, distance, name, moving_time, elapsed_time, elev, ride_type, avg_speed, max_speed, calories, rider_name)
+                ride_info = (ride_id, bike, distance, name, date, moving_time, elapsed_time, elev, ride_type, avg_speed, max_speed, calories, rider_name)
                 db.add_ride(ride_info)
             elif subselection == 2:
                 # return to the main menu
