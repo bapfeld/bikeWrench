@@ -291,13 +291,14 @@ def create_db(db_path, schema):
 # Main interaction functions
 ###########################################
 def int_input_func(prompt, list_options=None):
-    while True:
+    test_val = True
+    while test_val:
         try:
             i = int(input(prompt))
             if list_options is not None:
                 if i not in list_options:
                     raise KeyError()
-            break
+            test_val = False
         except ValueError:
             print("You must enter an integer value")
         except KeyError:
@@ -305,16 +306,18 @@ def int_input_func(prompt, list_options=None):
     return i
 
 def float_input_func(prompt):
-    while True:
+    test_val = True
+    while test_val:
         try:
             i = float(input(prompt))
-            break
+            test_val = False
         except:
             print("You must enter a numeric value")
     return i
 
-def str_input_func(prompt, list_options):
-    while True:
+def str_input_func(prompt, list_options=None):
+    test_val = True
+    while test_val:
         try:
             i = input(prompt)
             if i == '':
@@ -322,7 +325,7 @@ def str_input_func(prompt, list_options):
             if list_options is not None:
                 if i not in list_options:
                     raise KeyError()
-            break
+            test_val = False
         except ValueError:
             print("You must enter a value")
         except KeyError:
@@ -635,62 +638,62 @@ def main():
                     print(row['id'], ": ", row['type'])
                 print("\n")
             
-            show_parts_menu()
-            subselection_function(list(range(1, 7)))
-            if subselection == 1:
-                # get part stats
-                p = int_input_func("Part id: ", list_options=parts['id'])
-                b = parts.loc[parts['id'] == p, :]['bike'].iloc[0]
-                switch = str_input_func("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ",
-                                        list_options=['a', 'l', 'd'])
-                part_summary_func(db, switch, b, p, u)
-                input("Press enter to continue")
-            elif subselection == 2:
-                # get all parts stats
-                b = str_input_func("Which bike do you want to see records for? ",
-                                   list_options=blist)
-                switch = str_input_func("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ",
-                                        list_options=['a', 'l', 'd'])
-                q = "SELECT id from parts WHERE bike = '%s'" %b
-                all_parts = db.get_from_db(q)
-                if all_parts.shape[0] > 0:
-                    for index, row in all_parts.iterrows:
-                        part_summary_func(db, switch, b, row['id'], u)
+                show_parts_menu()
+                subselection_function(list(range(1, 7)))
+                if subselection == 1:
+                    # get part stats
+                    p = int_input_func("Part id: ", list_options=list(parts['id']))
+                    b = parts.loc[parts['id'] == p, :]['bike'].iloc[0]
+                    switch = str_input_func("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ",
+                                            list_options=['a', 'l', 'd'])
+                    part_summary_func(db, switch, b, p, u)
                     input("Press enter to continue")
-            elif subselection == 3:
-                # maintain parts
-                part_id = int_input_func("Part id: ",
-                                         list_options=parts['id'])
-                work = str_input_func("Work performed: ")
-                d = str_input_func("Date work performed (YYYY-MM-DD): ")
-                db.add_maintenance((part_id, work, d))
-            elif subselection == 4:
-                # replace parts
-                old_part_id = int_input_func("Part id: ",
-                                             list_options=parts['id'])
-                new_part = str_input_func("New part type: ")
-                br = str_input_func("Brand: ")
-                model = str_input_func("Model: ")
-                pr = float_input_func("Price: ")
-                wt = float_input_func("Weight (g): ")
-                size = str_input_func("Size: ")
-                bike = str_input_func("Which bike? ")
-                pur = str_input_func("Date added: ")
-                db.replace_part((new_part, pur, br, pr, wt, size, model, bike), old_part_id)
-            elif subselection == 5:
-                # add new
-                new_part = str_input_func("New part type: ")
-                br = str_input_func("Brand: ")
-                model = str_input_func("Model: ")
-                pr = float_input("Price: ")
-                wt = float_input("Weight (g): ")
-                size = str_input_func("Size: ")
-                bike = str_input_func("Which bike? ")
-                pur = str_input_func("Date added: ")
-                db.add_part((new_part, pur, br, pr, wt, size, model, bike))
-            elif subselection == 6:
-                # return to main menu
-                pass
+                elif subselection == 2:
+                    # get all parts stats
+                    b = str_input_func("Which bike do you want to see records for? ",
+                                       list_options=blist)
+                    switch = str_input_func("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ",
+                                            list_options=['a', 'l', 'd'])
+                    q = "SELECT id from parts WHERE bike = '%s'" %b
+                    all_parts = db.get_from_db(q)
+                    if all_parts.shape[0] > 0:
+                        for index, row in all_parts.iterrows:
+                            part_summary_func(db, switch, b, row['id'], u)
+                        input("Press enter to continue")
+                elif subselection == 3:
+                    # maintain parts
+                    part_id = int_input_func("Part id: ",
+                                             list_options=list(parts['id']))
+                    work = str_input_func("Work performed: ")
+                    d = str_input_func("Date work performed (YYYY-MM-DD): ")
+                    db.add_maintenance((part_id, work, d))
+                elif subselection == 4:
+                    # replace parts
+                    old_part_id = int_input_func("Part id: ",
+                                                 list_options=list(parts['id']))
+                    new_part = str_input_func("New part type: ")
+                    br = str_input_func("Brand: ")
+                    model = str_input_func("Model: ")
+                    pr = float_input_func("Price: ")
+                    wt = float_input_func("Weight (g): ")
+                    size = str_input_func("Size: ")
+                    bike = str_input_func("Which bike? ")
+                    pur = str_input_func("Date added: ")
+                    db.replace_part((new_part, pur, br, pr, wt, size, model, bike), old_part_id)
+                elif subselection == 5:
+                    # add new
+                    new_part = str_input_func("New part type: ")
+                    br = str_input_func("Brand: ")
+                    model = str_input_func("Model: ")
+                    pr = float_input("Price: ")
+                    wt = float_input("Weight (g): ")
+                    size = str_input_func("Size: ")
+                    bike = str_input_func("Which bike? ")
+                    pur = str_input_func("Date added: ")
+                    db.add_part((new_part, pur, br, pr, wt, size, model, bike))
+                elif subselection == 6:
+                    # return to main menu
+                    pass
         elif selection == 5:
             # Ride options
             show_ride_menu()
