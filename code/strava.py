@@ -4,7 +4,7 @@
 
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser, argparse, sqlite3, os, sys, re
+import configparser, argparse, sqlite3, os, sys, re, requests
 import pandas as pd
 
 ###########################################
@@ -235,7 +235,6 @@ class strava():
         self.id_list = [str(x) for x in id_list]
         self.secrets_path = secrets_path
         self.client = stravalib_client
-        self.gen_secrets()
 
     def gen_secrets(self):
         if self.secrets_path.endswith(".ini"):
@@ -258,15 +257,27 @@ class strava():
         s = re.search("code (.*?) client_secret (.*?) client_id (.*?)\n", secrets)
         return (s.group(1), s.group(2), s.group(3))
 
+    def test_conn(self):
+        try:
+            _ = requests.get('http://www.google.com', timeout=5)
+            return True
+        except requests.ConnectionError:
+            return False
+
     def fetch_new_activities(self):
-        activity_list = self.client.get_activities()
-        if self.id_list is not None:
-            self.new_id_list = [str(x.id) for x in activity_list if str(x.id) not in self.id_list and x.type == "Ride"]
+        if self.test_conn():
+            self.gen_secrets()
+            activity_list = self.client.get_activities()
+            if self.id_list is not None:
+                self.new_id_list = [str(x.id) for x in activity_list if str(x.id) not in self.id_list and x.type == "Ride"]
+            else:
+                self.new_id_list = [x.id for x in activity_list]
+            if len(self.new_id_list) > 0:
+                self.new_activities = [self.client.get_activity(id) for id in self.new_id_list]
+            else:
+                self.new_activities = None
         else:
-            self.new_id_list = [x.id for x in activity_list]
-        if len(self.new_id_list) > 0:
-            self.new_activities = [self.client.get_activity(id) for id in self.new_id_list]
-        else:
+            print("No internet connection. Unable to update rides.")
             self.new_activities = None
 
 ###########################################
