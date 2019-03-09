@@ -279,6 +279,35 @@ def create_db(db_path, schema):
 ###########################################
 # Main interaction functions
 ###########################################
+def int_input_func(prompt):
+    while True:
+        try:
+            i = int(input(prompt))
+            break
+        except:
+            print("You must enter an integer value")
+    return i
+
+def float_input_func(prompt):
+    while True:
+        try:
+            i = float(input(prompt))
+            break
+        except:
+            print("You must enter a numeric value")
+    return i
+
+def str_input_func(prompt):
+    while True:
+        try:
+            i = input(prompt)
+            if i == '':
+                raise ValueError()
+            break
+        except ValueError:
+            print("You must enter a value")
+    return i
+
 def selection_function(list_options):
     while True:
         try:
@@ -350,7 +379,7 @@ def startup(db_path, schema, rider_name):
     db_is_new = not os.path.exists(db_path)
     if db_is_new:
         print("Initializing a new database for %s" %rider_name)
-        preferred_units = input('Imperial (i) or Metric (m)?: ')
+        preferred_units = str_input_func('Imperial (i) or Metric (m)?: ')
         if preferred_units == "i":
             preferred_units = "imperial"
         else:
@@ -388,7 +417,7 @@ def part_summary_func(db, switch, b, p, u):
                 AND date >= date(%s)""" % (bid, mrld)
         pt = db.get_from_db(q2)
     elif switch == "d":
-        dt = input("Date (YYYY-MM-DD): ")
+        dt = str_input_func("Date (YYYY-MM-DD): ")
         # need to generate some dates here
         # this is where i left off
         q = """SELECT distance, elapsed_time, elev from rides 
@@ -462,7 +491,7 @@ def main():
                     print('Global Max Speed: %.2f kph' %rd['max_speed'])
                     print('Global Average Speed: %.2 kph' %rd['avg_speed'])
                     print('Global Total Distance: %.1f kilometers' %rd['total_dist'])
-                input("Press any key to continue")
+                input("Press enter to continue")
             elif subselection == 2:
                 # edit rider
                 rd = db.get_from_db('select * from riders')
@@ -470,7 +499,7 @@ def main():
                 print("Current rider info: ")
                 print("Name: ", rd['name'])
                 print("Preferred units: ", rd['units'])
-                nm = input("New name: ")
+                nm = str_input_func("New name: ")
                 if nm == '':
                     nm = rd['name']
                 db.edit_entry("""UPDATE riders 
@@ -491,7 +520,7 @@ def main():
             if subselection == 1:
                 # update bike stats
                 print('Current list of bikes in database: ', ', '.join(blist))
-                b = input("Name of bike to update: ")
+                b = str_input_func("Name of bike to update: ")
                 db.update_bike(b)
                 # show the results from the update
                 q = "SELECT * from bikes WHERE name = '%s'" %b
@@ -504,11 +533,11 @@ def main():
                 else:
                     print("Total Distance Ridden: %.2f kilometers" %bk['total_mi'])
                     print("Total Elevation Climbed: %.0f meters" %bk['total_elev'])
-                input("Press any key to continue")
+                input("Press enter to continue")
             elif subselection == 2:
                 # edit bike
                 print('Current list of bikes in database: ', ' '.join(blist))
-                b = input("Name of bike to edit: ")
+                b = str_input_func("Name of bike to edit: ")
                 # report current bike info
                 q = "SELECT * from bikes WHERE name = '%s'" %b
                 bk = db.get_from_db(q)
@@ -518,16 +547,16 @@ def main():
                 print("Purchased: ", bk['purchased'])
                 print("Price: ", bk['price'])
                 # ask for new info
-                nm = input("New bike name: ")
+                nm = input("New bike name (leave blank to leave unchanged): ")
                 if nm == '':
                     nm = bk['name']
-                cl = input("New color: ")
+                cl = input("New color (leave blank to leave unchanged): ")
                 if cl == '':
                     cl = bk['color']
-                pur = input("New purchase date: ")
+                pur = input("New purchase date (leave blank to leave unchanged): ")
                 if pur == '':
                     pur = bk['purchased']
-                pr = input("New price: ")
+                pr = input("New price (leave blank to leave unchanged): ")
                 if pr == '':
                     pr = bk['price']
                 else:
@@ -538,11 +567,11 @@ def main():
                               (nm, cl, pur, pr, b))
             elif subselection == 3:
                 # Add a new bike
-                b = input("Name of new bike: ")
-                c = input("Color of new bike: ")
-                p = input("Purchase date of new bike: ")
-                pr = input("Price of new bike: ")
-                i = input("Strava identifier of new bike: ")
+                b = str_input_func("Name of new bike: ")
+                c = str_input_func("Color of new bike: ")
+                p = str_input_func("Purchase date of new bike: ")
+                pr = str_input_func("Price of new bike: ")
+                i = str_input_func("Strava identifier of new bike: ")
                 db.add_bike((i, b, c, p, pr))
             elif subselection == 4:
                 # automatically get the bike names from strava
@@ -558,8 +587,8 @@ def main():
                 print("No bikes found in database. Try updating bike lists first.")
                 pass
             print('Current list of bikes in database: ', ' '.join(blist))
-            b = input("Which bike do you want to see parts for? Enter 'all' for all bike parts: ")
-            inuse = input("Do you want to see all bike parts (a) or only those current in use (c)? ")
+            b = str_input_func("Which bike do you want to see parts for? Enter 'all' for all bike parts: ")
+            inuse = str_input_func("Do you want to see all bike parts (a) or only those current in use (c)? ")
             if b == 'all':
                 if inuse == "a":
                     parts = db.get_from_db('SELECT * from parts')
@@ -574,7 +603,7 @@ def main():
                     parts = db.get_from_db(q)
             if parts.shape[0] == 0:
                 print("No parts found")
-                input("Press any key to continue")
+                input("Press enter to continue")
             else:
                 print("The following parts meet your search: ")
                 for index, row in parts.iterrows():
@@ -585,53 +614,49 @@ def main():
             subselection_function(list(range(1, 7)))
             if subselection == 1:
                 # get part stats
-                p = int(input("Part id: "))
+                p = int_input_func("Part id: ")
                 b = parts.loc[parts['id'] == p, :]['bike'].iloc[0]
-                switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
+                switch = str_input_func("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
                 part_summary_func(db, switch, b, p, u)
-                input("Press any key to continue")
+                input("Press enter to continue")
             elif subselection == 2:
                 # get all parts stats
-                b = input("Which bike do you want to see records for? ")
-                switch = input("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
+                b = str_input_func("Which bike do you want to see records for? ")
+                switch = str_input_func("Do you want all (a) stats, everything since last maintenance (l), or from some arbitrary date (d)? ")
                 q = "SELECT id from parts WHERE bike = '%s'" %b
                 all_parts = db.get_from_db(q)
                 if all_parts.shape[0] > 0:
                     for index, row in all_parts.iterrows:
                         part_summary_func(db, switch, b, row['id'], u)
-                    input("Press any key to continue")
+                    input("Press enter to continue")
             elif subselection == 3:
                 # maintain parts
-                part_id = int(input("Part id: "))
-                work = input("Work performed: ")
-                d = input("Date work performed (YYYY-MM-DD): ")
+                part_id = int_input_func("Part id: ")
+                work = str_input_func("Work performed: ")
+                d = str_input_func("Date work performed (YYYY-MM-DD): ")
                 db.add_maintenance((part_id, work, d))
             elif subselection == 4:
                 # replace parts
-                old_part_id = input("Part id: ")
-                if old_part_id == '':
-                    old_part_id = None
-                else:
-                    old_part_id = int(old_part_id)
-                new_part = input("New part type: ")
-                br = input("Brand: ")
-                model = input("Model: ")
-                pr = float(input("Price: "))
-                wt = float(input("Weight (g): "))
-                size = input("Size: ")
-                bike = input("Which bike? ")
-                pur = input("Date added: ")
+                old_part_id = int_input_func("Part id: ")
+                new_part = str_input_func("New part type: ")
+                br = str_input_func("Brand: ")
+                model = str_input_func("Model: ")
+                pr = float_input_func("Price: ")
+                wt = float_input_func("Weight (g): ")
+                size = str_input_func("Size: ")
+                bike = str_input_func("Which bike? ")
+                pur = str_input_func("Date added: ")
                 db.replace_part((new_part, pur, br, pr, wt, size, model, bike), old_part_id)
             elif subselection == 5:
                 # add new
-                new_part = input("New part type: ")
-                br = input("Brand: ")
-                model = input("Model: ")
-                pr = float(input("Price: "))
-                wt = float(input("Weight (g): "))
-                size = input("Size: ")
-                bike = input("Which bike? ")
-                pur = input("Date added: ")
+                new_part = str_input_func("New part type: ")
+                br = str_input_func("Brand: ")
+                model = str_input_func("Model: ")
+                pr = float_input("Price: ")
+                wt = float_input("Weight (g): ")
+                size = str_input_func("Size: ")
+                bike = str_input_func("Which bike? ")
+                pur = str_input_func("Date added: ")
                 db.add_part((new_part, pur, br, pr, wt, size, model, bike))
             elif subselection == 6:
                 # return to main menu
@@ -643,13 +668,13 @@ def main():
             if subselection == 1:
                 print("Adding a new manual entry. Input required.")
                 ride_id = db.gen_ride_id()
-                bike = input('Bike used: ')
-                distance = int(input('Distance: '))
-                name = input('Ride name: ')
-                moving_time = float(input('Moving time: '))
-                elapsed_time = float(input('Elapsed time: '))
-                elev = float(input('Elevation gain: '))
-                ride_type = input('Ride type: ')
+                bike = str_input_func('Bike used: ')
+                distance = int_input_func('Distance: ')
+                name = str_input_func('Ride name: ')
+                moving_time = float_input_func('Moving time: ')
+                elapsed_time = float_input_func('Elapsed time: ')
+                elev = float_input_func('Elevation gain: ')
+                ride_type = str_input_func('Ride type: ')
                 avg_speed = distance / moving_time
                 max_speed = 0
                 calories = 0
