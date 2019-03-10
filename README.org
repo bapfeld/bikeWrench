@@ -8,7 +8,8 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 - [ ] Export capabilities (e.g. export an entire maintenance log to csv)
 - [ ] Function to show basic rider/bike info (e.g. name, bike color, etc.)
 - [ ] Produce graphics
-- [ ] GUI?
+- [ ] GUI?/Package into a single executable?
+- [ ] Create directories for new database if they don't exist
 
 * Installation/Usage Requirements
 ** Python requirements
