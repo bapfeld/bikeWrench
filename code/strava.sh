@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python3 strava.py \
-        --db_file='~/strava/data/strava.db' \
+python3 ~/stravaDB/code/strava.py \
+        --db_file='~/Dropbox/strava.db' \
         --rider_name='Brendan' \
-        --secrets_path='~/strava/code/strava.gpg'
+        --secrets_path='~/stravaDB/code/strava.gpg'
