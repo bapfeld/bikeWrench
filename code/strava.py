@@ -92,7 +92,7 @@ class my_db():
         self.add_part(part_values)
         if old_part is not None:
             with sqlite3.connect(self.db_path) as conn:
-                conn.execute('UPDATE parts SET inuse = False WHERE id=?', (old_part))
+                conn.execute('UPDATE parts SET inuse = False WHERE id=?', (old_part, ))
 
     def add_maintenance(self, main_values):
         with sqlite3.connect(self.db_path) as conn:
