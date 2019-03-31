@@ -678,7 +678,7 @@ def main():
                 wt = float_input_func("Weight (g): ")
                 size = str_input_func("Size: ")
                 bike = str_input_func("Which bike? ")
-                pur = str_input_func("Date added: ")
+                pur = str_input_func("Date added (YYYY-MM-DD): ")
                 db.replace_part((new_part, pur, br, pr, wt, size, model, bike), old_part_id)
             elif subselection == 5:
                 # add new
@@ -689,7 +689,7 @@ def main():
                 wt = float_input_func("Weight (g): ")
                 size = str_input_func("Size: ")
                 bike = str_input_func("Which bike? ")
-                pur = str_input_func("Date added: ")
+                pur = str_input_func("Date added (YYYY-MM-DD): ")
                 db.add_part((new_part, pur, br, pr, wt, size, model, bike))
             elif subselection == 6:
                 # return to main menu
