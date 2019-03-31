@@ -657,7 +657,7 @@ def main():
                 q = "SELECT id from parts WHERE bike = '%s'" %b
                 all_parts = db.get_from_db(q)
                 if all_parts.shape[0] > 0:
-                    for index, row in all_parts.iterrows:
+                    for index, row in all_parts.itertuples(index=False):
                         part_summary_func(db, switch, b, row['id'], u)
                     input("Press enter to continue")
             elif subselection == 3:
