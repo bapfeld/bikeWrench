@@ -45,10 +45,14 @@ class StravaApp(QWidget):
 
     def init_new_db(self):
         """Function to initialize a new DB using a pop-up dialogue"""
-        self.db_path, _ = QFileDialog.getOpenFileName(self,
+        db_path, ok = QFileDialog.getOpenFileName(self,
                                                       caption='Selection location to save database file',
                                                       directory=self.init_dir,
                                                       filter='database files(*.db)')
+        if ok:
+            self.db_path = db_path
+        else:
+            self.init_new_db()
 
     def try_get_password(self):
         """Attempts to get Strava application information, else prompts for input"""
