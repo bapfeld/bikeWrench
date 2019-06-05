@@ -1,11 +1,28 @@
 ###########################################
 # Imports
 ###########################################
-
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog, QToolTip, QGroupBox, QPushButton, QGridLayout, QMessageBox, QLabel, QButtonGroup, QRadioButton)
+from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
 import configparser, argparse, sqlite3, os, sys, re, requests
 import pandas as pd
+
+###########################################
+# Application Class
+###########################################
+class StravaApp(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.get_path()
+
+    def get_path(self):
+        try:
+            self.bdr = sys._MEIPASS
+        except:
+            self.bdr = os.path.dirname(os.path.abspath(__file__))
+            
 
 ###########################################
 # Database Class
