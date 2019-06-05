@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QF
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser, argparse, sqlite3, os, sys, re, requests
+import configparser, argparse, sqlite3, os, sys, re, requests, keyring
 import pandas as pd
 
 ###########################################
@@ -16,13 +16,77 @@ class StravaApp(QWidget):
     def __init__(self):
         super().__init__()
         self.get_path()
+        self.test_os()
+        self.try_load_db()
+        self.try_get_password()
+        self.initUI()
 
+    def test_os(self):
+        system = platform.system()
+        if system == 'Windows':
+            self.init_dir = 'C:\\Documents\\'
+        else:
+            self.init_dir = os.path.expanduser('~/Documents/')
+            
     def get_path(self):
+        """Defines a base directory in which application files are held"""
         try:
             self.bdr = sys._MEIPASS
         except:
             self.bdr = os.path.dirname(os.path.abspath(__file__))
-            
+
+    def try_load_db(self):
+        """Define the database file location or initialize new if none exists"""
+        if os.path.exists(os.path.expanduser('~/.stravaDB_location')):
+            with open(os.path.expanduser('~/.stravaDB_location'), 'r') as f:
+                self.db_path = f.read().strip()
+        else:
+            self.init_new_db()
+
+    def init_new_db(self):
+        """Function to initialize a new DB using a pop-up dialogue"""
+        self.db_path, _ = QFileDialog.getOpenFileName(self,
+                                                      caption='Selection location to save database file',
+                                                      directory=self.init_dir,
+                                                      filter='database files(*.db)')
+
+    def try_get_password(self):
+        """Attempts to get Strava application information, else prompts for input"""
+        code = keyring.get_password('stravaDB', 'code')
+        if code is not None:
+            self.code = code
+        else:
+            text, ok = QInputDialog.getText(self,
+                                            'Application Code',
+                                            'Enter application code:')
+            if ok:
+                self.code = str(text)
+                keyring.set_password('stravaDB', 'code', str(text))
+        secret = keyring.get_password('stravaDB', 'client_secret')
+        if secret is not None:
+            self.client_secret = secret
+        else:
+            text, ok = QInputDialog.getText(self,
+                                            'Client Secret',
+                                            'Enter client secret:')
+            if ok:
+                self.client_secret = str(text)
+                keyring.set_password('stravaDB', 'client_secret', str(text))
+        cid = keyring.get_password('stravaDB', 'client_id')
+        if cid is not None:
+            self.client_id = cid
+        else:
+            text, ok = QInputDialog.getText(self,
+                                            'Client ID',
+                                            'Enter client id:')
+            if ok:
+                self.client_id = str(text)
+                keyring.set_password('stravaDB', 'client_id', str(text))
+
+        def initUI(self):
+            """Main GUI definition"""
+            QToolTip.setFont(QFont('SansSerif', 10))
+            pass
 
 ###########################################
 # Database Class
@@ -820,12 +884,6 @@ create table maintenance (
 
 
 if __name__ == '__main__':
-    main()
-
-###########################################
-# Temporary values
-###########################################
-# Let's start by building up a temporary database
-db_file = 'strava.db'
-db_path = os.path.expanduser('~/strava/data/' + db_file)
-secrets_path = os.path.expanduser('~/strava/code/strava.ini')
+    app = QApplication(sys.argv)
+    strava_app = StravaApp()
+    sys.exit(app.exec_())
