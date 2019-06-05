@@ -273,6 +273,7 @@ class strava():
             else:
                 self.new_id_list = [x.id for x in activity_list]
             if len(self.new_id_list) > 0:
+                print('Now fetching %i new activities' %len(self.new_id_list))
                 self.new_activities = [self.client.get_activity(id) for id in self.new_id_list]
             else:
                 self.new_activities = None
