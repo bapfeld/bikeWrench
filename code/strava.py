@@ -1,13 +1,14 @@
 ###########################################
 # Imports
 ###########################################
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog, QToolTip, QGroupBox, QPushButton, QGridLayout, QMessageBox, QLabel, QButtonGroup, QRadioButton)
+from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog, QToolTip, QGroupBox, QPushButton, QGridLayout, QMessageBox, QLabel, QButtonGroup, QRadioButton, QComboBox, QCalendarWidget)
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
 import configparser, argparse, sqlite3, os, sys, re, requests, keyring
 import pandas as pd
+from functools import partial
 
 ###########################################
 # Application Class
@@ -18,6 +19,7 @@ class StravaApp(QWidget):
         self.get_path()
         self.test_os()
         self.try_load_db()
+        self.load_db()
         self.try_get_password()
         self.initUI()
 
@@ -87,10 +89,143 @@ class StravaApp(QWidget):
                 self.client_id = str(text)
                 keyring.set_password('stravaDB', 'client_id', str(text))
 
-        def initUI(self):
-            """Main GUI definition"""
-            QToolTip.setFont(QFont('SansSerif', 10))
-            pass
+    def load_db(self):
+        self.get_all_bike_ids()
+
+    def get_from_db(self, query):
+        with sqlite3.connect(self.db_path) as conn:
+            res = pd.read_sql_query(query, conn)
+        return res
+
+    def get_all_bike_ids(self):
+        query = "SELECT id, name from bikes"
+        self.all_bike_ids = self.get_from_db(query)
+
+    def replace_part(self, old_part=None):
+        # need to get some kind of popup here to input part values!
+        self.add_part(part_values)
+        if old_part is not None:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute('UPDATE parts SET inuse = False WHERE id=?', (old_part, ))
+
+    def add_part(self, part_values):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""INSERT into parts (
+                                type, 
+                                purchased, 
+                                brand, 
+                                price, 
+                                weight, 
+                                size, 
+                                model, 
+                                bike, 
+                                inuse) 
+                            values (?, ?, ?, ?, ?, ?, ?, ?, True)""", part_values)
+
+    def add_maintenance(self):
+        # need to get some kind of popup here to input part values!
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""INSERT into maintenance 
+                            (part, work, date) values (?, ?, ?)""",
+                         main_values)
+            
+    def initUI(self):
+        """Main GUI definition"""
+        QToolTip.setFont(QFont('SansSerif', 10))
+
+        # Create all of the objects
+        ### Left Column
+        #### Upper left column box
+        self.upper_left_col_box = QGroupBox("Rider Info")
+        rider_info = QLabel()
+        rider_info.setTextFormat(Qt.RichText)
+        rider_info.setWordWrap(True)
+        rider_info.setText('')      
+
+        rider_layout = QGridLayout()
+        rider_layout.addWidget(rider_info, 0, 0)
+        self.upper_left_col_box.setLayout(rider_layout)
+
+        #### Middle row left column box
+        self.mid_left_col_box = QGroupBox('')
+        bike_list = QComboBox()
+        bike_list.addItems(list(self.all_bike_ids.name))
+        self.mid_left_col_box.currentIndexChanged.connect(self.selectionchange)
+
+        bike_dropdown_layout = QGridLayout()
+        bike_dropdown_layout.addWidget(bike_list, 0, 0)
+        self.mid_left_col_box.setLayout(bike_dropdown_layout)
+
+        #### Lower left column box
+        self.lower_left_col_box = QGroupBox('')
+        cal = QCalendarWidget()
+        cal.setGridVisible(True)
+        cal.clicked[QDate].connect(self.showDate)
+        self.date = cal.selectedDate().toString()
+
+        cal_layout = QGridLayout()
+        cal_layout.addWidget(cal, 0, 0)
+        self.lower_left_col_box.setLayout(cal_layout)
+
+        ### Center Column
+        self.center_col_box = QGroupBox("Parts List")
+        parts_list = QLabel()
+        parts_list.setTextFormat(Qt.RichText)
+        parts_list.setWordWrap(True)
+        parts_list.setText('')
+
+        parts_layout = QGridLayout()
+        parts_layout.addWidget(parts_list, 0, 0)
+        self.center_col_box.setLayout(parts_layout)
+
+        ### Right Column
+        #### Upper right column box
+        self.upper_right_col_box = QGroupBox('Part Stats')
+        part_stats = QLabel()
+        part_stats.setTextFormat(Qt.RichText)
+        part_stats.setWordWrap(True)
+        part_stats.setText('')
+
+        part_stats_layout = QGridLayout()
+        part_stats_layout.addWidget(part_stats, 0, 0)
+        self.upper_right_col_box.setLayout(part_stats_layout)
+
+        #### Lower right column box
+        self.lower_right_col_box = QGroupBox('Part Actions')
+
+        ##### buttons!
+        replace_part_button = QPushButton('Replace part', self)
+        replace_part_button.setToolTip('Replace currently selected part')
+        replace_part_button.clicked.connect(partial(self.replace_part,
+                                                    old_part=self.current_part))
+        new_part_button = QPushButton('Add new part', self)
+        new_part_button.setToolTip("""Add a new part to the bike.
+                                      NOTE: This is different from replacing an
+                                      existing part""")
+        new_part_button.clicked.connect(self.replace_part)
+        maintain_button = QPushButton('Maintain part', self)
+        maintain_button.setToolTip("Perform maintenance on selected part")
+        maintain_button.clicked.connect(self.add_maintenance)
+
+        parts_buttons_layout = QGridLayout()
+        parts_buttons_layout.addWidget(maintain_button, 0, 0)
+        parts_buttons_layout.addWidget(replace_part_button, 1, 0)
+        parts_buttons_layout.addWidget(new_part_button, 0, 1)
+        self.lower_right_col_box.setLayout(parts_buttons_layout)
+
+        # Generate the main layout
+        main_layout = QGridLayout()
+        main_layout.addWidget(self.upper_left_col_box, 0, 0, 4, 1)
+        main_layout.addWidget(self.mid_left_col_box, 4, 0, 1, 1)
+        main_layout.addWidget(self.lower_left_col_box, 5, 0, 4, 1)
+        main_layout.addWidget(self.center_col_box, 0, 1, 9, 1)
+        main_layout.addWidget(self.upper_right_col_box, 0, 2, 5, 2)
+        main_layout.addWidget(self.lower_right_col_box, 5, 2, 4, 2)
+
+        # Set window traits
+        self.setGeometry(300, 300, 1050, 700)
+        self.setWindowTitle('Strava Equipment Manager')
+        self.show()
 
 ###########################################
 # Database Class
@@ -158,35 +293,6 @@ class my_db():
             conn.execute("""INSERT into riders (name, units) 
                             values (?, ?)""",
                          rider_values)
-
-    def add_part(self, part_values):
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""INSERT into parts (
-                                type, 
-                                purchased, 
-                                brand, 
-                                price, 
-                                weight, 
-                                size, 
-                                model, 
-                                bike, 
-                                inuse) 
-                            values (?, ?, ?, ?, ?, ?, ?, ?, True)""", part_values)
-
-    def replace_part(self, part_values, old_part=None):
-        self.add_part(part_values)
-        if old_part is not None:
-            with sqlite3.connect(self.db_path) as conn:
-                conn.execute('UPDATE parts SET inuse = False WHERE id=?', (old_part, ))
-
-    def add_maintenance(self, main_values):
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute('INSERT into maintenance (part, work, date) values (?, ?, ?)', main_values)
-
-    def get_from_db(self, query):
-        with sqlite3.connect(self.db_path) as conn:
-            res = pd.read_sql_query(query, conn)
-        return res
     
     def edit_entry(self, sql, values):
         with sqlite3.connect(self.db_path) as conn:
@@ -200,10 +306,6 @@ class my_db():
     def get_all_ride_ids(self, rider_id):
         query = "SELECT id from rides WHERE rider='%s'" % rider_id
         self.all_ride_ids = self.get_from_db(query)
-
-    def get_all_bike_ids(self):
-        query = "SELECT id, name from bikes"
-        self.all_bike_ids = self.get_from_db(query)
             
     def update_rider(self, rider_id):
         # want to calculate max and avg speeds
