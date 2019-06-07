@@ -2,7 +2,7 @@
 # Imports
 ###########################################
 from PyQt5.QtCore import Qt, QDate
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog, QToolTip, QGroupBox, QPushButton, QGridLayout, QMessageBox, QLabel, QButtonGroup, QRadioButton, QComboBox, QCalendarWidget)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog, QInputDialog, QToolTip, QGroupBox, QPushButton, QGridLayout, QMessageBox, QLabel, QButtonGroup, QRadioButton, QComboBox, QCalendarWidget)
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
@@ -53,6 +53,8 @@ class StravaApp(QWidget):
                                                       filter='database files(*.db)')
         if ok:
             self.db_path = db_path
+            with open(os.path.expanduser('~/.stravaDB_location'), 'w') as f:
+                f.write(db_path)
         else:
             self.init_new_db()
 
