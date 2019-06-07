@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QF
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser, argparse, sqlite3, os, sys, re, requests, keyring
+import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform
 import pandas as pd
 from functools import partial
 
