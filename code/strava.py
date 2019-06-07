@@ -21,7 +21,12 @@ class StravaApp(QWidget):
         self.try_load_db()
         self.load_db()
         self.try_get_password()
+        self.load_basic_values()
         self.initUI()
+
+    def load_basic_values(self):
+        self.current_part = None
+        # self.current_bike = None
 
     def test_os(self):
         system = platform.system()
@@ -130,6 +135,12 @@ class StravaApp(QWidget):
             conn.execute("""INSERT into maintenance 
                             (part, work, date) values (?, ?, ?)""",
                          main_values)
+
+    def bike_choice(self, b):
+        self.current_bike = b
+
+    def select_date(self, d):
+        self.current_date = d
             
     def initUI(self):
         """Main GUI definition"""
@@ -152,7 +163,7 @@ class StravaApp(QWidget):
         self.mid_left_col_box = QGroupBox('')
         bike_list = QComboBox()
         bike_list.addItems(list(self.all_bike_ids.name))
-        self.mid_left_col_box.currentIndexChanged.connect(self.selectionchange)
+        bike_list.activated[str].connect(self.bike_choice)
 
         bike_dropdown_layout = QGridLayout()
         bike_dropdown_layout.addWidget(bike_list, 0, 0)
@@ -162,7 +173,7 @@ class StravaApp(QWidget):
         self.lower_left_col_box = QGroupBox('')
         cal = QCalendarWidget()
         cal.setGridVisible(True)
-        cal.clicked[QDate].connect(self.showDate)
+        cal.clicked[QDate].connect(self.select_date)
         self.date = cal.selectedDate().toString()
 
         cal_layout = QGridLayout()
