@@ -234,6 +234,7 @@ class StravaApp(QWidget):
         main_layout.addWidget(self.center_col_box, 0, 1, 9, 1)
         main_layout.addWidget(self.upper_right_col_box, 0, 2, 5, 2)
         main_layout.addWidget(self.lower_right_col_box, 5, 2, 4, 2)
+        self.setLayout(main_layout)
 
         # Set window traits
         self.setGeometry(300, 300, 1050, 700)
