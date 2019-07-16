@@ -14,8 +14,9 @@ from functools import partial
 # Application Class
 ###########################################
 class StravaApp(QWidget):
-    def __init__(self):
+    def __init__(self, schema):
         super().__init__()
+        self.schema = schema
         self.get_path()
         self.test_os()
         self.try_load_db()
@@ -26,7 +27,14 @@ class StravaApp(QWidget):
 
     def load_basic_values(self):
         self.current_part = None
+        self.rider_name = self.get_rider_name()
         # self.current_bike = None
+
+    def get_rider_name(self):
+        query = 'select name from riders'
+        rider_name = self.get_from_db(query)
+        rider_name = rider_name['name'][0]
+        return rider_name
 
     def test_os(self):
         system = platform.system()
@@ -60,8 +68,29 @@ class StravaApp(QWidget):
             self.db_path = db_path
             with open(os.path.expanduser('~/.stravaDB_location'), 'w') as f:
                 f.write(db_path)
+            self.create_db()
         else:
             self.init_new_db()
+        rider_name, _ = QFileDialog.getText(self,
+                                                    'Rider Name',
+                                                    'Enter rider name')
+        self.initialize_rider(rider_name)
+
+    def initialize_rider(self, rider_name):
+        rider_values = (rider_name, 'imperial')
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""INSERT into riders (name, units) 
+                            values (?, ?)""",
+                         rider_values)
+
+    def edit_entry(self, sql, values):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(sql, values)
+
+    def create_db(self):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.executescript(self.schema)
+
 
     def try_get_password(self):
         """Attempts to get Strava application information, else prompts for input"""
@@ -141,6 +170,11 @@ class StravaApp(QWidget):
 
     def select_date(self, d):
         self.current_date = d
+
+    def format_rider_info(self):
+        t = ''
+        t += self.rider_name
+        return t
             
     def initUI(self):
         """Main GUI definition"""
@@ -153,7 +187,7 @@ class StravaApp(QWidget):
         rider_info = QLabel()
         rider_info.setTextFormat(Qt.RichText)
         rider_info.setWordWrap(True)
-        rider_info.setText('')      
+        rider_info.setText(self.format_rider_info())      
 
         rider_layout = QGridLayout()
         rider_layout.addWidget(rider_info, 0, 0)
@@ -301,16 +335,6 @@ class my_db():
         with sqlite3.connect(self.db_path) as conn:
             conn.executemany('INSERT into rides (id, bike, distance, name, date, moving_time, elapsed_time, elev, type, avg_speed, max_speed, calories, rider) values (?,?,?,?,?,?,?,?,?,?,?,?,?)', a_list)
 
-    def initialize_rider(self, units):
-        rider_values = (self.rider_id, units)
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""INSERT into riders (name, units) 
-                            values (?, ?)""",
-                         rider_values)
-    
-    def edit_entry(self, sql, values):
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(sql, values)
             
     def get_all_ride_data(self, rider_id):
         query = "SELECT * from rides WHERE rider='%s'" % rider_id
@@ -406,11 +430,7 @@ class my_db():
                         with sqlite3.connect(self.db_path) as conn:
                             conn.execute(sql, vals)
 
-    def get_rider_name(self):
-        query = 'select name from riders'
-        rider_name = self.get_from_db(query)
-        rider_name = rider_name['name'][0]
-        return rider_name
+    
 
     def gen_ride_id(self):
         self.get_all_ride_ids(self.rider_id)
@@ -481,13 +501,6 @@ class strava():
         else:
             print("No internet connection. Unable to update rides.")
             self.new_activities = None
-
-###########################################
-# Create the database
-###########################################
-def create_db(db_path, schema):
-    with sqlite3.connect(db_path) as conn:
-        conn.executescript(schema)
 
 ###########################################
 # Main interaction functions
@@ -923,87 +936,69 @@ def main():
             # exit option
             break
     
-def initialize_params(args_parser):
-    args_parser.add_argument(
-        '--db_file',
-        help='Path to a local database',
-        required=True
-    )
-    args_parser.add_argument(
-        '--rider_name',
-        help='Name of the rider',
-        required=True
-    )
-    args_parser.add_argument(
-        '--secrets_path',
-        help='Path to the local secrets file.',
-        required=True
-    )
-    return args_parser.parse_args()
-
-strava_db_schema = """
--- Riders are top level
-create table riders (
-    name       text primary key,
-    max_speed  real,
-    avg_speed  real,
-    total_dist real,
-    units      text
-);
-
--- Bikes belong to riders
-create table bikes (
-    id          text primary key,
-    name        text,
-    color       text,
-    purchased   date,
-    price       real,
-    total_mi    real,
-    total_elev  real
-);
-
--- Rides record data about a bike ride
-create table rides (
-    id           integer primary key,
-    bike         text not null references bike(id),
-    distance     integer,
-    name         text,
-    date         date,
-    moving_time  integer,
-    elapsed_time integer,
-    elev         real,
-    type         text,
-    avg_speed    real,
-    max_speed    real,
-    calories     real,
-    rider        text not null references rider(name)
-);
-
--- Parts belong to bikes
-create table parts (
-    id           integer primary key autoincrement not null,
-    type         text,
-    purchased    date,
-    brand        text,
-    price        real,
-    weight       real,
-    size         text,
-    model        text,
-    bike         text not null references bikes(name),
-    inuse        text
-);
-
--- Maintenance tasks record things that happen to parts
-create table maintenance (
-    id           integer primary key autoincrement not null,
-    part         integer not null references parts(id),
-    work         text,
-    date         date
-);
-"""
-
 
 if __name__ == '__main__':
+    strava_db_schema = """
+    -- Riders are top level
+    create table riders (
+        name       text primary key,
+        max_speed  real,
+        avg_speed  real,
+        total_dist real,
+        units      text
+    );
+
+    -- Bikes belong to riders
+    create table bikes (
+        id          text primary key,
+        name        text,
+        color       text,
+        purchased   date,
+        price       real,
+        total_mi    real,
+        total_elev  real
+    );
+    
+    -- Rides record data about a bike ride
+    create table rides (
+        id           integer primary key,
+        bike         text not null references bike(id),
+        distance     integer,
+        name         text,
+        date         date,
+        moving_time  integer,
+        elapsed_time integer,
+        elev         real,
+        type         text,
+        avg_speed    real,
+        max_speed    real,
+        calories     real,
+        rider        text not null references rider(name)
+    );
+
+    -- Parts belong to bikes
+    create table parts (
+        id           integer primary key autoincrement not null,
+        type         text,
+        purchased    date,
+        brand        text,
+        price        real,
+        weight       real,
+        size         text,
+        model        text,
+        bike         text not null references bikes(name),
+        inuse        text
+    );
+
+    -- Maintenance tasks record things that happen to parts
+    create table maintenance (
+        id           integer primary key autoincrement not null,
+        part         integer not null references parts(id),
+        work         text,
+        date         date
+    );
+    """
+
     app = QApplication(sys.argv)
-    strava_app = StravaApp()
+    strava_app = StravaApp(strava_db_schema)
     sys.exit(app.exec_())
