@@ -216,6 +216,7 @@ class StravaApp(QWidget):
         if update:
             self.update_rider()
         rider = self.get_rider_info()
+        u = rider.units[0]
         rider.rename(columns={'name': '<b>Name:</b> ',
                               'max_speed': '<b>Max Speed:</b> ',
                               'avg_speed': '<b>Average Speed:</b> ',
@@ -224,7 +225,7 @@ class StravaApp(QWidget):
                      inplace=True)
         t = rider.T.to_string(header=False)
         t = re.sub(r'\n', '<br>', t)
-        if rider.Units[0] == 'imperial':
+        if u == 'imperial':
             t = re.sub(r'(^Max Speed.*?)', r'\1 mph', t)
             t = re.sub(r'(^Average Speed.*?)', r'\1 mph', t)
             t = re.sub(r'(^Total Distance.*?)', r'\1 miles', t)
