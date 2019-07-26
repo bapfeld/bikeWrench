@@ -179,8 +179,23 @@ class StravaApp(QWidget):
                             (part, work, date) values (?, ?, ?)""",
                          main_values)
 
+    def get_all_bike_parts(self):
+        sql = """SELECT * 
+                 FROM parts 
+                 WHERE bike = '%s'""" %self.current_bike
+        self.current_bike_parts_list = self.get_from_db(sql)
+        
+
     def bike_choice(self, b):
         self.current_bike = b
+        self.get_all_bike_parts()
+        self.change_parts_list()
+        # self.mb(b)
+
+    def part_choice(self, p):
+        self.current_part = self.current_bike_parts_list.id[p]
+        self.format_part_info()
+        # self.mb(str(p))
 
     def select_date(self, d):
         self.current_date = d
@@ -217,6 +232,21 @@ class StravaApp(QWidget):
              SET max_speed = ?, avg_speed = ?, total_dist = ?, total_climb = ?
              WHERE name = ?"""
         self.edit_entry(sql, (ms, av, tot, tot_c, self.rider_name))
+
+    def change_parts_list(self):
+        bpl = self.current_bike_parts_list[['id', 'type']]
+        p_list = bpl['type']
+        self.parts_list_menu.addItems(list(p_list))
+
+    def format_part_info(self):
+        sql = """SELECT * 
+                 FROM parts 
+                 WHERE id = %i""" %self.current_part
+        res = self.get_from_db(sql)
+        t = res.T.to_string(header=False)
+        t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
+        t = re.sub(r'\n', '<br>', t)
+        self.part_stats.setText(t)
 
     def format_rider_info(self, update=False):
         if update:
@@ -360,6 +390,7 @@ class StravaApp(QWidget):
         self.rider_info = QLabel(self)
         self.rider_info.setTextFormat(Qt.RichText)
         self.rider_info.setWordWrap(True)
+        self.rider_info.setAlignment(Qt.AlignTop)
         self.rider_info.setText(self.format_rider_info())
 
         up_rider = QPushButton('Update Rider Stats', self)
@@ -377,13 +408,18 @@ class StravaApp(QWidget):
         self.upper_left_col_box.setLayout(rider_layout)
 
         #### Middle row left column box
-        self.mid_left_col_box = QGroupBox('')
+        self.mid_left_col_box = QGroupBox('Bike and Part Selection')
         bike_list = QComboBox()
         bike_list.addItems(list(self.all_bike_ids.name))
         bike_list.activated[str].connect(self.bike_choice)
 
+        self.parts_list_menu = QComboBox(self)
+        self.parts_list_menu.addItem(None)
+        self.parts_list_menu.currentIndexChanged.connect(self.part_choice)
+
         bike_dropdown_layout = QGridLayout()
         bike_dropdown_layout.addWidget(bike_list, 0, 0)
+        bike_dropdown_layout.addWidget(self.parts_list_menu, 1, 0)
         self.mid_left_col_box.setLayout(bike_dropdown_layout)
 
         #### Lower left column box
@@ -397,27 +433,17 @@ class StravaApp(QWidget):
         cal_layout.addWidget(cal, 0, 0)
         self.lower_left_col_box.setLayout(cal_layout)
 
-        ### Center Column
-        self.center_col_box = QGroupBox("Parts List")
-        parts_list = QLabel()
-        parts_list.setTextFormat(Qt.RichText)
-        parts_list.setWordWrap(True)
-        parts_list.setText('')
-
-        parts_layout = QGridLayout()
-        parts_layout.addWidget(parts_list, 0, 0)
-        self.center_col_box.setLayout(parts_layout)
-
         ### Right Column
         #### Upper right column box
         self.upper_right_col_box = QGroupBox('Part Stats')
-        part_stats = QLabel()
-        part_stats.setTextFormat(Qt.RichText)
-        part_stats.setWordWrap(True)
-        part_stats.setText('')
+        self.part_stats = QLabel(self)
+        self.part_stats.setTextFormat(Qt.RichText)
+        self.part_stats.setWordWrap(True)
+        self.part_stats.setAlignment(Qt.AlignTop)
+        self.part_stats.setText('')
 
         part_stats_layout = QGridLayout()
-        part_stats_layout.addWidget(part_stats, 0, 0)
+        part_stats_layout.addWidget(self.part_stats, 0, 0)
         self.upper_right_col_box.setLayout(part_stats_layout)
 
         #### Lower right column box
@@ -458,10 +484,9 @@ class StravaApp(QWidget):
         main_layout.addWidget(self.upper_left_col_box, 0, 0, 4, 1)
         main_layout.addWidget(self.mid_left_col_box, 4, 0, 1, 1)
         main_layout.addWidget(self.lower_left_col_box, 5, 0, 4, 1)
-        main_layout.addWidget(self.center_col_box, 0, 1, 9, 1)
-        main_layout.addWidget(self.upper_right_col_box, 0, 2, 5, 2)
-        main_layout.addWidget(self.lower_right_col_box, 5, 2, 4, 2)
-        main_layout.addWidget(self.message_box, 9, 0, 1, 4)
+        main_layout.addWidget(self.upper_right_col_box, 0, 3, 5, 2)
+        main_layout.addWidget(self.lower_right_col_box, 5, 3, 4, 2)
+        main_layout.addWidget(self.message_box, 9, 0, 1, 3)
         self.setLayout(main_layout)
 
         # Set window traits
