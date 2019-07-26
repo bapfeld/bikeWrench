@@ -216,11 +216,11 @@ class StravaApp(QWidget):
         if update:
             self.update_rider()
         rider = self.get_rider_info()
-        rider.rename(columns={'name': 'Name: ',
-                              'max_speed': 'Max Speed: ',
-                              'avg_speed': 'Average Speed: ',
-                              'total_dist': 'Total Distance: ',
-                              'units': 'Units'},
+        rider.rename(columns={'name': '<b>Name:</b> ',
+                              'max_speed': '<b>Max Speed:</b> ',
+                              'avg_speed': '<b>Average Speed:</b> ',
+                              'total_dist': '<b>Total Distance:</b> ',
+                              'units': '<b>Units:</b> '},
                      inplace=True)
         t = rider.T.to_string(header=False)
         t = re.sub(r'\n', '<br>', t)
