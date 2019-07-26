@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QF
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform
+import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale
 import numpy as np
 import pandas as pd
 from functools import partial
@@ -45,6 +45,7 @@ class StravaApp(QWidget):
         self.max_speed = res['max_speed'][0]
         self.avg_speed = res['avg_speed'][0]
         self.tot_dist = res['total_dist'][0]
+        self.tot_climb = res['total_climb'][0]
         self.units = res['units'][0]
         return res
 
@@ -185,7 +186,7 @@ class StravaApp(QWidget):
         self.current_date = d
 
     def get_all_ride_data(self):
-        query = "SELECT * from rides WHERE name='%s'" % self.rider_name
+        query = "SELECT * from rides WHERE rider='%s'" % self.rider_name
         with sqlite3.connect(self.db_path) as conn:
             self.all_rides = pd.read_sql_query(query, conn)
 
@@ -204,36 +205,61 @@ class StravaApp(QWidget):
             tot = np.round(self.all_rides['distance'].sum(), 2)
         except:
             tot = None
+        try:
+            tot_c = np.round(self.all_rides['elev'].sum(), 2)
+        except:
+            tot_c = None
         self.max_speed = ms
         self.avg_speed = av
         self.tot_dist = tot
+        self.tot_elev = tot_c
         sql = """UPDATE riders 
-             SET max_speed = ?, avg_speed = ?, total_dist = ? 
+             SET max_speed = ?, avg_speed = ?, total_dist = ?, total_climb = ?
              WHERE name = ?"""
-        self.edit_entry(sql, (ms, av, tot, self.rider_name))
+        self.edit_entry(sql, (ms, av, tot, tot_c, self.rider_name))
 
     def format_rider_info(self, update=False):
         if update:
             self.update_rider()
         rider = self.get_rider_info()
         u = rider.units[0]
+        t_dist = int(np.round(rider.total_dist[0]))
+        t_dist = f'{t_dist:n}'
+        t_climb = int(np.round(rider.total_climb[0]))
+        t_climb = f'{t_climb:n}'
+        rider = rider.reindex(columns=['name',
+                                       'max_speed',
+                                       'avg_speed',
+                                       'total_dist',
+                                       'total_climb',
+                                       'units'])
         rider.rename(columns={'name': '<b>Name:</b> ',
                               'max_speed': '<b>Max Speed:</b> ',
                               'avg_speed': '<b>Average Speed:</b> ',
                               'total_dist': '<b>Total Distance:</b> ',
+                              'total_climb': '<b>Total Elevation Gain:</b> ', 
                               'units': '<b>Units:</b> '},
                      inplace=True)
         t = rider.T.to_string(header=False)
         t = re.sub(r'\n', '<br>', t)
         if u == 'imperial':
-            t = re.sub(r'(^Max Speed.*?)', r'\1 mph', t)
-            t = re.sub(r'(^Average Speed.*?)', r'\1 mph', t)
-            t = re.sub(r'(^Total Distance.*?)', r'\1 miles', t)
+            t = re.sub(r'(Max Speed.*?)<br>', r'\1 mph<br>', t)
+            t = re.sub(r'(Average Speed.*?)<br>', r'\1 mph<br>', t)
+            t = re.sub(r'(Total Distance.*?)<br>',
+                       'Total Distance:</b> %s miles<br>' %t_dist, t)
+            t = re.sub(r'(Total Elevation Gain.*?)<br>',
+                       'Total Elevation Gain:</b> %s feet<br>' %t_climb, t)
         else:
             t = re.sub(r'(^Max Speed.*?)', r'\1 kph', t)
             t = re.sub(r'(^Average Speed.*?)', r'\1 kph', t)
-            t = re.sub(r'(^Total Distance.*?)', r'\1 km', t)
-        return t
+            t = re.sub(r'(Total Distance.*?)<br>',
+                       'Total Distance:</b> %s kilometers<br>' %t_dist, t)
+            t = re.sub(r'(Total Elevation Gain.*?)<br>',
+                       'Total Elevation Gain:</b> %s meters<br>' %t_climb, t)
+        if update:
+            self.rider_info.setText(t)
+        else:
+            return t
 
     def test_conn(self):
         try:
@@ -331,10 +357,10 @@ class StravaApp(QWidget):
         ### Left Column
         #### Upper left column box
         self.upper_left_col_box = QGroupBox("Rider Info")
-        rider_info = QLabel()
-        rider_info.setTextFormat(Qt.RichText)
-        rider_info.setWordWrap(True)
-        rider_info.setText(self.format_rider_info())
+        self.rider_info = QLabel(self)
+        self.rider_info.setTextFormat(Qt.RichText)
+        self.rider_info.setWordWrap(True)
+        self.rider_info.setText(self.format_rider_info())
 
         up_rider = QPushButton('Update Rider Stats', self)
         up_rider.setToolTip('Update max speed, average speed, and total distance')
@@ -345,7 +371,7 @@ class StravaApp(QWidget):
         up_rides.clicked.connect(self.new_activities)
 
         rider_layout = QGridLayout()
-        rider_layout.addWidget(rider_info, 0, 0)
+        rider_layout.addWidget(self.rider_info, 0, 0)
         rider_layout.addWidget(up_rider, 1, 0)
         rider_layout.addWidget(up_rides, 1, 1)
         self.upper_left_col_box.setLayout(rider_layout)
@@ -560,14 +586,16 @@ def bike_list_func(db):
 #### 
 
 if __name__ == '__main__':
+    locale.setlocale(locale.LC_ALL, '')
     strava_db_schema = """
     -- Riders are top level
     create table riders (
         name       text primary key,
-        max_speed  real,
-        avg_speed  real,
-        total_dist real,
-        units      text
+        max_speed   real,
+        avg_speed   real,
+        total_dist  real,
+        total_climb real, 
+        units       text
     );
 
     -- Bikes belong to riders
