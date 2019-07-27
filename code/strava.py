@@ -34,9 +34,9 @@ class StravaApp(QWidget):
         # self.current_bike = None
 
     def get_all_ride_ids(self):
-        query = "SELECT id from rides WHERE rider='%s'" % self.rider_name
+        query = "SELECT id FROM rides WHERE rider='%s'" % self.rider_name
         all_ride_ids = self.get_from_db(query)
-        self.id_list = all_ride_ids['id']
+        self.id_list = list(all_ride_ids['id'])
 
     def get_rider_info(self):
         query = 'select * from riders'
@@ -313,13 +313,13 @@ class StravaApp(QWidget):
             activity_list = self.client.get_activities()
             if self.id_list is not None:
                 self.new_id_list = [x.id for x in activity_list
-                                    if x.id not in self.id_list and x.type == "Ride"]
+                                    if (x.id not in self.id_list and x.type == "Ride")]
             else:
                 self.new_id_list = [x.id for x in activity_list]
             if len(self.new_id_list) > 0:
-                self.mb('Now fetching %i new activities' %len(self.new_id_list))
                 self.new_activities = [self.client.get_activity(id) for id
                                        in self.new_id_list]
+                self.mb('Fetched %i new activities' %len(self.new_id_list))
             else:
                 self.new_activities = None
         else:
@@ -333,8 +333,8 @@ class StravaApp(QWidget):
             except AttributeError:
                 out = 'Unknown'
             return out
-        def unit_try(self, num, t):
-            if self.unit == 'imperial':
+        def unit_try(num, t, u):
+            if u == 'imperial':
                 if t == 'long_dist':
                     return float(unithelper.miles(num))
                 elif t == 'short_dist':
@@ -350,24 +350,24 @@ class StravaApp(QWidget):
                     return float(unithelper.kph(num))
         a_list = [(a.id,
                    gear_try(a),
-                   unit_try(a.distance, 'long_dist'), 
+                   unit_try(a.distance, 'long_dist', self.units), 
                    a.name,
                    a.start_date.strftime("%Y-%M-%d"), 
                    a.moving_time.seconds / 3600,
                    a.elapsed_time.seconds / 3600,
-                   unit_try(a.total_elevation_gain, short_dist),
+                   unit_try(a.total_elevation_gain, 'short_dist', self.units),
                    a.type,
-                   unit_try(a.average_speed, speed), 
-                   unit_try(a.max_speed, speed),
+                   unit_try(a.average_speed, 'speed', self.units), 
+                   unit_try(a.max_speed, 'speed', self.units),
                    float(a.calories),
-                   rider_name, ) for a in activity_list]
+                   self.rider_name, ) for a in activity_list]
         
         with sqlite3.connect(self.db_path) as conn:
             sql = """INSERT into rides 
                      (id, bike, distance, name, date, moving_time,
                       elapsed_time, elev, type, avg_speed, max_speed,
                       calories, rider) 
-                     values (?,?,?,?,?,?,?,?,?,?,?,?,%s)""" %self.rider_name
+                     values (?,?,?,?,?,?,?,?,?,?,?,?,?)""" 
             conn.executemany(sql, a_list)
 
 
