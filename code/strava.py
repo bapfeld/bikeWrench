@@ -193,9 +193,11 @@ class StravaApp(QWidget):
         # self.mb(b)
 
     def part_choice(self, p):
-        self.current_part = self.current_bike_parts_list.id[p]
-        self.format_part_info()
-        # self.mb(str(p))
+        if p >= 1:
+            self.current_part = self.current_bike_parts_list.id[p - 1]
+            self.format_part_info()
+        else:
+            self.part_stats.setText('')
 
     def select_date(self, d):
         self.current_date = d
