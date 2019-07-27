@@ -490,7 +490,7 @@ class StravaApp(QWidget):
         main_layout.addWidget(self.upper_right_col_box, 0, 1, 5, 1)
         main_layout.addWidget(self.lower_right_col_box, 5, 1, 4, 1)
         main_layout.addWidget(self.message_box, 9, 0, 1, 2)
-        main_layout.setColumnStretch(0, 1)
+        main_layout.setColumnStretch(0, 1) # args are col number and relative weight
         main_layout.setColumnStretch(1, 1)
         self.setLayout(main_layout)
 
