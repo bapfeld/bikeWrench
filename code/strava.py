@@ -322,6 +322,7 @@ class StravaApp(QWidget):
                 self.mb('Fetched %i new activities' %len(self.new_id_list))
             else:
                 self.new_activities = None
+                self.mb('No new activities.')
         else:
             self.mb("No internet connection. Unable to update rides.")
             self.new_activities = None
