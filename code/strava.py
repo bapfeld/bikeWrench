@@ -6,10 +6,11 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QF
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale
+import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime
 import numpy as np
 import pandas as pd
 from functools import partial
+from input_form_dialog import FormOptions, get_input
 
 ###########################################
 # Application Class
@@ -155,7 +156,7 @@ class StravaApp(QWidget):
         self.add_part(part_values)
         if old_part is not None:
             with sqlite3.connect(self.db_path) as conn:
-                conn.execute('UPDATE parts SET inuse = False WHERE id=?',
+                conn.execute('UPDATE parts SET inuse = 0 WHERE id=?',
                              (old_part, ))
 
     def add_part(self, part_values):
@@ -173,18 +174,25 @@ class StravaApp(QWidget):
                             values (?, ?, ?, ?, ?, ?, ?, ?, True)""", part_values)
 
     def add_maintenance(self):
-        # need to get some kind of popup here to input part values!
-        pass
+        # Define today
+        current_date = datetime.date.today().strftime("%Y-%m-%d")
+        # define our input files
+        dat = dict()
+        dat['Work'] = 'Work summary'
+        dat['Date'] = current_date
 
-        # with sqlite3.connect(self.db_path) as conn:
-        #     conn.execute("""INSERT into maintenance 
-        #                     (part, work, date) values (?, ?, ?)""",
-        #                  main_values)
+        if get_input(f'Add Maintenance Record for part {self.current_part}', dat):
+            main_values = (int(self.current_part), dat['Work'], dat['Date'])
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""INSERT into maintenance 
+                                (part, work, date) values (?, ?, ?)""",
+                             main_values)
 
     def get_all_bike_parts(self):
         sql = """SELECT * 
                  FROM parts 
-                 WHERE bike = '%s'""" %self.current_bike
+                 WHERE bike = '%s'
+                 AND inuse = 1""" %self.current_bike
         self.current_bike_parts_list = self.get_from_db(sql)
         
 
