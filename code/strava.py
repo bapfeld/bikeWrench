@@ -288,9 +288,12 @@ class StravaApp(QWidget):
                   FROM maintenance
                   WHERE id={self.current_part}"""
         main_res = self.get_from_db(sql)
-        t = res.T.to_string(header=False)
-        t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
-        t = re.sub(r'\n', '<br>', t)
+        if main_res.shape[0] > 0:
+            t = main_res.T.to_string(header=False)
+            t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
+            t = re.sub(r'\n', '<br>', t)
+        else:
+            t = ''
         self.part_main.setText(t)
 
     def format_rider_info(self, update=False):
@@ -504,6 +507,10 @@ class StravaApp(QWidget):
         self.part_main.setWordWrap(True)
         self.part_main.setAlignment(Qt.AlignTop)
         self.part_main.setText('')
+
+        part_main_layout = QGridLayout()
+        part_main_layout.addWidget(self.part_main, 0, 0)
+        self.middle_right_col_box.setLayout(part_main_layout)
 
         #### Lower right column box
         self.lower_right_col_box = QGroupBox('Part Actions')
