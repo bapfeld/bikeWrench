@@ -235,12 +235,37 @@ class StravaApp(QWidget):
              WHERE name = ?"""
         self.edit_entry(sql, (ms, av, tot, tot_c, self.rider_name))
 
+    def update_part(self):
+        sql = f"""SELECT distance, elapsed_time, elev 
+                  FROM rides 
+                  WHERE bike=(SELECT id FROM bikes WHERE name='{self.current_bike}')
+                  AND date >= (SELECT purchased 
+                               FROM parts 
+                               WHERE id={self.current_part})"""
+        res = self.get_from_db(sql)
+        try:
+            dist = np.round(res.distance.sum(), 2)
+            dist = f'{dist:n}'
+        except:
+            dist = None
+        try:
+            elev = np.round(res.elev.sum(), 2)
+            elev = f'{elev:n}'
+        except:
+            elev = None
+        try:
+            time = np.round(res.elapsed_time.sum(), 2)
+            time = f'{time:n}'
+        except:
+            time = None
+        self.format_part_info(dist, elev, time)
+
     def change_parts_list(self):
         bpl = self.current_bike_parts_list[['id', 'type']]
         p_list = bpl['type']
         self.parts_list_menu.addItems(list(p_list))
 
-    def format_part_info(self):
+    def format_part_info(self, dist=None, elev=None, time=None):
         sql = """SELECT * 
                  FROM parts 
                  WHERE id = %i""" %self.current_part
@@ -476,11 +501,16 @@ class StravaApp(QWidget):
         maintain_button = QPushButton('Maintain part', self)
         maintain_button.setToolTip("Perform maintenance on selected part")
         maintain_button.clicked.connect(self.add_maintenance)
+        update_part_button = QPushButton('Update Part Stats', self)
+        update_part_button.setToolTip('Update currently selected part')
+        update_part_button.clicked.connect(self.update_part)
+        
 
         parts_buttons_layout = QGridLayout()
         parts_buttons_layout.addWidget(maintain_button, 0, 0)
         parts_buttons_layout.addWidget(replace_part_button, 1, 0)
         parts_buttons_layout.addWidget(new_part_button, 0, 1)
+        parts_buttons_layout.addWidget(update_part_button, 1, 1)
         self.lower_right_col_box.setLayout(parts_buttons_layout)
 
         ##### Message box
