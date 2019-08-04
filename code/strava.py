@@ -2,7 +2,7 @@
 # Imports
 ###########################################
 from PyQt5.QtCore import Qt, QDate
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog, QInputDialog, QToolTip, QGroupBox, QPushButton, QGridLayout, QMessageBox, QLabel, QButtonGroup, QRadioButton, QComboBox, QCalendarWidget)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog, QInputDialog, QToolTip, QGroupBox, QPushButton, QGridLayout, QMessageBox, QLabel, QButtonGroup, QRadioButton, QComboBox, QCalendarWidget, QLineEdit)
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
@@ -13,7 +13,7 @@ from functools import partial
 
 ###########################################
 # Application Class
-###########################################
+###########################################       
 class StravaApp(QWidget):
     def __init__(self, schema, client):
         super().__init__()
@@ -174,10 +174,12 @@ class StravaApp(QWidget):
 
     def add_maintenance(self):
         # need to get some kind of popup here to input part values!
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""INSERT into maintenance 
-                            (part, work, date) values (?, ?, ?)""",
-                         main_values)
+        pass
+
+        # with sqlite3.connect(self.db_path) as conn:
+        #     conn.execute("""INSERT into maintenance 
+        #                     (part, work, date) values (?, ?, ?)""",
+        #                  main_values)
 
     def get_all_bike_parts(self):
         sql = """SELECT * 
