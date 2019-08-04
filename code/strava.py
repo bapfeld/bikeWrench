@@ -194,7 +194,7 @@ class StravaApp(QWidget):
 
     def part_choice(self, p):
         if p >= 1:
-            self.current_part = self.current_bike_parts_list.id[p - 1]
+            self.current_part = self.current_bike_parts_list.id[p]
             self.format_part_info()
         else:
             self.part_stats.setText('')
@@ -263,6 +263,7 @@ class StravaApp(QWidget):
     def change_parts_list(self):
         bpl = self.current_bike_parts_list[['id', 'type']]
         p_list = bpl['type']
+        self.parts_list_menu.clear()
         self.parts_list_menu.addItems(list(p_list))
 
     def format_part_info(self, dist=None, elev=None, time=None):
