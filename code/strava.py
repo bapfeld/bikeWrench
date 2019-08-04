@@ -248,6 +248,12 @@ class StravaApp(QWidget):
         t = res.T.to_string(header=False)
         t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
         t = re.sub(r'\n', '<br>', t)
+        if dist is not None:
+            t += f'<br><br><b>Total Distance:</b> {dist}'
+        if elev is not None:
+            t += f'<br><b>Total Elevation:</b> {elev}'
+        if time is not None:
+            t += f'<br><b>Total Time:</b> {time}'
         self.part_stats.setText(t)
 
     def format_rider_info(self, update=False):
@@ -313,15 +319,20 @@ class StravaApp(QWidget):
         if self.test_conn():
             self.gen_secrets()
             activity_list = self.client.get_activities()
-            if self.id_list is not None:
-                self.new_id_list = [x.id for x in activity_list
-                                    if (x.id not in self.id_list and x.type == "Ride")]
-            else:
-                self.new_id_list = [x.id for x in activity_list]
-            if len(self.new_id_list) > 0:
-                self.new_activities = [self.client.get_activity(id) for id
-                                       in self.new_id_list]
-                self.mb('Fetched %i new activities' %len(self.new_id_list))
+            if activity_list is not None:
+                if self.id_list is not None:
+                    self.new_id_list = [x.id for x in activity_list
+                                        if (x.id not in self.id_list and x.type == "Ride")]
+                else:
+                    self.new_id_list = [x.id for x in activity_list]
+                if len(self.new_id_list) > 0:
+                    self.new_activities = [self.client.get_activity(id) for id
+                                           in self.new_id_list]
+                    self.mb('Fetched %i new activities' %len(self.new_id_list))
+                    self.update_rider()
+                else:
+                    self.new_activities = None
+                    self.mb('No new activities.')
             else:
                 self.new_activities = None
                 self.mb('No new activities.')
@@ -376,7 +387,7 @@ class StravaApp(QWidget):
 
     def new_activities(self):
         self.fetch_new_activities()
-        if self.new_id_list is not None:
+        if self.new_activities is not None:
             self.add_multiple_rides(self.new_activities)
 
     def mb(self, s):
