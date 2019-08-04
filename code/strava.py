@@ -284,7 +284,7 @@ class StravaApp(QWidget):
         
 
         # Part Maintenance
-        sql = f"""SELECT word, date
+        sql = f"""SELECT work, date
                   FROM maintenance
                   WHERE id={self.current_part}"""
         main_res = self.get_from_db(sql)
