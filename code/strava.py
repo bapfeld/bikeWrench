@@ -266,6 +266,7 @@ class StravaApp(QWidget):
         self.parts_list_menu.addItems(list(p_list))
 
     def format_part_info(self, dist=None, elev=None, time=None):
+        # Part Stats
         sql = """SELECT * 
                  FROM parts 
                  WHERE id = %i""" %self.current_part
@@ -280,6 +281,17 @@ class StravaApp(QWidget):
         if time is not None:
             t += f'<br><b>Total Time:</b> {time}'
         self.part_stats.setText(t)
+        
+
+        # Part Maintenance
+        sql = f"""SELECT word, date
+                  FROM maintenance
+                  WHERE id={self.current_part}"""
+        main_res = self.get_from_db(sql)
+        t = res.T.to_string(header=False)
+        t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
+        t = re.sub(r'\n', '<br>', t)
+        self.part_main.setText(t)
 
     def format_rider_info(self, update=False):
         if update:
@@ -485,6 +497,14 @@ class StravaApp(QWidget):
         part_stats_layout.addWidget(self.part_stats, 0, 0)
         self.upper_right_col_box.setLayout(part_stats_layout)
 
+        #### Middle right column box
+        self.middle_right_col_box = QGroupBox('Part Maintenance')
+        self.part_main = QLabel(self)
+        self.part_main.setTextFormat(Qt.RichText)
+        self.part_main.setWordWrap(True)
+        self.part_main.setAlignment(Qt.AlignTop)
+        self.part_main.setText('')
+
         #### Lower right column box
         self.lower_right_col_box = QGroupBox('Part Actions')
 
@@ -527,10 +547,11 @@ class StravaApp(QWidget):
         main_layout = QGridLayout()
         main_layout.addWidget(self.upper_left_col_box, 0, 0, 4, 1)
         main_layout.addWidget(self.mid_left_col_box, 4, 0, 1, 1)
-        main_layout.addWidget(self.lower_left_col_box, 5, 0, 4, 1)
-        main_layout.addWidget(self.upper_right_col_box, 0, 1, 5, 1)
-        main_layout.addWidget(self.lower_right_col_box, 5, 1, 4, 1)
-        main_layout.addWidget(self.message_box, 9, 0, 1, 2)
+        main_layout.addWidget(self.lower_left_col_box, 7, 0, 4, 1)
+        main_layout.addWidget(self.upper_right_col_box, 0, 1, 4, 1)
+        main_layout.addWidget(self.middle_right_col_box, 4, 1, 3, 1)
+        main_layout.addWidget(self.lower_right_col_box, 7, 1, 4, 1)
+        main_layout.addWidget(self.message_box, 11, 0, 1, 2)
         main_layout.setColumnStretch(0, 1) # args are col number and relative weight
         main_layout.setColumnStretch(1, 1)
         self.setLayout(main_layout)
