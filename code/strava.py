@@ -82,13 +82,14 @@ class StravaApp(QWidget):
             self.db_path = db_path
             with open(os.path.expanduser('~/.stravaDB_location'), 'w') as f:
                 f.write(db_path)
-            self.create_db()
-        else:
-            self.init_new_db()
-        rider_name, _ = QFileDialog.getText(self,
+            if not os.path.exists(self.db_path):
+                self.create_db()
+                rider_name, _ = QFileDialog.getText(self,
                                                     'Rider Name',
                                                     'Enter rider name')
-        self.initialize_rider(rider_name)
+                self.initialize_rider(rider_name)
+        else:
+            self.init_new_db()
 
     def initialize_rider(self, rider_name):
         rider_values = (rider_name, 'imperial')
