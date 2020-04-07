@@ -1,26 +1,21 @@
 -- Riders are top level
 CREATE TABLE riders (
     name       TEXT PRIMARY KEY,
-    max_speed  REAL,
-    avg_speed  REAL,
-    total_dist REAL,
     units      TEXT
 );
 
 -- Bikes belong to riders
 CREATE TABLE bikes (
-    id          TEXT PRIMARY KEY,
+    bike_id     TEXT PRIMARY KEY,
     name        TEXT,
     color       TEXT,
     purchased   DATE,
-    price       REAL,
-    total_mi    REAL,
-    total_elev  REAL
+    price       REAL
 );
 
 -- Rides record data about a bike ride
 CREATE TABLE rides (
-    id           INTEGER PRIMARY KEY,
+    ride_id      INTEGER PRIMARY KEY,
     bike         TEXT NOT NULL REFERENCES bike(id),
     distance     INTEGER,
     name         TEXT,
@@ -37,7 +32,7 @@ CREATE TABLE rides (
 
 -- Parts belong to bikes
 CREATE TABLE parts (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    part_id      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     type         TEXT,
     purchased    DATE,
     brand        TEXT,
@@ -51,8 +46,8 @@ CREATE TABLE parts (
 
 -- Maintenance tasks record things that happen to parts
 CREATE TABLE maintenance (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    part         INTEGER NOT NULL REFERENCES parts(id),
+    maint_id     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    part         INTEGER NOT NULL REFERENCES parts(part_id),
     work         TEXT,
     date         DATE
 );
