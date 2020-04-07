@@ -581,70 +581,22 @@ class StravaApp(QWidget):
         self.show()
 
 
+def initialize_params():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--schema_path',
+        help="Path to the create_db.sql script",
+        required=True,
+    )
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
     locale.setlocale(locale.LC_ALL, '')
-    strava_db_schema = """
-    -- Riders are top level
-    create table riders (
-        name       text primary key,
-        max_speed   real,
-        avg_speed   real,
-        total_dist  real,
-        total_climb real, 
-        units       text
-    );
-
-    -- Bikes belong to riders
-    create table bikes (
-        id          text primary key,
-        name        text,
-        color       text,
-        purchased   date,
-        price       real,
-        total_mi    real,
-        total_elev  real
-    );
-    
-    -- Rides record data about a bike ride
-    create table rides (
-        id           integer primary key,
-        bike         text not null references bike(id),
-        distance     integer,
-        name         text,
-        date         date,
-        moving_time  integer,
-        elapsed_time integer,
-        elev         real,
-        type         text,
-        avg_speed    real,
-        max_speed    real,
-        calories     real,
-        rider        text not null references rider(name)
-    );
-
-    -- Parts belong to bikes
-    create table parts (
-        id           integer primary key autoincrement not null,
-        type         text,
-        purchased    date,
-        brand        text,
-        price        real,
-        weight       real,
-        size         text,
-        model        text,
-        bike         text not null references bikes(name),
-        inuse        text
-    );
-
-    -- Maintenance tasks record things that happen to parts
-    create table maintenance (
-        id           integer primary key autoincrement not null,
-        part         integer not null references parts(id),
-        work         text,
-        date         date
-    );
-    """
-
+    args = initialize_params()
+    schema_path = os.path.expanduser(args.schema_path)
+    with open(schema_path, 'r') as f:
+        strava_db_schema = f.read()
     cl = Client()
     app = QApplication(sys.argv)
     strava_app = StravaApp(strava_db_schema, cl)
