@@ -40,7 +40,7 @@ class StravaApp(QWidget):
         self.id_list = list(all_ride_ids['id'])
 
     def get_rider_info(self):
-        query = 'select * from riders'
+        query = 'SELECT * FROM riders'
         res = self.get_from_db(query)
         self.rider_name = res['name'][0]
         self.max_speed = res['max_speed'][0]
@@ -75,7 +75,7 @@ class StravaApp(QWidget):
     def init_new_db(self):
         """Function to initialize a new DB using a pop-up dialogue"""
         db_path, ok = QFileDialog.getOpenFileName(self,
-                                                      caption='Selection location to save database file',
+                                                      caption='Select location to save database file',
                                                       directory=self.init_dir,
                                                       filter='database files(*.db)')
         if ok:
@@ -95,7 +95,7 @@ class StravaApp(QWidget):
         rider_values = (rider_name, 'imperial')
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""INSERT into riders (name, units) 
-                            values (?, ?)""",
+                            VALUES (?, ?)""",
                          rider_values)
 
     def edit_entry(self, sql, values):
@@ -149,7 +149,7 @@ class StravaApp(QWidget):
         return res
 
     def get_all_bike_ids(self):
-        query = "SELECT id, name from bikes"
+        query = "SELECT id, name FROM bikes"
         self.all_bike_ids = self.get_from_db(query)
 
     def replace_part(self, old_part=None):
@@ -162,7 +162,7 @@ class StravaApp(QWidget):
 
     def add_part(self, part_values):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""INSERT into parts (
+            conn.execute("""INSERT INTO parts (
                                 type, 
                                 purchased, 
                                 brand, 
@@ -172,7 +172,7 @@ class StravaApp(QWidget):
                                 model, 
                                 bike, 
                                 inuse) 
-                            values (?, ?, ?, ?, ?, ?, ?, ?, True)""", part_values)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, True)""", part_values)
 
     def add_maintenance(self):
         # Define today
@@ -185,8 +185,8 @@ class StravaApp(QWidget):
         if get_input(f'Add Maintenance Record for part {self.current_part}', dat):
             main_values = (int(self.current_part), dat['Work'], dat['Date'])
             with sqlite3.connect(self.db_path) as conn:
-                conn.execute("""INSERT into maintenance 
-                                (part, work, date) values (?, ?, ?)""",
+                conn.execute("""INSERT INTO maintenance 
+                                (part, work, date) VALUES (?, ?, ?)""",
                              main_values)
 
     def get_all_bike_parts(self):
@@ -214,7 +214,7 @@ class StravaApp(QWidget):
         self.current_date = d
 
     def get_all_ride_data(self):
-        query = "SELECT * from rides WHERE rider='%s'" % self.rider_name
+        query = "SELECT * FROM rides WHERE rider='%s'" % self.rider_name
         with sqlite3.connect(self.db_path) as conn:
             self.all_rides = pd.read_sql_query(query, conn)
 
@@ -429,11 +429,11 @@ class StravaApp(QWidget):
                    self.rider_name, ) for a in activity_list]
         
         with sqlite3.connect(self.db_path) as conn:
-            sql = """INSERT into rides 
+            sql = """INSERT INTO rides 
                      (id, bike, distance, name, date, moving_time,
                       elapsed_time, elev, type, avg_speed, max_speed,
                       calories, rider) 
-                     values (?,?,?,?,?,?,?,?,?,?,?,?,?)""" 
+                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""" 
             conn.executemany(sql, a_list)
 
 
