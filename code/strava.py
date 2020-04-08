@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
 import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime
-import numpy as np
+# import numpy as np
 import pandas as pd
 from functools import partial
 from input_form_dialog import FormOptions, get_input
@@ -30,12 +30,12 @@ class StravaApp(QWidget):
 
     def load_basic_values(self):
         self.current_part = None
-        self.rider = self.get_rider_info()
+        self.get_rider_info()
         self.get_all_ride_ids()
         # self.current_bike = None
 
     def get_all_ride_ids(self):
-        query = "SELECT id FROM rides WHERE rider='%s'" % self.rider_name
+        query = f"SELECT ride_id FROM rides WHERE rider='{self.rider_name}'"
         all_ride_ids = self.get_from_db(query)
         self.id_list = list(all_ride_ids['id'])
 
@@ -43,12 +43,29 @@ class StravaApp(QWidget):
         query = 'SELECT * FROM riders'
         res = self.get_from_db(query)
         self.rider_name = res['name'][0]
-        self.max_speed = res['max_speed'][0]
-        self.avg_speed = res['avg_speed'][0]
-        self.tot_dist = res['total_dist'][0]
-        self.tot_climb = res['total_climb'][0]
         self.units = res['units'][0]
-        return res
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            try:
+                c.execute('SELECT MAX(max_speed) FROM rides')
+                self.max_speed = round(c.fetchone()[0], 2)
+            except:
+                self.max_speed = None
+            try:
+                c.execute('SELECT MEAN(avg_speed) FROM rides') # is this correct?
+                self.avg_speed = round(c.fetchone()[0], 2)
+            except:
+                self.avg_speed = None
+            try:
+                c.execute('SELECT SUM(distance) FROM rides')
+                self.tot_dist = round(c.fetchone()[0], 2)
+            except:
+                self.tot_dist = None
+            try:
+                c.execute('SELECT SUM(elev) FROM rides')
+                self.tot_climb = round(c.fetchone()[0], 2)
+            except:
+                self.tot_climb = None
 
     def test_os(self):
         system = platform.system()
@@ -106,10 +123,11 @@ class StravaApp(QWidget):
         with sqlite3.connect(self.db_path) as conn:
             conn.executescript(self.schema)
 
-
     def try_get_password(self):
         """Attempts to get Strava application information, else prompts for input"""
         code = keyring.get_password('stravaDB', 'code')
+        secret = keyring.get_password('stravaDB', 'client_secret')
+        cid = keyring.get_password('stravaDB', 'client_id')
         if code is not None:
             self.code = code
         else:
@@ -119,7 +137,6 @@ class StravaApp(QWidget):
             if ok:
                 self.code = str(text)
                 keyring.set_password('stravaDB', 'code', str(text))
-        secret = keyring.get_password('stravaDB', 'client_secret')
         if secret is not None:
             self.client_secret = secret
         else:
@@ -129,7 +146,6 @@ class StravaApp(QWidget):
             if ok:
                 self.client_secret = str(text)
                 keyring.set_password('stravaDB', 'client_secret', str(text))
-        cid = keyring.get_password('stravaDB', 'client_id')
         if cid is not None:
             self.client_id = cid
         else:
@@ -149,7 +165,7 @@ class StravaApp(QWidget):
         return res
 
     def get_all_bike_ids(self):
-        query = "SELECT id, name FROM bikes"
+        query = "SELECT bike_id, name FROM bikes"
         self.all_bike_ids = self.get_from_db(query)
 
     def replace_part(self, old_part=None):
@@ -157,7 +173,7 @@ class StravaApp(QWidget):
         self.add_part(part_values)
         if old_part is not None:
             with sqlite3.connect(self.db_path) as conn:
-                conn.execute('UPDATE parts SET inuse = 0 WHERE id=?',
+                conn.execute("UPDATE parts SET inuse = 'True' WHERE part_id=?",
                              (old_part, ))
 
     def add_part(self, part_values):
@@ -190,10 +206,10 @@ class StravaApp(QWidget):
                              main_values)
 
     def get_all_bike_parts(self):
-        sql = """SELECT * 
-                 FROM parts 
-                 WHERE bike = '%s'
-                 AND inuse = 1""" %self.current_bike
+        sql = f"""SELECT * 
+                  FROM parts 
+                  WHERE bike = '{self.current_bike}'
+                  AND inuse = 'True'"""
         self.current_bike_parts_list = self.get_from_db(sql)
         
 
@@ -214,65 +230,37 @@ class StravaApp(QWidget):
         self.current_date = d
 
     def get_all_ride_data(self):
-        query = "SELECT * FROM rides WHERE rider='%s'" % self.rider_name
+        query = f"SELECT * FROM rides WHERE rider='{self.rider_name}'"
         with sqlite3.connect(self.db_path) as conn:
             self.all_rides = pd.read_sql_query(query, conn)
-
-    def update_rider(self):
-        # want to calculate max and avg speeds
-        self.get_all_ride_data()
-        try:
-            ms = np.round(self.all_rides['max_speed'].max(), 2)
-        except:
-            ms = None
-        try:
-            av = np.round(self.all_rides['avg_speed'].mean(), 2)
-        except:
-            av = None
-        try:
-            tot = np.round(self.all_rides['distance'].sum(), 2)
-        except:
-            tot = None
-        try:
-            tot_c = np.round(self.all_rides['elev'].sum(), 2)
-        except:
-            tot_c = None
-        self.max_speed = ms
-        self.avg_speed = av
-        self.tot_dist = tot
-        self.tot_elev = tot_c
-        sql = """UPDATE riders 
-             SET max_speed = ?, avg_speed = ?, total_dist = ?, total_climb = ?
-             WHERE name = ?"""
-        self.edit_entry(sql, (ms, av, tot, tot_c, self.rider_name))
 
     def update_part(self):
         sql = f"""SELECT distance, elapsed_time, elev 
                   FROM rides 
-                  WHERE bike=(SELECT id FROM bikes WHERE name='{self.current_bike}')
+                  WHERE bike=(SELECT bike_id FROM bikes WHERE name='{self.current_bike}')
                   AND date >= (SELECT purchased 
                                FROM parts 
-                               WHERE id={self.current_part})"""
+                               WHERE part_id={self.current_part})"""
         res = self.get_from_db(sql)
         try:
-            dist = np.round(res.distance.sum(), 2)
+            dist = round(res.distance.sum(), 2)
             dist = f'{dist:n}'
         except:
             dist = None
         try:
-            elev = np.round(res.elev.sum(), 2)
+            elev = round(res.elev.sum(), 2)
             elev = f'{elev:n}'
         except:
             elev = None
         try:
-            time = np.round(res.elapsed_time.sum(), 2)
+            time = round(res.elapsed_time.sum(), 2)
             time = f'{time:n}'
         except:
             time = None
         self.format_part_info(dist, elev, time)
 
     def change_parts_list(self):
-        bpl = self.current_bike_parts_list[['id', 'type']]
+        bpl = self.current_bike_parts_list[['part_id', 'type']]
         p_list = bpl['type']
         self.parts_list_menu.clear()
         self.parts_list_menu.addItems(list(p_list))
@@ -281,7 +269,7 @@ class StravaApp(QWidget):
         # Part Stats
         sql = """SELECT * 
                  FROM parts 
-                 WHERE id = %i""" %self.current_part
+                 WHERE part_id = {self.current_part}"""
         res = self.get_from_db(sql)
         t = res.T.to_string(header=False)
         t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
@@ -298,7 +286,7 @@ class StravaApp(QWidget):
         # Part Maintenance
         sql = f"""SELECT work, date
                   FROM maintenance
-                  WHERE id={self.current_part}"""
+                  WHERE part_id={self.current_part}"""
         main_res = self.get_from_db(sql)
         if main_res.shape[0] > 0:
             t = main_res.T.to_string(header=False)
@@ -308,44 +296,28 @@ class StravaApp(QWidget):
             t = ''
         self.part_main.setText(t)
 
-    def format_rider_info(self, update=False):
-        if update:
-            self.update_rider()
-        rider = self.get_rider_info()
-        u = rider.units[0]
-        t_dist = int(np.round(rider.total_dist[0]))
-        t_dist = f'{t_dist:n}'
-        t_climb = int(np.round(rider.total_climb[0]))
-        t_climb = f'{t_climb:n}'
-        rider = rider.reindex(columns=['name',
-                                       'max_speed',
-                                       'avg_speed',
-                                       'total_dist',
-                                       'total_climb',
-                                       'units'])
-        rider.rename(columns={'name': '<b>Name:</b> ',
-                              'max_speed': '<b>Max Speed:</b> ',
-                              'avg_speed': '<b>Average Speed:</b> ',
-                              'total_dist': '<b>Total Distance:</b> ',
-                              'total_climb': '<b>Total Elevation Gain:</b> ', 
-                              'units': '<b>Units:</b> '},
-                     inplace=True)
-        t = rider.T.to_string(header=False)
-        t = re.sub(r'\n', '<br>', t)
-        if u == 'imperial':
+    def format_rider_info(self):
+        self.get_rider_info()
+        t = f"""<b>Name:</b> {self.rider_name}<br>
+                <b>Max Speed:</b> {self.max_speed}<br>
+                <b>Average Speed:</b> {self.avg_speed}<br>
+                <b>Total Distance:</b> {int(self.tot_dist)}<br>
+                <b>Total Elevation Gain:</b> {int(self.tot_climb)}<br>
+                <b>Units:</b> {self.units}"""
+        if self.units == 'imperial':
             t = re.sub(r'(Max Speed.*?)<br>', r'\1 mph<br>', t)
             t = re.sub(r'(Average Speed.*?)<br>', r'\1 mph<br>', t)
-            t = re.sub(r'(Total Distance.*?)<br>',
-                       'Total Distance:</b> %s miles<br>' %t_dist, t)
-            t = re.sub(r'(Total Elevation Gain.*?)<br>',
-                       'Total Elevation Gain:</b> %s feet<br>' %t_climb, t)
+            t = re.sub(r'(Total Distance:</b> (.*?))<br>',
+                       'Total Distance:</b> \2 miles<br>', t)
+            t = re.sub(r'(Total Elevation Gain:<b> (.*?))<br>',
+                       'Total Elevation Gain:</b> \2 feet<br>', t)
         else:
             t = re.sub(r'(^Max Speed.*?)', r'\1 kph', t)
             t = re.sub(r'(^Average Speed.*?)', r'\1 kph', t)
-            t = re.sub(r'(Total Distance.*?)<br>',
-                       'Total Distance:</b> %s kilometers<br>' %t_dist, t)
-            t = re.sub(r'(Total Elevation Gain.*?)<br>',
-                       'Total Elevation Gain:</b> %s meters<br>' %t_climb, t)
+            t = re.sub(r'(Total Distance:</b> (.*?))<br>',
+                       'Total Distance:</b> \2 kilometers<br>', t)
+            t = re.sub(r'(Total Elevation Gain:</b> (.*?))<br>',
+                       'Total Elevation Gain:</b> \2 meters<br>', t)
         if update:
             self.rider_info.setText(t)
         else:
@@ -380,8 +352,7 @@ class StravaApp(QWidget):
                 if len(self.new_id_list) > 0:
                     self.new_activities = [self.client.get_activity(id) for id
                                            in self.new_id_list]
-                    self.mb('Fetched %i new activities' %len(self.new_id_list))
-                    self.update_rider()
+                    self.mb(f'Fetched {len(self.new_id_list)} new activities')
                 else:
                     self.new_activities = None
                     self.mb('No new activities.')
@@ -430,12 +401,11 @@ class StravaApp(QWidget):
         
         with sqlite3.connect(self.db_path) as conn:
             sql = """INSERT INTO rides 
-                     (id, bike, distance, name, date, moving_time,
+                     (ride_id, bike, distance, name, date, moving_time,
                       elapsed_time, elev, type, avg_speed, max_speed,
                       calories, rider) 
                      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""" 
             conn.executemany(sql, a_list)
-
 
     def new_activities(self):
         self.fetch_new_activities()
@@ -461,7 +431,7 @@ class StravaApp(QWidget):
 
         up_rider = QPushButton('Update Rider Stats', self)
         up_rider.setToolTip('Update max speed, average speed, and total distance')
-        up_rider.clicked.connect(lambda: self.format_rider_info(update=True))
+        up_rider.clicked.connect(lambda: self.format_rider_info())
 
         up_rides = QPushButton('Fetch New Rides', self)
         up_rides.setToolTip('Fetch new rides from Strava and update rider stats')
