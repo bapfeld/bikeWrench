@@ -7,8 +7,6 @@ from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
 import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime
-# import numpy as np
-import pandas as pd
 from functools import partial
 from input_form_dialog import FormOptions, get_input
 
@@ -36,14 +34,12 @@ class StravaApp(QWidget):
 
     def get_all_ride_ids(self):
         query = f"SELECT ride_id FROM rides WHERE rider='{self.rider_name}'"
-        all_ride_ids = self.get_from_db(query)
-        self.id_list = list(all_ride_ids['id'])
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(query)
+            self.id_list = [x[0] for x in c.fetchall()]
 
     def get_rider_info(self):
-        query = 'SELECT * FROM riders'
-        res = self.get_from_db(query)
-        self.rider_name = res['name'][0]
-        self.units = res['units'][0]
         with sqlite.connect(self.db_path) as conn:
             c = conn.cursor()
             try:
@@ -66,6 +62,10 @@ class StravaApp(QWidget):
                 self.tot_climb = round(c.fetchone()[0], 2)
             except:
                 self.tot_climb = None
+            c.execute('SELECT * FROM riders')
+            res = c.fetchone()
+            self.rider_name = res[0][0]
+            self.units = res[0][1]
 
     def test_os(self):
         system = platform.system()
@@ -159,14 +159,12 @@ class StravaApp(QWidget):
     def load_db(self):
         self.get_all_bike_ids()
 
-    def get_from_db(self, query):
-        with sqlite3.connect(self.db_path) as conn:
-            res = pd.read_sql_query(query, conn)
-        return res
-
     def get_all_bike_ids(self):
         query = "SELECT bike_id, name FROM bikes"
-        self.all_bike_ids = self.get_from_db(query)
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(query)
+            self.all_bike_ids = {x[0]: x[1] for x in c.fetchall()}
 
     def replace_part(self, old_part=None):
         # need to get some kind of popup here to input part values!
@@ -206,11 +204,14 @@ class StravaApp(QWidget):
                              main_values)
 
     def get_all_bike_parts(self):
-        sql = f"""SELECT * 
-                  FROM parts 
-                  WHERE bike = '{self.current_bike}'
-                  AND inuse = 'True'"""
-        self.current_bike_parts_list = self.get_from_db(sql)
+        query = f"""SELECT * 
+                    FROM parts 
+                    WHERE bike = '{self.current_bike}'
+                    AND inuse = 'True'"""
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(query)
+            self.current_bike_parts_list = c.fetchall()
         
 
     def bike_choice(self, b):
@@ -221,7 +222,7 @@ class StravaApp(QWidget):
 
     def part_choice(self, p):
         if p >= 1:
-            self.current_part = self.current_bike_parts_list.id[p]
+            self.current_part = self.current_bike_parts_list[p][0]
             self.format_part_info()
         else:
             self.part_stats.setText('')
@@ -231,49 +232,61 @@ class StravaApp(QWidget):
 
     def get_all_ride_data(self):
         query = f"SELECT * FROM rides WHERE rider='{self.rider_name}'"
-        with sqlite3.connect(self.db_path) as conn:
-            self.all_rides = pd.read_sql_query(query, conn)
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(query)
+            self.all_rides = c.fetchall()
 
     def update_part(self):
-        sql = f"""SELECT distance, elapsed_time, elev 
-                  FROM rides 
-                  WHERE bike=(SELECT bike_id FROM bikes WHERE name='{self.current_bike}')
-                  AND date >= (SELECT purchased 
-                               FROM parts 
-                               WHERE part_id={self.current_part})"""
-        res = self.get_from_db(sql)
+        query = f"""SELECT distance, elapsed_time, elev 
+                    FROM rides 
+                    WHERE bike=(SELECT bike_id FROM bikes WHERE name='{self.current_bike}')
+                    AND date >= (SELECT purchased 
+                                 FROM parts 
+                                 WHERE part_id={self.current_part})"""
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(query)
+            res = c.fetchall()
         try:
-            dist = round(res.distance.sum(), 2)
+            dist = round(sum([x[0] for x in res]), 2)
             dist = f'{dist:n}'
         except:
             dist = None
         try:
-            elev = round(res.elev.sum(), 2)
+            elev = round(sum([x[2] for x in res]), 2)
             elev = f'{elev:n}'
         except:
             elev = None
         try:
-            time = round(res.elapsed_time.sum(), 2)
+            time = round(sum([x[1] for x in res]), 2)
             time = f'{time:n}'
         except:
             time = None
         self.format_part_info(dist, elev, time)
 
     def change_parts_list(self):
-        bpl = self.current_bike_parts_list[['part_id', 'type']]
-        p_list = bpl['type']
+        p_list = [x[1] for x in self.current_bike_parts_list]
         self.parts_list_menu.clear()
         self.parts_list_menu.addItems(list(p_list))
 
     def format_part_info(self, dist=None, elev=None, time=None):
         # Part Stats
-        sql = """SELECT * 
-                 FROM parts 
-                 WHERE part_id = {self.current_part}"""
-        res = self.get_from_db(sql)
-        t = res.T.to_string(header=False)
-        t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
-        t = re.sub(r'\n', '<br>', t)
+        query = """SELECT * 
+                   FROM parts 
+                   WHERE part_id = {self.current_part}"""
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(query)
+            res = c.fetchone()
+        t = f"""<b>Part ID:</b> {res[0]}<br>
+                <b>Type:</b> {res[1]}<br>
+                <b>Purchased:</b> {res[2]}<br>
+                <b>Brand:</b> {res[3]}<br>
+                <b>Weight:</b> {res[4]}<br>
+                <b>Size:</b> {res[5]}<br>
+                <b>Model:</b> {res[6]}<br>
+                <b>Bike:</b> {res[7]}<br>"""
         if dist is not None:
             t += f'<br><br><b>Total Distance:</b> {dist}'
         if elev is not None:
@@ -284,16 +297,18 @@ class StravaApp(QWidget):
         
 
         # Part Maintenance
-        sql = f"""SELECT work, date
-                  FROM maintenance
-                  WHERE part_id={self.current_part}"""
-        main_res = self.get_from_db(sql)
-        if main_res.shape[0] > 0:
-            t = main_res.T.to_string(header=False)
-            t = re.sub(r'^(.*?) ', r'<b>\1:</b> ', t, flags=re.M)
-            t = re.sub(r'\n', '<br>', t)
-        else:
-            t = ''
+        query = f"""SELECT work, date
+                    FROM maintenance
+                    WHERE part_id={self.current_part}"""
+        with sqlite.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(query)
+            main_res = c.fetchall()
+        t = ''
+        if len(main_res) > 0:
+            for rec in main_res:
+                t += f"""<b>Date:</b> {rec[3]}<br>
+                         <b>Work done:</b> {rec[2]}<br>"""
         self.part_main.setText(t)
 
     def format_rider_info(self):
@@ -446,7 +461,7 @@ class StravaApp(QWidget):
         #### Middle row left column box
         self.mid_left_col_box = QGroupBox('Bike and Part Selection')
         bike_list = QComboBox()
-        bike_list.addItems(list(self.all_bike_ids.name))
+        bike_list.addItems(self.all_bike_ids.values())
         bike_list.activated[str].connect(self.bike_choice)
 
         self.parts_list_menu = QComboBox(self)
