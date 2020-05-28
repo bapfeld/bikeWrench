@@ -14,7 +14,7 @@ from base_class import add_method, StravaApp
 @add_method(StravaApp)
 def get_all_bike_ids(self):
     query = "SELECT bike_id, name FROM bikes"
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         self.all_bike_ids = {x[0]: x[1] for x in c.fetchall()}
@@ -22,14 +22,14 @@ def get_all_bike_ids(self):
 @add_method(StravaApp)
 def get_all_ride_ids(self):
     query = f"SELECT ride_id FROM rides WHERE rider='{self.rider_name}'"
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         self.id_list = [x[0] for x in c.fetchall()]
         
 @add_method(StravaApp)
 def get_rider_info(self):
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         try:
             c.execute('SELECT MAX(max_speed) FROM rides')
@@ -106,7 +106,7 @@ def get_all_bike_parts(self):
                 FROM parts 
                 WHERE bike = '{self.current_bike}'
                 AND inuse = 'True'"""
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         self.current_bike_parts_list = c.fetchall()
@@ -114,7 +114,7 @@ def get_all_bike_parts(self):
 @add_method(StravaApp)
 def get_all_ride_data(self):
     query = f"SELECT * FROM rides WHERE rider='{self.rider_name}'"
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         self.all_rides = c.fetchall()
@@ -127,7 +127,7 @@ def update_part(self):
                 AND date >= (SELECT purchased 
                              FROM parts 
                              WHERE part_id={self.current_part})"""
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         res = c.fetchall()

@@ -9,7 +9,7 @@ from stravalib import unithelper
 import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime
 from functools import partial
 from input_form_dialog import FormOptions, get_input
-import base_class
+from base_class import StravaApp
 import startup_funcs
 import sql_funcs
 import strava_interaction

@@ -39,7 +39,7 @@ def try_load_db(self):
 @add_method(StravaApp)
 def init_new_db(self):
     """Function to initialize a new DB using a pop-up dialogue"""
-    db_path, ok = QFileDialog.getOpenFileName(self,
+    db_path, ok = QFileDialog.getSaveFileName(self,
                                               caption='Select location to save database file',
                                               directory=self.init_dir,
                                               filter='database files(*.db)')
@@ -49,7 +49,7 @@ def init_new_db(self):
             f.write(db_path)
         if not os.path.exists(self.db_path):
             self.create_db()
-            rider_name, _ = QFileDialog.getText(self,
+            rider_name, _ = QInputDialog.getText(self,
                                                 'Rider Name',
                                                 'Enter rider name')
             self.initialize_rider(rider_name)
@@ -67,7 +67,7 @@ def initialize_rider(self, rider_name):
 @add_method(StravaApp)
 def create_db(self):
     with sqlite3.connect(self.db_path) as conn:
-        conn.executescript(self.schema)@add_method(StravaApp)
+        conn.executescript(self.schema)
 
 @add_method(StravaApp)
 def load_db(self):
