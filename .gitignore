@@ -2,3 +2,4 @@ code/strava.ini
 **/.Rhistory
 **/*.gpg
 data/*.db
+code/__pycache__/*
