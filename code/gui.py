@@ -46,7 +46,7 @@ def format_part_info(self, dist=None, elev=None, time=None):
     query = """SELECT * 
                FROM parts 
                WHERE part_id = {self.current_part}"""
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         res = c.fetchone()
@@ -71,7 +71,7 @@ def format_part_info(self, dist=None, elev=None, time=None):
     query = f"""SELECT work, date
                 FROM maintenance
                 WHERE part_id={self.current_part}"""
-    with sqlite.connect(self.db_path) as conn:
+    with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         main_res = c.fetchall()
@@ -83,7 +83,7 @@ def format_part_info(self, dist=None, elev=None, time=None):
     self.part_main.setText(t)
 
 @add_method(StravaApp)
-def format_rider_info(self):
+def format_rider_info(self, update=False):
     self.get_rider_info()
     t = f"""<b>Name:</b> {self.rider_name}<br>
             <b>Max Speed:</b> {self.max_speed}<br>
