@@ -55,7 +55,7 @@ def fetch_new_activities(self):
         self.new_activities = None
 
 @add_method(StravaApp)
-def new_activities(self):
+def get_new_activities(self):
     self.fetch_new_activities()
     if self.new_activities is not None:
         self.add_multiple_rides(self.new_activities)
