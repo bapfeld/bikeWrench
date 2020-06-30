@@ -132,7 +132,7 @@ def initUI(self):
 
     up_rides = QPushButton('Fetch New Rides', self)
     up_rides.setToolTip('Fetch new rides from Strava and update rider stats')
-    up_rides.clicked.connect(self.new_activities)
+    up_rides.clicked.connect(lambda: self.get_new_activities())
 
     rider_layout = QGridLayout()
     rider_layout.addWidget(self.rider_info, 0, 0)
