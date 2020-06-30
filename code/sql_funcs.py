@@ -35,22 +35,22 @@ def get_rider_info(self):
             c.execute('SELECT MAX(max_speed) FROM rides')
             self.max_speed = round(c.fetchone()[0], 2)
         except:
-            self.max_speed = None
+            self.max_speed = 0
         try:
             c.execute('SELECT MEAN(avg_speed) FROM rides') # is this correct?
             self.avg_speed = round(c.fetchone()[0], 2)
         except:
-            self.avg_speed = None
+            self.avg_speed = 0
         try:
             c.execute('SELECT SUM(distance) FROM rides')
             self.tot_dist = round(c.fetchone()[0], 2)
         except:
-            self.tot_dist = None
+            self.tot_dist = 0
         try:
             c.execute('SELECT SUM(elev) FROM rides')
             self.tot_climb = round(c.fetchone()[0], 2)
         except:
-            self.tot_climb = None
+            self.tot_climb = 0
         c.execute('SELECT * FROM riders')
         res = c.fetchone()
         self.rider_name = res[0][0]
