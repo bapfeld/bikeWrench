@@ -31,6 +31,10 @@ def get_all_ride_ids(self):
 def get_rider_info(self):
     with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
+        c.execute('SELECT * FROM riders')
+        res = c.fetchone()
+        self.rider_name = res[0]
+        self.units = res[1]
         try:
             c.execute('SELECT MAX(max_speed) FROM rides')
             self.max_speed = round(c.fetchone()[0], 2)
@@ -51,10 +55,14 @@ def get_rider_info(self):
             self.tot_climb = round(c.fetchone()[0], 2)
         except:
             self.tot_climb = 0
-        c.execute('SELECT * FROM riders')
-        res = c.fetchone()
-        self.rider_name = res[0]
-        self.units = res[1]
+
+@add_method(StravaApp)
+def convert_rider_info(self):
+    if self.units == 'imperial':
+        self.max_speed = round(self.max_speed / 1.609, 2)
+        self.avg_speed = round(self.avg_speed / 1.609, 2)
+        self.tot_dist = round(self.tot_dist / 1.609, 2)
+        self.tot_climb = round(self.tot_climb * 3.281, 2)
 
 @add_method(StravaApp)
 def edit_entry(self, sql, values):

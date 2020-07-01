@@ -85,26 +85,23 @@ def format_part_info(self, dist=None, elev=None, time=None):
 @add_method(StravaApp)
 def format_rider_info(self, update=False):
     self.get_rider_info()
+    self.convert_rider_info()
     t = f"""<b>Name:</b> {self.rider_name}<br>
             <b>Max Speed:</b> {self.max_speed}<br>
             <b>Average Speed:</b> {self.avg_speed}<br>
-            <b>Total Distance:</b> {int(self.tot_dist)}<br>
-            <b>Total Elevation Gain:</b> {int(self.tot_climb)}<br>
+            <b>Total Distance:</b> {self.tot_dist}<br>
+            <b>Total Elevation Gain:</b> {self.tot_climb}<br>
             <b>Units:</b> {self.units}"""
     if self.units == 'imperial':
         t = re.sub(r'(Max Speed.*?)<br>', r'\1 mph<br>', t)
         t = re.sub(r'(Average Speed.*?)<br>', r'\1 mph<br>', t)
-        t = re.sub(r'(Total Distance:</b> (.*?))<br>',
-                   'Total Distance:</b> \2 miles<br>', t)
-        t = re.sub(r'(Total Elevation Gain:<b> (.*?))<br>',
-                   'Total Elevation Gain:</b> \2 feet<br>', t)
+        t = re.sub(r'(Total Distance.*?)<br>', r'\1 miles<br>', t)
+        t = re.sub(r'(Total Elevation Gain.*?)<br>', r'\1 feet<br>', t)
     else:
-        t = re.sub(r'(^Max Speed.*?)', r'\1 kph', t)
-        t = re.sub(r'(^Average Speed.*?)', r'\1 kph', t)
-        t = re.sub(r'(Total Distance:</b> (.*?))<br>',
-                   'Total Distance:</b> \2 kilometers<br>', t)
-        t = re.sub(r'(Total Elevation Gain:</b> (.*?))<br>',
-                   'Total Elevation Gain:</b> \2 meters<br>', t)
+        t = re.sub(r'(^Max Speed.*?)<br>', r'\1 kph<br>', t)
+        t = re.sub(r'(^Average Speed.*?)<br>', r'\1 kph<br>', t)
+        t = re.sub(r'(Total Distance.*?)<br>', r'\1 kilometers<br>', t)
+        t = re.sub(r'(Total Elevation Gain.*?)<br>', r'\1 meters<br>', t)
     if update:
         self.rider_info.setText(t)
     else:
