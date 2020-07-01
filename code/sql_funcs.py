@@ -37,7 +37,7 @@ def get_rider_info(self):
         except:
             self.max_speed = 0
         try:
-            c.execute('SELECT MEAN(avg_speed) FROM rides') # is this correct?
+            c.execute('SELECT AVG(avg_speed) FROM rides') # is this correct?
             self.avg_speed = round(c.fetchone()[0], 2)
         except:
             self.avg_speed = 0
@@ -53,8 +53,8 @@ def get_rider_info(self):
             self.tot_climb = 0
         c.execute('SELECT * FROM riders')
         res = c.fetchone()
-        self.rider_name = res[0][0]
-        self.units = res[0][1]
+        self.rider_name = res[0]
+        self.units = res[1]
 
 @add_method(StravaApp)
 def edit_entry(self, sql, values):
