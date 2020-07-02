@@ -52,13 +52,19 @@ def init_new_db(self):
             rider_name, _ = QInputDialog.getText(self,
                                                 'Rider Name',
                                                 'Enter rider name')
-            self.initialize_rider(rider_name)
+            rider_units, _ = QInputDialog.getItem(self,
+                                                  title='Preferred Units',
+                                                  label='Select Preferred Units:',
+                                                  items=['imperial', 'standard'],
+                                                  current=0, editable=False)
+            self.initialize_rider(rider_name, rider_units)
     else:
         self.init_new_db()
 
 @add_method(StravaApp)
-def initialize_rider(self, rider_name):
-    rider_values = (rider_name, 'imperial')
+def initialize_rider(self, rider_name, rider_units):
+    rider_values = (rider_name, rider_units)
+    self.units = rider_units
     with sqlite3.connect(self.db_path) as conn:
         conn.execute("""INSERT into riders (name, units) 
                         VALUES (?, ?)""",
