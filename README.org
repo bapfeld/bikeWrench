@@ -1,6 +1,6 @@
 #+TITLE: Project README
 
-This is a fun project for playing around with my strava data.
+This is a project aimed at tracking wear and usage of different bike components. Note that it is not currently functional in the most recent commit on the master branch. 
 
 * Overview
 The idea here is to create a lightweight way to track maintenance. I want to limit external dependencies and basically just get the minimum info from the activities and log it, with the ability then to see wear and tear by part, last time various maintenance tasks were performed, etc. 
