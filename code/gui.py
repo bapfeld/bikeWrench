@@ -139,17 +139,22 @@ def initUI(self):
 
     #### Middle row left column box
     self.mid_left_col_box = QGroupBox('Bike and Part Selection')
-    bike_list = QComboBox()
-    bike_list.addItems(self.all_bike_ids.values())
-    bike_list.activated[str].connect(self.bike_choice)
+    self.bike_list = QComboBox()
+    self.bike_list.addItems(self.all_bike_ids.values())
+    self.bike_list.activated[str].connect(self.bike_choice)
 
     self.parts_list_menu = QComboBox(self)
     self.parts_list_menu.addItem(None)
     self.parts_list_menu.currentIndexChanged.connect(self.part_choice)
 
+    add_bike = QPushButton('Add New Bicycle', self)
+    add_bike.setToolTip('Add a new bike!')
+    add_bike.clicked.connect(lambda: self.add_new_bike())
+
     bike_dropdown_layout = QGridLayout()
-    bike_dropdown_layout.addWidget(bike_list, 0, 0)
+    bike_dropdown_layout.addWidget(self.bike_list, 0, 0)
     bike_dropdown_layout.addWidget(self.parts_list_menu, 1, 0)
+    bike_dropdown_layout.addWidget(add_bike, 2, 0)
     self.mid_left_col_box.setLayout(bike_dropdown_layout)
 
     #### Lower left column box

@@ -193,3 +193,7 @@ def add_multiple_rides(self, activity_list):
                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""" 
         conn.executemany(sql, a_list)
 
+@add_method(StravaApp)
+def add_new_bike(self):
+    pass
+
