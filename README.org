@@ -13,6 +13,18 @@ Until this is bundled into a standalone binary, the following python libraries a
 - =PyQt5=
 - =numpy=
 - =pandas=
+- =input-form-dialog= (see more below)
+
+*** Input-form-dialog
+This package is out of date and will not work with python3.x. If you are building or running the stravaDB app from source, you should also build this package from source:
+
+#+begin_src bash
+cd ~/.config
+git clone https://github.com/bapfeld/input-form-dialog.git
+cd input-form-dialog
+python3 setup.py sdist bdist_wheel
+pip3 install --user dist/input_form_dialog-1.0.1-py3-none-any.whl
+#+end_src
 
 ** Strava API
 The first step is to create an "app" with strava in order to access the API. Go to [[https://www.strava.com/settings/api][https://www.strava.com/settings/api]] and follow the directions for creating an application. Choose any name you want and set the callback domain to =localhost=. You'll need the client id and client secret later in this process.

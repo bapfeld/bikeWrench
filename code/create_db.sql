@@ -1,58 +1,53 @@
 -- Riders are top level
-create table riders (
-    name       text primary key,
-    max_speed  real,
-    avg_speed  real,
-    total_dist real,
-    units      text
+CREATE TABLE riders (
+    name       TEXT PRIMARY KEY,
+    units      TEXT
 );
 
 -- Bikes belong to riders
-create table bikes (
-    id          text primary key,
-    name        text,
-    color       text,
-    purchased   date,
-    price       real,
-    total_mi    real,
-    total_elev  real
+CREATE TABLE bikes (
+    bike_id     TEXT PRIMARY KEY,
+    name        TEXT,
+    color       TEXT,
+    purchased   DATE,
+    price       REAL
 );
 
 -- Rides record data about a bike ride
-create table rides (
-    id           integer primary key,
-    bike         text not null references bike(id),
-    distance     integer,
-    name         text,
-    date         date,
-    moving_time  integer,
-    elapsed_time integer,
-    elev         real,
-    type         text,
-    avg_speed    real,
-    max_speed    real,
-    calories     real,
-    rider        text not null references rider(name)
+CREATE TABLE rides (
+    ride_id      INTEGER PRIMARY KEY,
+    bike         TEXT NOT NULL REFERENCES bike(id),
+    distance     INTEGER,
+    name         TEXT,
+    date         DATE,
+    moving_time  INTEGER,
+    elapsed_time INTEGER,
+    elev         REAL,
+    type         TEXT,
+    avg_speed    REAL,
+    max_speed    REAL,
+    calories     REAL,
+    rider        TEXT NOT NULL REFERENCES rider(name)
 );
 
 -- Parts belong to bikes
-create table parts (
-    id           integer primary key autoincrement not null,
-    type         text,
-    purchased    date,
-    brand        text,
-    price        real,
-    weight       real,
-    size         text,
-    model        text,
-    bike         text not null references bikes(name),
-    inuse        text
+CREATE TABLE parts (
+    part_id      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    type         TEXT,
+    purchased    DATE,
+    brand        TEXT,
+    price        REAL,
+    weight       REAL,
+    size         TEXT,
+    model        TEXT,
+    bike         TEXT NOT NULL REFERENCES bikes(name),
+    inuse        TEXT
 );
 
 -- Maintenance tasks record things that happen to parts
-create table maintenance (
-    id           integer primary key autoincrement not null,
-    part         integer not null references parts(id),
-    work         text,
-    date         date
+CREATE TABLE maintenance (
+    maint_id     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    part         INTEGER NOT NULL REFERENCES parts(part_id),
+    work         TEXT,
+    date         DATE
 );
