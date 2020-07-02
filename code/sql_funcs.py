@@ -164,32 +164,24 @@ def add_multiple_rides(self, activity_list):
         except AttributeError:
             out = 'Unknown'
         return out
-    def unit_try(num, t, u):
-        if u == 'imperial':
-            if t == 'long_dist':
-                return float(unithelper.miles(num))
-            elif t == 'short_dist':
-                return float(unithelper.feet(num))
-            elif t == 'speed':
-                return float(unithelper.mph(num))
-        else:
-            if t == 'long_dist':
-                return float(unithelper.kilometers(num))
-            elif t == 'short_dist':
-                return float(unithelper.meters(num))
-            elif t == 'speed':
-                return float(unithelper.kph(num))
+    def unit_try(num, t):
+        if t == 'long_dist':
+            return float(unithelper.kilometers(num))
+        elif t == 'short_dist':
+            return float(unithelper.meters(num))
+        elif t == 'speed':
+            return float(unithelper.kph(num))
     a_list = [(a.id,
                gear_try(a),
-               unit_try(a.distance, 'long_dist', self.units), 
+               unit_try(a.distance, 'long_dist'),
                a.name,
-               a.start_date.strftime("%Y-%M-%d"), 
+               a.start_date.strftime("%Y-%M-%d"),
                a.moving_time.seconds / 3600,
                a.elapsed_time.seconds / 3600,
-               unit_try(a.total_elevation_gain, 'short_dist', self.units),
+               unit_try(a.total_elevation_gain, 'short_dist'),
                a.type,
-               unit_try(a.average_speed, 'speed', self.units), 
-               unit_try(a.max_speed, 'speed', self.units),
+               unit_try(a.average_speed, 'speed'),
+               unit_try(a.max_speed, 'speed'),
                float(a.calories),
                self.rider_name, ) for a in activity_list]
 
