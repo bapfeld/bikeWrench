@@ -131,10 +131,15 @@ def initUI(self):
     up_rides.setToolTip('Fetch new rides from Strava and update rider stats')
     up_rides.clicked.connect(lambda: self.get_new_activities())
 
+    up_bikes = QPushButton('Add bikes', self)
+    up_bikes.setToolTip('Add new bikes based on IDs in rides.')
+    up_bikes.clicked.connect(lambda: self.find_new_bikes())
+
     rider_layout = QGridLayout()
     rider_layout.addWidget(self.rider_info, 0, 0)
     rider_layout.addWidget(up_rider, 1, 0)
     rider_layout.addWidget(up_rides, 1, 1)
+    rider_layout.addWidget(up_bikes, 2, 0)
     self.upper_left_col_box.setLayout(rider_layout)
 
     #### Middle row left column box

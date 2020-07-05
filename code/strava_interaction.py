@@ -59,4 +59,4 @@ def get_new_activities(self):
     self.fetch_new_activities()
     if self.new_activities is not None:
         self.add_multiple_rides(self.new_activities)
-
+    self.find_new_bikes()
