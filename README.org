@@ -14,6 +14,9 @@ Until this is bundled into a standalone binary, the following python libraries a
 - =numpy=
 - =pandas=
 - =input-form-dialog= (see more below)
+- =dateparser=
+
+Requirements.txt includes specific version for these modules to make creation of a virtual environment simple. Other version may work, but these are the ones that the project is built against and are known to work.
 
 *** Input-form-dialog
 This package is out of date and will not work with python3.x. If you are building or running the stravaDB app from source, you should also build this package from source:

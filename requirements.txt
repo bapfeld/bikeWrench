@@ -1,0 +1,6 @@
+stravalib==0.10.2
+PyQt5==5.15.0
+numpy==1.17.4
+pandas==0.25.3
+input-form-dialog==1.0.1
+dateparser==0.7.6
