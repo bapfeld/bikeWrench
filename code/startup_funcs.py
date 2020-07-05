@@ -53,10 +53,10 @@ def init_new_db(self):
                                                 'Rider Name',
                                                 'Enter rider name')
             rider_units, _ = QInputDialog.getItem(self,
-                                                  title='Preferred Units',
-                                                  label='Select Preferred Units:',
-                                                  items=['imperial', 'standard'],
-                                                  current=0, editable=False)
+                                                  'Preferred Units',
+                                                  'Select Preferred Units:',
+                                                  ['imperial', 'standard'],
+                                                  0, False)
             self.initialize_rider(rider_name, rider_units)
     else:
         self.init_new_db()

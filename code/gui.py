@@ -131,10 +131,15 @@ def initUI(self):
     up_rides.setToolTip('Fetch new rides from Strava and update rider stats')
     up_rides.clicked.connect(lambda: self.get_new_activities())
 
+    up_bikes = QPushButton('Add bikes', self)
+    up_bikes.setToolTip('Add new bikes based on IDs in rides.')
+    up_bikes.clicked.connect(lambda: self.find_new_bikes())
+
     rider_layout = QGridLayout()
     rider_layout.addWidget(self.rider_info, 0, 0)
     rider_layout.addWidget(up_rider, 1, 0)
     rider_layout.addWidget(up_rides, 1, 1)
+    rider_layout.addWidget(up_bikes, 2, 0)
     self.upper_left_col_box.setLayout(rider_layout)
 
     #### Middle row left column box
@@ -147,18 +152,18 @@ def initUI(self):
     self.parts_list_menu.addItem(None)
     self.parts_list_menu.currentIndexChanged.connect(self.part_choice)
 
-    add_bike = QPushButton('Add New Bicycle', self)
-    add_bike.setToolTip('Add a new bike!')
-    add_bike.clicked.connect(lambda: self.add_new_bike())
+    # add_bike = QPushButton('Add New Bicycle', self)
+    # add_bike.setToolTip('Add a new bike!')
+    # add_bike.clicked.connect(lambda: self.add_new_bike())
 
     bike_dropdown_layout = QGridLayout()
     bike_dropdown_layout.addWidget(self.bike_list, 0, 0)
     bike_dropdown_layout.addWidget(self.parts_list_menu, 1, 0)
-    bike_dropdown_layout.addWidget(add_bike, 2, 0)
+    #bike_dropdown_layout.addWidget(add_bike, 2, 0)
     self.mid_left_col_box.setLayout(bike_dropdown_layout)
 
     #### Lower left column box
-    self.lower_left_col_box = QGroupBox('')
+    self.lower_left_col_box = QGroupBox('Calendar Box')
     cal = QCalendarWidget()
     cal.setGridVisible(True)
     cal.clicked[QDate].connect(self.select_date)
@@ -222,14 +227,15 @@ def initUI(self):
     self.lower_right_col_box.setLayout(parts_buttons_layout)
 
     ##### Message box
-    self.message_box = QGroupBox()
-
-    # messages
-    self.message = QLabel(self)
-    self.message.setText('')
-    mes_layout = QGridLayout()
-    mes_layout.addWidget(self.message, 0, 0)
-    self.message_box.setLayout(mes_layout)
+    self.message_box = QGroupBox('Message Box')
+    self.msg = QLabel(self)
+    self.msg.setTextFormat(Qt.RichText)
+    self.msg.setWordWrap(True)
+    self.msg.setAlignment(Qt.AlignTop)
+    self.msg.setText('')
+    msg_box_layout = QGridLayout()
+    msg_box_layout.addWidget(self.msg, 0, 0)
+    self.message_box.setLayout(msg_box_layout)
 
     # Generate the main layout
     main_layout = QGridLayout()

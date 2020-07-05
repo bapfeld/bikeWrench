@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QF
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime
+import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime, dateparser
 from functools import partial
 from input_form_dialog import FormOptions, get_input
 from base_class import add_method, StravaApp
@@ -26,7 +26,7 @@ def get_all_ride_ids(self):
         c = conn.cursor()
         c.execute(query)
         self.id_list = [x[0] for x in c.fetchall()]
-        
+
 @add_method(StravaApp)
 def get_rider_info(self):
     with sqlite3.connect(self.db_path) as conn:
@@ -194,6 +194,131 @@ def add_multiple_rides(self, activity_list):
         conn.executemany(sql, a_list)
 
 @add_method(StravaApp)
-def add_new_bike(self):
-    pass
+def add_new_bike(self, bike_id, dist, elev, min_date, max_date, special_message=None):
+    if self.units == 'imperial':
+        dist = str(round(float(dist) / 1.609, 2)) + ' miles'
+        elev = str(round(float(elev) * 3.281, 2)) + ' feet'
+    else:
+        dist = str(round(float(dist), 2)) + ' km'
+        elev = str(round(float(elev), 2)) + ' meters'
 
+    name_dialog = f"""Enter a name for the bike with id {bike_id}.\nHere's what we know about this bike: You've ridden it {dist} and {elev}.\nIt was first used on {min_date} and most recently used on {max_date}."""
+
+    if special_message is not None:
+        name_dialog = ' '.join([special_message, name_dialog])
+
+    bike_name, _ = QInputDialog.getText(self,
+                                        'Bike Name',
+                                        name_dialog)
+
+    color_dialog = f"""Enter the color of {bike_name}"""
+    purchased_dialog = f"""Enter the purchased date for {bike_name}"""
+    price_dialog = f"""Enter the purchase price for{bike_name}"""
+
+    bike_color, _ = QInputDialog.getText(self,
+                                         'Bike Name',
+                                         color_dialog)
+    bike_purchase, _ = QInputDialog.getText(self,
+                                            'Bike Name',
+                                            purchased_dialog)
+    bike_purchase = dateparser.parse(bike_purchase)
+    bike_price, _ = QInputDialog.getText(self,
+                                         'Bike Name',
+                                         price_dialog)
+    bike_price = re.sub(r'\$', '', bike_price)
+
+    q = f"""INSERT INTO bikes 
+                (bike_id, name, color, purchased, price) 
+            VALUES 
+                (?, ?, ?, ?, ?)"""
+    vals = (bike_id, bike_name, bike_color, bike_purchase, bike_price)
+    with sqlite3.connect(self.db_path) as conn:
+        conn.execute(q, vals)
+        conn.commit()
+
+@add_method(StravaApp)
+def add_unknown_bike(self, bike_vals):
+    # Run again to make sure we have full list
+    self.get_all_bike_ids()
+    d = """It looks like you have an unknown bike in your stable.\nThis could be because you haven't set up any bikes in your Strava equipment.\nIt could also be some rides where you did not specify a bike.\nDo you want to treat this as a normal bike or automatically assign its stats to another bike?"""
+    action, _ = QInputDialog.getItem(self,
+                                     'Unknown bike',
+                                     d,
+                                     ['Cancel - do nothing',
+                                      'Assign to another bike',
+                                      'Treat as a regular bike'],
+                                     1,
+                                     False)
+    if action == 'Assign to another bike':
+        q = 'SELECT name, bike_id FROM bikes;'
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(q)
+            res = c.fetchall()
+        if len(res) == 0:
+            m = 'Looks like there are no current bikes. Setting Unknown bike as a regular bike.'
+            add_new_bike(*bike_vals, special_message=m)
+        else:
+            b_choice, _ = QInputDialog.getItem(self,
+                                               'Which bike?',
+                                               'Which bike corresponds to Unknown?',
+                                               list(self.all_bike_ids.values()),
+                                               0,
+                                               False)
+            q = f"""SELECT * FROM bikes WHERE name = '{b_choice}';"""
+            with sqlite3.connect(self.db_path) as conn:
+                c = conn.cursor()
+                c.execute(q)
+                res = c.fetchone()
+            q = f"""INSERT INTO bikes
+                        (bike_id, name, color, purchased, price) 
+                    VALUES 
+                        (?, ?, ?, ?, ?)"""
+            vals = ('Unknown', b_choice, res[2], res[3], res[4])
+            with sqlite3.connect(self.db_path) as conn:
+                c = conn.cursor()
+                c.execute(q, vals)
+                conn.commit()
+    elif action == 'Treat as a regular bike':
+        add_new_bike(*bike_vals)
+    else:
+        pass
+
+@add_method(StravaApp)
+def find_new_bikes(self):
+    """Simple function to determine if there are any bikes that haven't been added"""
+
+    # Check what bikes already exist
+    self.get_all_bike_ids()
+
+    # And see what bikes appear in rides
+    with sqlite3.connect(self.db_path) as conn:
+        q = """SELECT
+                   bike,
+                   SUM(distance),
+                   SUM(elev),
+                   MIN(date),
+                   MAX(date)
+               FROM 
+                   rides
+               GROUP BY
+                   1;"""
+        c = conn.cursor()
+        c.execute(q)
+        res = c.fetchall()
+        # Make sure that unknown bike is always last
+        res.sort(key=lambda tup: tup[0], reverse=True)
+
+    bike_id_keys = list(self.all_bike_ids.keys())
+    if len(res) > 0:
+        if sum([True if x[0] in bike_id_keys else False for x in res]) == len(bike_id_keys):
+            self.msg.setText('No new bikes found.')
+        else:
+            for item in res:
+                if item[0] not in bike_id_keys:
+                    if item[0] != 'Unknown':
+                        self.add_new_bike(*item)
+                    else:
+                        self.add_unknown_bike(*item)
+    else:
+        self.msg.setText('No bikes found in rides! Try updating rides first.')
