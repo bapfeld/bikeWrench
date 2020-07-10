@@ -23,7 +23,8 @@ def add_method(cls):
     return decorator
 
 class StravaApp(QWidget):
-    def __init__(self, schema, client):
+    def __init__(self, schema, client, parts_dict):
         super().__init__()
         self.schema = schema
         self.client = client
+        self.parts_dict = parts_dict

@@ -1,0 +1,59 @@
+{
+    "Frame": [
+        "Frame",
+        "Fork",
+        "Stem",
+        "Handlebars",
+        "Bar tape",
+        "Bar end plugs",
+        "Derailleur hanger",
+        "Bottom bracket",
+        "Headset"
+    ],
+    "Braking": [
+        "Front brake",
+        "Rear brake",
+        "Front brake pads",
+        "Rear brake pads",
+        "Front brake disc",
+        "Rear brake disc",
+        "Brake cables/housing",
+        "Brake cables",
+        "Brake cable housing"
+    ],
+    "Shifting":[
+        "Shifters",
+        "Left shifter",
+        "Right shifter",
+        "Shift cabling",
+        "Shift cables",
+        "Shift cable housing",
+        "Front derailleur",
+        "Rear derailleur"
+    ],
+    "Drive train": [
+        "Cranks",
+        "Right crank arm",
+        "Left crank arm",
+        "Pedals",
+        "Chainrings",
+        "Spider",
+        "Cassette",
+        "Chain"
+    ],
+    "Wheels": [
+        "Wheelset",
+        "Front wheel",
+        "Rear wheel",
+        "Front skewer",
+        "Rear skewer",
+        "Front hub",
+        "Rear hub",
+        "Front tire",
+        "Rear tire",
+        "Front inner tube",
+        "Rear inner tube",
+        "Front rim tape",
+        "Rear rim tape"
+    ]
+}
