@@ -8,6 +8,7 @@ from stravalib.client import Client
 from stravalib import unithelper
 import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime, dateparser
 from functools import partial
+from collections import OrderedDict
 from input_form_dialog import FormOptions, get_input
 from base_class import add_method, StravaApp
 
@@ -71,12 +72,58 @@ def edit_entry(self, sql, values):
 
 @add_method(StravaApp)
 def replace_part(self, old_part=None):
-    # need to get some kind of popup here to input part values!
-    self.add_part(part_values)
-    if old_part is not None:
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("UPDATE parts SET inuse = 'True' WHERE part_id=?",
-                         (old_part, ))
+    self.msg.setText('Function not yet implemented')       
+    #     with sqlite3.connect(self.db_path) as conn:
+    #         conn.execute("UPDATE parts SET inuse = 'True' WHERE part_id=?",
+    #                      (old_part, ))
+
+@add_method(StravaApp)
+def get_part_inputs(self, new=True):
+    if new:
+        part_class, _ = QInputDialog.getItem(self,
+                                             'Part Type',
+                                             'What type of part are you adding?',
+                                             list(self.parts_dict.keys()),
+                                             0,
+                                             False)
+        part_type, _ = QInputDialog.getItem(self,
+                                            'Part Type',
+                                            'What type of part are you adding?',
+                                            self.parts_dict[part_class],
+                                            0,
+                                            False)
+    purchased_dt, _ = QInputDialog.getText(self,
+                                           'Purchase date',
+                                           'When did you purchase this part?')
+    purchased_dt = dateparser.parse(purchased_dt)
+    brand, _ = QInputDialog.getText(self,
+                                    'Brand',
+                                    'Part brand')
+    model, _ = QInputDialog.getText(self,
+                                    'Model',
+                                    'Part model')
+    price, _ = QInputDialog.getText(self,
+                                    'Purchase price',
+                                    'Price')
+    price = re.sub(r'\$', '', price)
+    weight, _ = QInputDialog.getText(self,
+                                     'Part weight',
+                                     'What does the part weigh (g)?')
+    weight = re.sub(r'\s*g', '', weight)
+    sz, _ = QInputDialog.getText(self,
+                                 'Part size',
+                                 'What size is the part?')
+    return (part_type, purchased_dt, brand, price, weight, sz, model, self.current_bike, "TRUE")
+
+@add_method(StravaApp)
+def add_new_part(self):
+    parts = self.get_part_inputs(new=True)
+    self.add_part(parts)
+
+@add_method(StravaApp)
+def add_replacement_part(self):
+    pass
+
 @add_method(StravaApp)
 def add_part(self, part_values):
     with sqlite3.connect(self.db_path) as conn:
@@ -90,30 +137,29 @@ def add_part(self, part_values):
                             model, 
                             bike, 
                             inuse) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, True)""", part_values)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", part_values)
 
 @add_method(StravaApp)
 def add_maintenance(self):
-    # Define today
-    current_date = datetime.date.today().strftime("%Y-%m-%d")
     # define our input files
-    dat = dict()
-    dat['Work'] = 'Work summary'
-    dat['Date'] = current_date
+    dat = OrderedDict()
+    dat['Work'] = 'Enter work summary here'
+    dat['Date'] = datetime.date.today().strftime("%Y-%m-%d")
 
     if get_input(f'Add Maintenance Record for part {self.current_part}', dat):
-        main_values = (int(self.current_part), dat['Work'], dat['Date'])
+        dt = dateparser.parse(dat['Date'])
+        main_values = (int(self.current_part), dat['Work'], dt)
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""INSERT INTO maintenance 
+            conn.execute("""INSERT INTO maintenance
                             (part, work, date) VALUES (?, ?, ?)""",
                          main_values)
 
 @add_method(StravaApp)
 def get_all_bike_parts(self):
-    query = f"""SELECT * 
+    query = f"""SELECT *
                 FROM parts 
                 WHERE bike = '{self.current_bike}'
-                AND inuse = 'True'"""
+                AND inuse = 'TRUE'"""
     with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
@@ -126,10 +172,10 @@ def get_all_ride_data(self):
         c = conn.cursor()
         c.execute(query)
         self.all_rides = c.fetchall()
-        
+
 @add_method(StravaApp)
 def update_part(self):
-    query = f"""SELECT distance, elapsed_time, elev 
+    query = f"""SELECT distance, elapsed_time, elev
                 FROM rides 
                 WHERE bike=(SELECT bike_id FROM bikes WHERE name='{self.current_bike}')
                 AND date >= (SELECT purchased 

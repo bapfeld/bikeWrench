@@ -13,13 +13,16 @@ from base_class import add_method, StravaApp
 
 @add_method(StravaApp)
 def mb(self, s):
-    self.message.setText(s)
+    self.msg.setText(str(s))
 
 @add_method(StravaApp)
 def bike_choice(self, b):
     self.current_bike = b
     self.get_all_bike_parts()
     self.change_parts_list()
+    if len(self.current_bike_parts_list) > 0:
+        self.current_part = self.current_bike_parts_list[0][0]
+        self.format_part_info()
     # self.mb(b)
 
 @add_method(StravaApp)
@@ -43,7 +46,7 @@ def change_parts_list(self):
 @add_method(StravaApp)
 def format_part_info(self, dist=None, elev=None, time=None):
     # Part Stats
-    query = """SELECT * 
+    query = f"""SELECT *
                FROM parts 
                WHERE part_id = {self.current_part}"""
     with sqlite3.connect(self.db_path) as conn:
@@ -54,10 +57,11 @@ def format_part_info(self, dist=None, elev=None, time=None):
             <b>Type:</b> {res[1]}<br>
             <b>Purchased:</b> {res[2]}<br>
             <b>Brand:</b> {res[3]}<br>
-            <b>Weight:</b> {res[4]}<br>
-            <b>Size:</b> {res[5]}<br>
-            <b>Model:</b> {res[6]}<br>
-            <b>Bike:</b> {res[7]}<br>"""
+            <b>Price:</b> ${res[4]}<br>
+            <b>Weight:</b> {res[5]}<br>
+            <b>Size:</b> {res[6]}<br>
+            <b>Model:</b> {res[7]}<br>
+            <b>Bike:</b> {res[8]}<br>"""
     if dist is not None:
         t += f'<br><br><b>Total Distance:</b> {dist}'
     if elev is not None:
@@ -70,7 +74,7 @@ def format_part_info(self, dist=None, elev=None, time=None):
     # Part Maintenance
     query = f"""SELECT work, date
                 FROM maintenance
-                WHERE part_id={self.current_part}"""
+                WHERE part={self.current_part}"""
     with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
@@ -210,10 +214,10 @@ def initUI(self):
     new_part_button.setToolTip("""Add a new part to the bike.
                                   NOTE: This is different from replacing an
                                   existing part""")
-    new_part_button.clicked.connect(self.replace_part)
+    new_part_button.clicked.connect(lambda: self.add_new_part())
     maintain_button = QPushButton('Maintain part', self)
     maintain_button.setToolTip("Perform maintenance on selected part")
-    maintain_button.clicked.connect(self.add_maintenance)
+    maintain_button.clicked.connect(lambda: self.add_maintenance())
     update_part_button = QPushButton('Update Part Stats', self)
     update_part_button.setToolTip('Update currently selected part')
     update_part_button.clicked.connect(self.update_part)

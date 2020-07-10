@@ -90,15 +90,21 @@ def try_get_password(self):
     if code is not None:
         d['code'] = code
         self.code = code
+    else:
+        d['code'] = ''
     if secret is not None:
         d['secret'] = secret
         self.client_secret = secret
+    else:
+        d['secret'] = ''
     if cid is not None:
         d['id'] = cid
         self.client_id = cid
+    else:
+        d['id'] = ''
     if get_input('Please enter application values:', d):
         self.code, self.client_secret, self.client_id = (d['code'], d['secret'], d['id'])
-        keyring.set_password('stravaDB', 'code', str(d['code']))     
+        keyring.set_password('stravaDB', 'code', str(d['code']))
         keyring.set_password('stravaDB', 'client_secret', str(d['secret']))
         keyring.set_password('stravaDB', 'client_id', str(d['id']))
 
