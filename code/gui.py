@@ -82,8 +82,8 @@ def format_part_info(self, dist=None, elev=None, time=None):
     t = ''
     if len(main_res) > 0:
         for rec in main_res:
-            t += f"""<b>Date:</b> {rec[3]}<br>
-                     <b>Work done:</b> {rec[2]}<br>"""
+            t += f"""<b>Date:</b> {rec[1]}<br>
+                     <b>Work done:</b> {rec[0]}<br>"""
     self.part_main.setText(t)
 
 @add_method(StravaApp)
