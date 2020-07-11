@@ -18,7 +18,15 @@ def get_all_bike_ids(self):
     with sqlite3.connect(self.db_path) as conn:
         c = conn.cursor()
         c.execute(query)
-        self.all_bike_ids = {x[0]: x[1] for x in c.fetchall()}
+        res = c.fetchall()
+    self.all_bike_ids = {x[0]: x[1] for x in res}
+    if len(res) > 0:
+        self.current_bike = list(self.all_bike_ids.values())[0]
+        self.get_all_bike_parts()
+        if len(self.current_bike_parts_list) > 0:
+            self.current_part = self.current_bike_parts_list[0][0]
+    else:
+        self.current_part = None
 
 @add_method(StravaApp)
 def get_all_ride_ids(self):
@@ -273,10 +281,10 @@ def add_new_bike(self, bike_id, dist, elev, min_date, max_date, special_message=
                                          price_dialog)
     bike_price = re.sub(r'\$', '', bike_price)
 
-    q = f"""INSERT INTO bikes 
-                (bike_id, name, color, purchased, price) 
-            VALUES 
-                (?, ?, ?, ?, ?)"""
+    q = """INSERT INTO bikes
+               (bike_id, name, color, purchased, price) 
+           VALUES 
+               (?, ?, ?, ?, ?)"""
     vals = (bike_id, bike_name, bike_color, bike_purchase, bike_price)
     with sqlite3.connect(self.db_path) as conn:
         conn.execute(q, vals)

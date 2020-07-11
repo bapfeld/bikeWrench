@@ -51,8 +51,8 @@ def init_new_db(self):
         if not os.path.exists(self.db_path):
             self.create_db()
             rider_name, _ = QInputDialog.getText(self,
-                                                'Rider Name',
-                                                'Enter rider name')
+                                                 'Rider Name',
+                                                 'Enter rider name')
             rider_units, _ = QInputDialog.getItem(self,
                                                   'Preferred Units',
                                                   'Select Preferred Units:',
@@ -67,7 +67,7 @@ def initialize_rider(self, rider_name, rider_units):
     rider_values = (rider_name, rider_units)
     self.units = rider_units
     with sqlite3.connect(self.db_path) as conn:
-        conn.execute("""INSERT into riders (name, units) 
+        conn.execute("""INSERT into riders (name, units)
                         VALUES (?, ?)""",
                      rider_values)
 
@@ -113,4 +113,3 @@ def load_basic_values(self):
     self.current_part = None
     self.get_rider_info()
     self.get_all_ride_ids()
-    self.current_bike = None

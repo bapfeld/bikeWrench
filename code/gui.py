@@ -41,7 +41,7 @@ def select_date(self, d):
 def change_parts_list(self):
     p_list = [x[1] for x in self.current_bike_parts_list]
     self.parts_list_menu.clear()
-    self.parts_list_menu.addItems(list(p_list))
+    self.parts_list_menu.addItems(list(None, p_list))
 
 @add_method(StravaApp)
 def format_part_info(self, dist=None, elev=None, time=None):
@@ -153,7 +153,10 @@ def initUI(self):
     self.bike_list.activated[str].connect(self.bike_choice)
 
     self.parts_list_menu = QComboBox(self)
-    self.parts_list_menu.addItem(None)
+    if len(self.all_bike_ids) > 0:
+        self.parts_list_menu.addItems([x[1] for x in self.current_bike_parts_list])
+    else:
+        self.parts_list_menu.addItem(None)
     self.parts_list_menu.currentIndexChanged.connect(self.part_choice)
 
     # add_bike = QPushButton('Add New Bicycle', self)
