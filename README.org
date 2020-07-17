@@ -37,7 +37,7 @@ You will also need to get a special authorization code for your application. Ass
 #+BEGIN_EXAMPLE python
   from stravalib.client import Client
 
-  client= Client()
+  client = Client()
 
   url = client.authorization_url(client_id=YourClientID,
                                  redirect_uri='http://127.0.0.1:5000/authorization')
@@ -46,5 +46,7 @@ You will also need to get a special authorization code for your application. Ass
 
 ** Secrets!
 The application will attempt to use your machine's keyring to store the client credentials. You will be prompted to enter these (from the previous step) the first time you launch the application.
+
+The application will also store your refresh token in the database file. It expires every 6 hours and without the client id or client secret it won't do much good. Still, you probably don't want to go around sharing this.
 
 

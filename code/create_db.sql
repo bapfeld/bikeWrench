@@ -1,7 +1,9 @@
 -- Riders are top level
 CREATE TABLE riders (
     name       TEXT PRIMARY KEY,
-    units      TEXT
+    units      TEXT,
+    r_tkn      TEXT,
+    tkn_exp    DATETIME
 );
 
 -- Bikes belong to riders

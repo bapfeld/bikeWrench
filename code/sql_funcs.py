@@ -44,6 +44,12 @@ def get_rider_info(self):
         res = c.fetchone()
         self.rider_name = res[0]
         self.units = res[1]
+        if res[2] is not None > 0:
+            self.client.refresh_token = res[2]
+            self.client.expires_at = datetime.datetime.fromtimestamp(res[3])
+        else:
+            self.client.refresh_token = None
+            self.client.expires_at = None
         try:
             c.execute('SELECT MAX(max_speed) FROM rides')
             self.max_speed = round(c.fetchone()[0], 2)

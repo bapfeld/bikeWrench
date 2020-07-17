@@ -6,7 +6,13 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QApplication, QF
 from PyQt5.QtGui import QFont
 from stravalib.client import Client
 from stravalib import unithelper
-import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime
+import configparser, argparse
+import sqlite3
+import os, sys, platform
+import locale, datetime, time
+import re
+import requests
+import keyring
 from functools import partial
 from input_form_dialog import FormOptions, get_input
 from base_class import add_method, StravaApp
@@ -20,13 +26,35 @@ def test_conn(self):
         return False
 
 @add_method(StravaApp)
+def reset_secrets(self, tkn):
+    self.client.access_token = tkn['access_token']
+    self.client.refresh_token = tkn['refresh_token']
+    self.client.expires_at = tkn['expires_at']
+    with sqlite3.connect(self.db_path) as conn:
+        q = f"""UPDATE
+                    riders
+                SET
+                    r_tkn='{self.client.refresh_token}',
+                    tkn_exp={self.client.expires_at}
+                WHERE
+                    name='{self.rider_name}'"""
+        c = conn.cursor()
+        c.execute(q)
+
+@add_method(StravaApp)
 def gen_secrets(self):
-    tr = self.client.exchange_code_for_token(client_id=self.client_id,
-                                             client_secret=self.client_secret,
-                                             code=self.code)
-    self.client.access_token = tr['access_token']
-    self.client.refresh_token = tr['refresh_token']
-    self.client.expires_at = tr['expires_at']
+    if self.client.refresh_token is None:
+        tkn = self.client.exchange_code_for_token(client_id=self.client_id,
+                                                  client_secret=self.client_secret,
+                                                  code=self.code)
+        self.reset_secrets(tkn)
+    elif time.time() > self.client.expires_at:
+        tkn = self.client.refresh_access_token(client_id=self.client_id,
+                                               client_secret=self.client_secret,
+                                               refresh_token=self.refresh_token)
+        self.reset_secrets(tkn)
+    else:
+        pass
 
 @add_method(StravaApp)
 def fetch_new_activities(self):
