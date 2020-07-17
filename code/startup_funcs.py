@@ -8,7 +8,6 @@ from stravalib.client import Client
 from stravalib import unithelper
 import configparser, argparse, sqlite3, os, sys, re, requests, keyring, platform, locale, datetime
 from functools import partial
-from collections import OrderedDict
 from input_form_dialog import FormOptions, get_input
 from base_class import add_method, StravaApp
 
@@ -86,27 +85,21 @@ def try_get_password(self):
     code = keyring.get_password('stravaDB', 'code')
     secret = keyring.get_password('stravaDB', 'client_secret')
     cid = keyring.get_password('stravaDB', 'client_id')
-    d = OrderedDict()
     if code is not None:
-        d['code'] = code
         self.code = code
     else:
-        d['code'] = ''
+        self.code, _ = QInputDialog.getText(self, 'Code', 'Application code')
+        keyring.set_password('stravaDB', 'code', str(self.code))
     if secret is not None:
-        d['secret'] = secret
         self.client_secret = secret
     else:
-        d['secret'] = ''
+        self.client_secret, _ = QInputDialog.getText(self, 'Secret', 'Client secret')
+        keyring.set_password('stravaDB', 'client_secret', str(self.client_secret))
     if cid is not None:
-        d['id'] = cid
         self.client_id = cid
     else:
-        d['id'] = ''
-    if get_input('Please enter application values:', d):
-        self.code, self.client_secret, self.client_id = (d['code'], d['secret'], d['id'])
-        keyring.set_password('stravaDB', 'code', str(d['code']))
-        keyring.set_password('stravaDB', 'client_secret', str(d['secret']))
-        keyring.set_password('stravaDB', 'client_id', str(d['id']))
+        self.client_id, _ = QInputDialog.getText(self, 'ID', 'Client ID')
+        keyring.set_password('stravaDB', 'client_id', str(self.client_id))
 
 @add_method(StravaApp)
 def load_basic_values(self):
