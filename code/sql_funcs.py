@@ -44,7 +44,7 @@ def get_rider_info(self):
         res = c.fetchone()
         self.rider_name = res[0]
         self.units = res[1]
-        if res[2] is not None > 0:
+        if res[2] is not None:
             self.client.refresh_token = res[2]
             self.client.expires_at = datetime.datetime.fromtimestamp(res[3])
         else:
@@ -56,7 +56,7 @@ def get_rider_info(self):
         except:
             self.max_speed = 0
         try:
-            c.execute('SELECT AVG(avg_speed) FROM rides') # is this correct?
+            c.execute('SELECT AVG(avg_speed) FROM rides')
             self.avg_speed = round(c.fetchone()[0], 2)
         except:
             self.avg_speed = 0
@@ -86,7 +86,7 @@ def edit_entry(self, sql, values):
 
 @add_method(StravaApp)
 def replace_part(self, old_part=None):
-    self.msg.setText('Function not yet implemented')       
+    self.msg.setText('Function not yet implemented')
     #     with sqlite3.connect(self.db_path) as conn:
     #         conn.execute("UPDATE parts SET inuse = 'True' WHERE part_id=?",
     #                      (old_part, ))
