@@ -51,7 +51,7 @@ def gen_secrets(self):
     elif datetime.datetime.now() > self.client.expires_at:
         tkn = self.client.refresh_access_token(client_id=self.client_id,
                                                client_secret=self.client_secret,
-                                               refresh_token=self.refresh_token)
+                                               refresh_token=self.client.refresh_token)
         self.reset_secrets(tkn)
     else:
         pass
