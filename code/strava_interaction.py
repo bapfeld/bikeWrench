@@ -17,6 +17,7 @@ from functools import partial
 from input_form_dialog import FormOptions, get_input
 from base_class import add_method, StravaApp
 
+
 @add_method(StravaApp)
 def test_conn(self):
     try:
@@ -25,21 +26,23 @@ def test_conn(self):
     except requests.ConnectionError:
         return False
 
+
 @add_method(StravaApp)
 def reset_secrets(self, tkn):
     self.client.access_token = tkn['access_token']
     self.client.refresh_token = tkn['refresh_token']
-    self.client.expires_at = tkn['expires_at']
+    self.client.expires_at = datetime.datetime.fromtimestamp(tkn['expires_at'])
     with sqlite3.connect(self.db_path) as conn:
         q = f"""UPDATE
                     riders
                 SET
                     r_tkn='{self.client.refresh_token}',
-                    tkn_exp={self.client.expires_at}
+                    tkn_exp={tkn['expires_at']}
                 WHERE
                     name='{self.rider_name}'"""
         c = conn.cursor()
         c.execute(q)
+
 
 @add_method(StravaApp)
 def gen_secrets(self):
@@ -55,6 +58,7 @@ def gen_secrets(self):
         self.reset_secrets(tkn)
     else:
         pass
+
 
 @add_method(StravaApp)
 def fetch_new_activities(self):
