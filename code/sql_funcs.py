@@ -330,10 +330,10 @@ def add_unknown_bike(self, bike_vals):
                 c = conn.cursor()
                 c.execute(q)
                 res = c.fetchone()
-            q = f"""INSERT INTO bikes
-                        (bike_id, name, color, purchased, price) 
-                    VALUES 
-                        (?, ?, ?, ?, ?)"""
+            q = """INSERT INTO bikes
+                       (bike_id, name, color, purchased, price)
+                   VALUES
+                       (?, ?, ?, ?, ?)"""
             vals = ('Unknown', b_choice, res[2], res[3], res[4])
             with sqlite3.connect(self.db_path) as conn:
                 c = conn.cursor()
@@ -376,9 +376,6 @@ def find_new_bikes(self):
         else:
             for item in res:
                 if item[0] not in bike_id_keys:
-                    if item[0] != 'Unknown':
-                        self.add_new_bike(*item)
-                    else:
-                        self.add_unknown_bike(*item)
+                    self.add_new_bike(*item)
     else:
         self.msg.setText('No bikes found in rides! Try updating rides first.')
