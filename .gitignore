@@ -4,3 +4,4 @@ code/strava.ini
 data/*.db
 __pycache__
 .env
+bikeGarage/static
