@@ -1,6 +1,8 @@
 #+TITLE: Project README
 
-This is a project aimed at tracking wear and usage of different bike components. Note that it is not currently functional in the most recent commit on the master branch. 
+This is a project aimed at tracking wear and usage of different bike components.
+
+I'm taking this in a new direction: instead of trying to force a GUI, I'm going to switch to a Flask app. I think that should get me up and running a lot faster.
 
 * Overview
 The idea here is to create a lightweight way to track maintenance. I want to limit external dependencies and basically just get the minimum info from the activities and log it, with the ability then to see wear and tear by part, last time various maintenance tasks were performed, etc. 
@@ -10,24 +12,11 @@ The idea here is to create a lightweight way to track maintenance. I want to lim
 ** Python requirements
 Until this is bundled into a standalone binary, the following python libraries are required:
 - =stravalib=
-- =PyQt5=
 - =numpy=
 - =pandas=
-- =input-form-dialog= (see more below)
 - =dateparser=
 
 Requirements.txt includes specific version for these modules to make creation of a virtual environment simple. Other version may work, but these are the ones that the project is built against and are known to work.
-
-*** Input-form-dialog
-This package is out of date and will not work with python3.x. If you are building or running the stravaDB app from source, you should also build this package from source:
-
-#+begin_src bash
-cd ~/.config
-git clone https://github.com/bapfeld/input-form-dialog.git
-cd input-form-dialog
-python3 setup.py sdist bdist_wheel
-pip3 install --user dist/input_form_dialog-1.0.1-py3-none-any.whl
-#+end_src
 
 ** Strava API
 The first step is to create an "app" with strava in order to access the API. Go to [[https://www.strava.com/settings/api][https://www.strava.com/settings/api]] and follow the directions for creating an application. Choose any name you want and set the callback domain to =localhost=. You'll need the client id and client secret later in this process.
