@@ -6,6 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 from flask import Flask, render_template
 from wtforms import (Form, TextField, TextAreaField,
                      validators, StringField, SubmitField)
+from bikeGarage import database, strava_funcs, startup_funcs
 
 ###########################################################################
 # Initial Setup                                                           #
