@@ -72,63 +72,58 @@
         </nav>
         <!-- Page Features -->
         <div>
-            <div class="container" style="margin-top:.5cm;">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Bikes</h5>
-                                <p class="card-text">Access list of bikes in garage and functions to add and update bikes as well as view bike statistics and summaries.</p>
-                                <a href="#" class="btn btn-primary">Bikes!</a>
-                            </div>
+            <div class="jumbotron">
+                <h2 class="display-3">{{ rider }}</h2>
+                <p class="lead">Edit details for {{ rider }}:</p>
+            </div>
+            <div>
+                <form action="{{ url_for('edit_rider_success') }}" method="POST" role="form">
+                    <!-- rider name -->
+                    <div class="text-left form-group">
+                        <span class="lead">Rider name:</span>
+                        <input class="form-control" type="text" for="rider_name" name="rider_name" destination="rider_name" placeholder="{{ rider }}">
+                    </div>
+
+                    
+                    <!-- units -->
+                    <div class="form-group">
+                        <span class="lead">Unit type preference:</span>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="units" id="units" value="imperial" {% if units == "imperial" %} checked {% endif %}>
+                            <label class="form-check-label" for="cover">
+                                Imperial
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="units" id="units" value="metric" {% if units == "metric" %} checked {% endif %}>
+                            <label class="form-check-label" for="cover">
+                                Metric
+                            </label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Parts</h5>
-                                <p class="card-text">Access list of parts and functions to maintain, replace, add, or edit parts as well as view part statistics and summaries.</p>
-                                <a href="#" class="btn btn-primary">Parts!</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Rider</h5>
-                                <p class="card-text">View rider statistics and access functions to update or edit rider.</p>
-                                <a href="/rider" class="btn btn-primary">Rider!</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Strava</h5>
-                                <p class="card-text">Access functions to fetch new ride data from Strava and manipulate Strava application credentials.</p>
-                                <a href="#" class="btn btn-primary">Strava!</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Update rider info</button>
+                </form>
             </div>
 
-            
+            <!-- Buttons at bottom -->
+            <div class="row">
+                <div class="col text-center" style="margin-top:.5cm;">
+                    <a class="btn btn-secondary btn-lg btn-block" role="button" href="/rider"> Cancel (return to rider info) </a>
+                </div>
+            </div>
         </div>
 
-        
+        <footer class="page-footer font-small">
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>
             </div>
-            <footer class="page-footer font-small">
-                <!-- Copyright -->
-                <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>
-                </div>
-                <!-- Copyright -->
-            </footer>
+            <!-- Copyright -->
+        </footer>
 
-            <!-- Scripts -->
-            <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
-            <script src="../static/js/bootstrap.bundle.min.js"></script>
+        <!-- Scripts -->
+        <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
+        <script src="../static/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

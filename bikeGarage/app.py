@@ -3,7 +3,7 @@ import sqlite3
 import datetime
 import dateparser
 from dotenv import load_dotenv, find_dotenv
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for
 from stravalib import unithelper
 # from wtforms import (Form, TextField, TextAreaField,
 #                      validators, StringField, SubmitField)
@@ -72,17 +72,21 @@ def convert_rider_info(units, max_speed, avg_speed, tot_dist, tot_climb):
     return (max_speed, avg_speed, tot_dist, tot_climb)
 
 
-###########################################################################
-# Flask definition                                                        #
-###########################################################################
-@app.route('/', methods=['GET'])
-def index():
-    return render_template('index.html')
+def update_rider(current_nm, nm, units, db_path):
+    q = f"""UPDATE riders 
+            SET name = '{nm}', 
+                units = '{units}' 
+            WHERE name = '{current_nm}'"""
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(q)
 
-@app.route('/rider', methods=['GET', 'POST'])
-def rider():
-    res = get_rider_info(db_path)
-    if res[1] == 'imperial':
+
+###########################################################################
+# App helper funcs                                                        #
+###########################################################################
+def units_text(unit_type):
+    if unit_type == 'imperial':
         speed_unit = 'MPH'
         dist_unit = 'miles'
         elev_unit = 'feet'
@@ -90,9 +94,45 @@ def rider():
         speed_unit = 'KPH'
         dist_unit = 'kilometers'
         elev_unit = 'meters'
+    return (speed_unit, dist_unit, elev_unit)
+
+###########################################################################
+# Flask definition                                                        #
+###########################################################################
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+
+@app.route('/rider', methods=['GET', 'POST'])
+def rider():
+    res = get_rider_info(db_path)
+    speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('rider.html', rider=res[0], max_speed=res[4],
                            avg_speed=res[5], tot_dist=res[6], tot_climb=res[7],
                            speed_unit=speed_unit, dist_unit=dist_unit, elev_unit=elev_unit)
+
+
+@app.route('/edit_rider', methods=['GET', 'POST'])
+def edit_rider():
+    res = get_rider_info(db_path)
+    speed_unit, dist_unit, elev_unit = units_text(res[1])
+    return render_template('edit_rider.html', rider=res[0], units=res[1])
+
+
+@app.route('/edit_rider_success', methods=['GET', 'POST'])
+def edit_rider_success():
+    if request.method == 'POST':
+        res = get_rider_info(db_path)
+        current_nm = res[0]
+        nm = request.form.get('rider_name')
+        units = request.form.get('units')
+        if (nm in ['None', '']) or nm is None:
+            nm = current_nm
+        if (units in ['None', '']) or units is None:
+            units = res[1]
+        update_rider(current_nm, nm, units, db_path)
+        return rider()
 
 
 ###########################################################################
