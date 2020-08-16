@@ -22,57 +22,6 @@ def get_all_ride_ids(db_path, rider_name):
     return id_list
 
 
-def get_rider_info(db_path):
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute('SELECT * FROM riders')
-        res = c.fetchone()
-        rider_name = res[0]
-        units = res[1]
-        if res[2] is not None:
-            refresh_token = res[2]
-            expires_at = datetime.datetime.fromtimestamp(res[3])
-        else:
-            refresh_token = None
-            expires_at = None
-        try:
-            c.execute('SELECT MAX(max_speed) FROM rides')
-            max_speed = round(c.fetchone()[0], 2)
-        except:
-            max_speed = 0
-        try:
-            c.execute('SELECT AVG(avg_speed) FROM rides')
-            avg_speed = round(c.fetchone()[0], 2)
-        except:
-            avg_speed = 0
-        try:
-            c.execute('SELECT SUM(distance) FROM rides')
-            tot_dist = round(c.fetchone()[0], 2)
-        except:
-            tot_dist = 0
-        try:
-            c.execute('SELECT SUM(elev) FROM rides')
-            tot_climb = round(c.fetchone()[0], 2)
-        except:
-            tot_climb = 0
-    max_speed, avg_speed, tot_dist, tot_climb = convert_rider_info(units,
-                                                                   max_speed,
-                                                                   avg_speed,
-                                                                   tot_dist,
-                                                                   tot_climb)
-    return (rider_name, units, refresh_token, expires_at,
-            max_speed, avg_speed, tot_dist, tot_climb)
-
-
-def convert_rider_info(units, max_speed, avg_speed, tot_dist, tot_climb):
-    if units == 'imperial':
-        max_speed = round(max_speed / 1.609, 2)
-        avg_speed = round(avg_speed / 1.609, 2)
-        tot_dist = round(tot_dist / 1.609, 2)
-        tot_climb = round(tot_climb * 3.281, 2)
-    return (max_speed, avg_speed, tot_dist, tot_climb)
-
-
 def edit_entry(db_path, sql, values):
     with sqlite3.connect(db_path) as conn:
         conn.execute(sql, values)
