@@ -55,6 +55,11 @@ def get_rider_info(db_path):
             tot_climb = round(c.fetchone()[0], 2)
         except:
             tot_climb = 0
+    max_speed, avg_speed, tot_dist, tot_climb = convert_rider_info(units,
+                                                                   max_speed,
+                                                                   avg_speed,
+                                                                   tot_dist,
+                                                                   tot_climb)
     return (rider_name, units, refresh_token, expires_at,
             max_speed, avg_speed, tot_dist, tot_climb)
 
