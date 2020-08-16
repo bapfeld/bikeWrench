@@ -24,21 +24,47 @@
             <div class="collapse navbar-collapse" id="navbarColor01">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="/">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/bikes">Bikes</a>
+                    <!-- Rider dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">Rider</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Rider Info</a>
+                            <a class="dropdown-item" href="#">Edit Rider</a>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/rider">Rider</a>
+                    <!-- Bike dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">Bikes</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Bike list</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Add new bike</a>
+                        </div>
                     </li>
+                    <!-- Parts dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">Parts</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Parts by bike</a>
+                            <a class="dropdown-item" href="#">Parts by type</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Part stats by part</a>
+                            <a class="dropdown-item" href="#">Part stats by type</a>
+                        </div>
+                    </li>
+                    <!-- Strava dropdown menu -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
                            aria-expanded="false">Strava</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/fetch_data">Fetch new rides</a>
+                            <a class="dropdown-item" href="#">Fetch new rides</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Separated link</a>
+                            <a class="dropdown-item" href="#">Strava app credentials</a>
                         </div>
                     </li>
                 </ul>
@@ -46,21 +72,63 @@
         </nav>
         <!-- Page Features -->
         <div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Bikes</h5>
+                                <p class="card-text">Access list of bikes in garage and functions to add and update bikes as well as view bike statistics and summaries.</p>
+                                <a href="#" class="btn btn-primary">Bikes!</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Parts</h5>
+                                <p class="card-text">Access list of parts and functions to maintain, replace, add, or edit parts as well as view part statistics and summaries.</p>
+                                <a href="#" class="btn btn-primary">Parts!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Rider</h5>
+                                <p class="card-text">View rider statistics and access functions to update or edit rider.</p>
+                                <a href="#" class="btn btn-primary">Rider!</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Strava</h5>
+                                <p class="card-text">Access functions to fetch new ride data from Strava and manipulate Strava application credentials.</p>
+                                <a href="#" class="btn btn-primary">Strava!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             
         </div>
 
         
-        </div>
-        <footer class="page-footer font-small">
-            <!-- Copyright -->
-            <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>
             </div>
-            <!-- Copyright -->
-        </footer>
+            <footer class="page-footer font-small">
+                <!-- Copyright -->
+                <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>
+                </div>
+                <!-- Copyright -->
+            </footer>
 
-        <!-- Scripts -->
-        <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
-        <script src="../static/js/bootstrap.bundle.min.js"></script>
+            <!-- Scripts -->
+            <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
+            <script src="../static/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
