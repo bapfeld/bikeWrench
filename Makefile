@@ -37,6 +37,7 @@ bootstrap:
 	curl -L https://github.com/twbs/bootstrap/releases/download/v4.5.0/bootstrap-4.5.0-dist.zip -o /tmp/bootstrap_files.zip
 	unzip /tmp/bootstrap_files.zip -d /tmp/bootstrap_files
 	cp -r /tmp/bootstrap_files/bootstrap-4.5.0-dist bikeGarage/static
+	curl https://code.jquery.com/jquery-3.3.1.slim.min.js -o bikeGarage/static/js/jquery-3.3.1.slim.min.js
 
 ## Download and install theme css
 theme_css:
