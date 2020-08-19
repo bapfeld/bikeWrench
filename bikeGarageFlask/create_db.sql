@@ -12,7 +12,8 @@ CREATE TABLE bikes (
     name        TEXT,
     color       TEXT,
     purchased   DATE,
-    price       REAL
+    price       REAL,
+    mfg         TEXT
 );
 
 -- Rides record data about a bike ride
