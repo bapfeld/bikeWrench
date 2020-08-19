@@ -73,18 +73,21 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">{{ rider }}</h2>
-                <p class="lead">Here's what we know about {{ rider }}:</p>
+                <h2 class="display-3">Bike List</h2>
+                <p class="lead">Here are all the bikes in your garage</p>
             </div>
+
+            <!-- Table with the bikes -->
             <div class="row">
+                <!-- Left column with table -->
                 <div class="col">
-                    <table class="table table-hover table-sm">
+                    <table class="table table-hover">
+                        <thead> <tr><th>Nickname</th><th>Manufacturer</th><th>Color</th><th>Purchase Date</th></tr>
+                        </thead>
                         <tbody>
-                            <tr><td><b>Name</b>:</td> <td>{{ rider }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ max_speed }} {{ speed_unit }}</td></tr>
-                            <tr><td><b>Average speed</b>:</td> <td>{{ avg_speed }} {{ speed_unit }}</td></tr>
-                            <tr><td><b>Total distance</b>:</td> <td>{{ tot_dist }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Total elevataion gain</b>:</td> <td>{{ tot_climb }} {{ elev_unit }}</td></tr>
+                            {% for bike in bikes %}
+                            <tr><td><a href="/bike?id={{ bike[0] }}">{{ bike[1] }}</a></td><td>{{ bike[5]}}</td><td>{{ bike[2] }}</td><td>{{ bike[3] }}</td></tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -94,7 +97,7 @@
         <!-- Buttons at bottom -->
         <div class="row" style="margin-top:.5cm;">
             <div class="col text-center">
-                <a class="btn btn-primary btn-lg btn-block" role="button" href="/edit_rider"> Edit Rider </a>
+                <a class="btn btn-primary btn-lg btn-block" role="button" href="#"> Add new bike</a>
             </div>
         </div>
 

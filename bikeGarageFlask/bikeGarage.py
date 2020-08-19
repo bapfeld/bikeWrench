@@ -77,6 +77,12 @@ def edit_rider_success():
         return rider()
 
 
+@app.route('/bikes', methods=['GET', 'POST'])
+def bikes():
+    res = db.get_all_bikes(db_path)
+    return render_template('bikes.html', bikes=res)
+
+
 ###########################################################################
 # Run the app                                                             #
 ###########################################################################

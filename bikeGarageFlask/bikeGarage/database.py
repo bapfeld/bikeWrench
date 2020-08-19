@@ -74,6 +74,15 @@ def get_all_bike_ids(db_path):
     return all_bike_ids
 
 
+def get_all_bikes(db_path):
+    query = "SELECT * FROM bikes;"
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(query)
+        res = c.fetchall()
+    return res
+
+
 def get_all_ride_ids(db_path, rider_name):
     query = f"SELECT ride_id FROM rides WHERE rider='{rider_name}'"
     with sqlite3.connect(db_path) as conn:
