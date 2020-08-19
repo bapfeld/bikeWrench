@@ -83,6 +83,15 @@ def get_all_bikes(db_path):
     return res
 
 
+def get_bike_details(db_path, bike_id):
+    query = f"SELECT * FROM bikes WHERE bike_id = '{bike_id}';"
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(query)
+        res = c.fetchone()
+    return res
+
+
 def get_all_ride_ids(db_path, rider_name):
     query = f"SELECT ride_id FROM rides WHERE rider='{rider_name}'"
     with sqlite3.connect(db_path) as conn:
@@ -129,6 +138,22 @@ def get_all_bike_parts(db_path, current_bike):
     return current_bike_parts_list
 
 
+def get_maintenance(db_path, part_ids):
+    query = """SELECT *
+                FROM maintenance 
+                WHERE part in (
+            """
+    for p in part_ids:
+        query += f"'{p}', "
+    query = query.strip(', ')
+    query += ');'
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(query)
+        res = c.fetchall()
+    return res
+
+
 def get_all_ride_data(db_path, rider_name):
     query = f"SELECT * FROM rides WHERE rider='{rider_name}'"
     with sqlite3.connect(db_path) as conn:
@@ -136,6 +161,24 @@ def get_all_ride_data(db_path, rider_name):
         c.execute(query)
         all_rides = c.fetchall()
     return all_rides
+
+
+def get_ride_data_for_bike(db_path, bike_id):
+    query = f"""SELECT SUM(distance) AS dist,
+                       MIN(date) AS earliest_ride,
+                       MAX(date) AS recent_ride,
+                       SUM(elev) AS climb,
+                       SUM(moving_time) AS mov_saddle_time,
+                       SUM(elapsed_time) AS saddle_time,
+                       MAX(max_speed) AS max_speed,
+                       SUM(calories) AS calories
+                FROM rides
+                WHERE bike = '{bike_id}'"""
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(query)
+        res = c.fetchone()
+    return res
 
 
 def update_part(db_path, current_bike, current_part):

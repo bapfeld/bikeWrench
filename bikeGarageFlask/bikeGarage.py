@@ -83,6 +83,22 @@ def bikes():
     return render_template('bikes.html', bikes=res)
 
 
+@app.route('/bike', methods=['GET', 'POST'])
+def bike():
+    if 'id' in request.args:
+        res = db.get_rider_info(db_path)
+        b_id = request.args['id']
+        deets = db.get_bike_details(db_path, b_id)
+        parts = db.get_all_bike_parts(db_path, b_id)
+        part_ids = [p[0] for p in parts]
+        maint = db.get_maintenance(db_path, part_ids)
+        stats = db.get_ride_data_for_bike(db_path, b_id)
+        speed_unit, dist_unit, elev_unit = units_text(res[1])
+        return render_template('bike.html', parts=parts, bike_details=deets,
+                               stats=stats, speed_unit=speed_unit, dist_unit=dist_unit,
+                               elev_unit=elev_unit)
+
+
 ###########################################################################
 # Run the app                                                             #
 ###########################################################################
