@@ -19,7 +19,7 @@ CREATE TABLE bikes (
 -- Rides record data about a bike ride
 CREATE TABLE rides (
     ride_id      INTEGER PRIMARY KEY,
-    bike         TEXT NOT NULL REFERENCES bike(id),
+    bike         TEXT NOT NULL REFERENCES bikes(bike_id),
     distance     INTEGER,
     name         TEXT,
     date         DATE,
@@ -43,7 +43,7 @@ CREATE TABLE parts (
     weight       REAL,
     size         TEXT,
     model        TEXT,
-    bike         TEXT NOT NULL REFERENCES bikes(name),
+    bike         TEXT NOT NULL REFERENCES bikes(bike_id),
     inuse        TEXT
 );
 
