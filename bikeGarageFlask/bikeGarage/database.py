@@ -181,6 +181,25 @@ def get_ride_data_for_bike(db_path, bike_id):
     return res
 
 
+def get_ride_data_for_part(db_path, bike_id, early_date):
+    query = f"""SELECT SUM(distance) AS dist,
+                       MIN(date) AS earliest_ride,
+                       MAX(date) AS recent_ride,
+                       SUM(elev) AS climb,
+                       SUM(moving_time) AS mov_saddle_time,
+                       SUM(elapsed_time) AS saddle_time,
+                       MAX(max_speed) AS max_speed,
+                       SUM(calories) AS calories
+                FROM rides
+                WHERE bike = '{bike_id}'
+                AND date >= '{early_date}'"""
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(query)
+        res = c.fetchone()
+    return res
+
+
 def update_part(db_path, current_bike, current_part):
     query = f"""SELECT distance, elapsed_time, elev
                 FROM rides 
@@ -286,3 +305,17 @@ def find_new_bikes(db_path):
     bike_id_keys = list(all_bike_ids.keys())
     new_bikes = [x for x in res if x[0] not in list(all_bike_ids.keys())]
     return new_bikes
+
+
+def get_part_details(db_path, part_id):
+    q1 = f"SELECT * FROM parts WHERE part_id = {part_id}"
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(q1)
+        res = c.fetchone()
+        q2 = f"SELECT bike_id, name FROM bikes WHERE bike_id = '{res[8]}'"
+        c.execute(q2)
+        res_2 = c.fetchone()
+        b_id, b_nm = res_2[0], res_2[1]
+    return (res, b_id, b_nm)
+    

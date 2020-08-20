@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="../static/css/bootstrap.css">
+        <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+
+        
+        <!-- <link href="../static/cover.css" rel="stylesheet"> -->
+        <title>Bike Garage</title>
+    </head>
+    <body>
+        <!-- Page Content -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand">Bike Garage</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <!-- Rider dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">Rider</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/rider">Rider Info</a>
+                            <a class="dropdown-item" href="/edit_rider">Edit Rider</a>
+                        </div>
+                    </li>
+                    <!-- Bike dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">Bikes</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/bikes">Bike list</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Add new bike</a>
+                        </div>
+                    </li>
+                    <!-- Parts dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">Parts</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Parts by bike</a>
+                            <a class="dropdown-item" href="#">Parts by type</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Part stats by part</a>
+                            <a class="dropdown-item" href="#">Part stats by type</a>
+                        </div>
+                    </li>
+                    <!-- Strava dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">Strava</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Fetch new rides</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Strava app credentials</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- Page Features -->
+        <div>
+            <div class="jumbotron">
+                <h2 class="display-3"> Part details </h2>
+                <p class="lead">Here's what we know about your part</p>
+            </div>
+
+            <!-- Bike details -->
+            <div class="row">
+                <div class="col">
+                    <table class="table table-hover table-sm">
+                        <tbody>
+                            <tr><td><b>Part id</b>:</td> <td>{{ part_details[0] }}</td></tr>
+                            <tr><td><b>Type</b>:</td> <td>{{ part_details[1] }}</td></tr>
+                            <tr><td><b>Purchase date</b>:</td> <td>{{ part_details[5] }}</td></tr>
+                            <tr><td><b>Brand</b>:</td> <td>{{ part_details[2] }}</td></tr>
+                            <tr><td><b>Price</b>:</td> <td>{{ part_details[3] }}</td></tr>
+                            <tr><td><b>Weight</b>:</td> <td>{{ part_details[4] }}</td></tr>
+                            <tr><td><b>Size</b>:</td> <td>{{ part_details[4] }}</td></tr>
+                            <tr><td><b>Model</b>:</td> <td>{{ part_details[4] }}</td></tr>
+                            <tr><td><b>Bike</b>:</td> <td>{{ bike_name }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Basic statistics -->
+            <div class="row">
+                <div class="col">
+                    <table class="table table-hover table-sm">
+                        <tbody>
+                            <tr><td><b>Total Distance</b>:</td> <td>{{ stats[0] }} {{ dist_unit }}</td></tr>
+                            <tr><td><b>Earliest Ride</b>:</td> <td>{{ stats[1] }}</td></tr>
+                            <tr><td><b>Most recent ride</b>:</td> <td>{{ stats[2] }}</td></tr>
+                            <tr><td><b>Total climbing</b>:</td> <td>{{ stats[3] }} {{ elev_unit }}</td></tr>
+                            <tr><td><b>Total moving time</b>:</td> <td>{{ stats[4] }}</td></tr>
+                            <tr><td><b>Total elapsed time</b>:</td> <td>{{ stats[5] }}</td></tr>
+                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats[6] }} {{ speed_unit }}</td></tr>
+                            <tr><td><b>Total calories</b>:</td> <td>{{ stats[7] }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table with the maintenance-->
+            <div class="row">
+                <!-- Left column with table -->
+                <div class="col">
+                    <table class="table table-hover">
+                        <thead> <tr><th>Part</th><th>Work</th><th>date</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for m in maint %}
+                            <tr><td>{{ m[1]}}</td><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Buttons at bottom -->
+        <div class="row" style="margin-top:.5cm;">
+            <div class="col text-center">
+                <a class="btn btn-primary btn-lg btn-block" role="button" href="#"> Maintain current part</a>
+            </div>
+        </div>
+        <div class="row" style="margin-top:.5cm;">
+            <div class="col text-center">
+                <a class="btn btn-secondary btn-lg btn-block" role="button" href="#"> Edit current part</a>
+            </div>
+        </div>
+        <div class="row" style="margin-top:.5cm;">
+            <div class="col text-center">
+                <a class="btn btn-secondary btn-lg btn-block" role="button" href="#"> Replace current part</a>
+            </div>
+        </div>
+
+        <footer class="page-footer font-small">
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>
+            </div>
+            <!-- Copyright -->
+        </footer>
+
+        <!-- Scripts -->
+        <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
+        <script src="../static/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

@@ -96,7 +96,19 @@ def bike():
         speed_unit, dist_unit, elev_unit = units_text(res[1])
         return render_template('bike.html', parts=parts, bike_details=deets,
                                stats=stats, speed_unit=speed_unit, dist_unit=dist_unit,
-                               elev_unit=elev_unit)
+                               elev_unit=elev_unit, maint=maint)
+
+
+@app.route('/part', methods=['GET', 'POST'])
+def part():
+    if 'id' in request.args:
+        p_id = request.args['id']
+        part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
+        early_date = part_details[2]
+        stats = db.get_ride_data_for_part(db_path, b_id, early_date)
+        maint = db.get_maintenance(db_path, list(p_id))
+        return render_template('part.html', bike_name=b_nm, part_details=part_details,
+                               maint=maint, stats=stats)
 
 
 ###########################################################################
