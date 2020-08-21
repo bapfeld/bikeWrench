@@ -77,6 +77,22 @@ def update_bike(b_id, nm, color, purchase, price, mfg, db_path):
         c.execute(q)
 
 
+def update_part(p_id, p_type, purchase, brand, price, weight,
+                size, model, db_path):
+    q = f"""UPDATE parts 
+            SET type = '{p_type}', 
+                purchased = '{purchase}',
+                brand = '{brand}',
+                price = '{price}',
+                weight = '{weight}',
+                size = '{size}',
+                model = '{model}'
+            WHERE part_id = '{p_id}'"""
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(q)
+
+
 def get_all_bike_ids(db_path):
     query = "SELECT bike_id, name FROM bikes"
     with sqlite3.connect(db_path) as conn:
@@ -211,35 +227,6 @@ def get_ride_data_for_part(db_path, bike_id, early_date):
         c.execute(query)
         res = c.fetchone()
     return res
-
-
-def update_part(db_path, current_bike, current_part):
-    query = f"""SELECT distance, elapsed_time, elev
-                FROM rides 
-                WHERE bike=(SELECT bike_id FROM bikes WHERE name='{current_bike}')
-                AND date >= (SELECT purchased 
-                             FROM parts 
-                             WHERE part_id={current_part})"""
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute(query)
-        res = c.fetchall()
-    try:
-        dist = round(sum([x[0] for x in res]), 2)
-        dist = f'{dist:n}'
-    except:
-        dist = None
-    try:
-        elev = round(sum([x[2] for x in res]), 2)
-        elev = f'{elev:n}'
-    except:
-        elev = None
-    try:
-        time = round(sum([x[1] for x in res]), 2)
-        time = f'{time:n}'
-    except:
-        time = None
-    return (dist, elev, time)
 
 
 def add_multiple_rides(db_path, rider_name, activity_list):

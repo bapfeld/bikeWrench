@@ -70,6 +70,46 @@ def edit_bike():
         return render_template('edit_bike.html', bike_details=bike_details)
 
 
+@app.route('/edit_part', methods=['GET', 'POST'])
+def edit_part():
+    if 'id' in request.args:
+        p_id = request.args['id']
+        part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
+        return render_template('edit_part.html', part_details=part_details,
+                               part_id=p_id, bike_name=b_nm)
+
+
+@app.route('/edit_part_success', methods=['GET', 'POST'])
+def edit_part_success():
+    if request.method == 'POST':
+        p_id = request.form.get('id')
+        part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
+        p_type = request.form.get('p_type')
+        purchase = request.form.get('purchase')
+        brand = request.form.get('brand')
+        price = request.form.get('price')
+        weight = request.form.get('weight')
+        size = request.form.get('size')
+        model = request.form.get('model')
+        if (p_type in ['None', '']) or p_type is None:
+            p_type = part_details[1]
+        if (purchase in ['None', '']) or purchase is None:
+            purchase = part_details[2]
+        if (brand in ['None', '']) or brand is None:
+            brand = part_details[3]
+        if (price in ['None', '']) or price is None:
+            price = part_details[4]
+        if (weight in ['None', '']) or weight is None:
+            weight = part_details[5]
+        if (size in ['None', '']) or size is None:
+            size = part_details[6]
+        if (model in ['None', '']) or model is None:
+            model = part_details[7]
+        db.update_part(p_id, p_type, purchase, brand, price, weight,
+                       size, model, db_path)
+        return bikes()
+
+
 @app.route('/edit_rider_success', methods=['GET', 'POST'])
 def edit_rider_success():
     if request.method == 'POST':
