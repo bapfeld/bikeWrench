@@ -62,6 +62,14 @@ def edit_rider():
     return render_template('edit_rider.html', rider=res[0], units=res[1])
 
 
+@app.route('/edit_bike', methods=['GET', 'POST'])
+def edit_bike():
+    if 'id' in request.args:
+        b_id = request.args['id']
+        bike_details = db.get_bike_details(db_path, b_id)
+        return render_template('edit_bike.html', bike_details=bike_details)
+
+
 @app.route('/edit_rider_success', methods=['GET', 'POST'])
 def edit_rider_success():
     if request.method == 'POST':
@@ -75,6 +83,29 @@ def edit_rider_success():
             units = res[1]
         db.update_rider(current_nm, nm, units, db_path)
         return rider()
+
+
+@app.route('/edit_bike_success', methods=['GET', 'POST'])
+def edit_bike_success():
+    if request.method == 'POST':
+        bike_details = db.get_bike_details(db_path, request.form.get('id'))
+        nm = request.form.get('bike_name')
+        color = request.form.get('color')
+        purchase = request.form.get('purchase')
+        price = request.form.get('price')
+        mfg = request.form.get('mfg')
+        if (nm in ['None', '']) or nm is None:
+            nm = bike_details[1]
+        if (color in ['None', '']) or color is None:
+            color = bike_details[2]
+        if (purchase in ['None', '']) or purchase is None:
+            purchase = bike_details[3]
+        if (price in ['None', '']) or price is None:
+            price = bike_details[4]
+        if (mfg in ['None', '']) or mfg is None:
+            mfg = bike_details[1]
+        db.update_bike(bike_details[0], nm, color, purchase, price, mfg, db_path)
+        return bikes()
 
 
 @app.route('/bikes', methods=['GET', 'POST'])

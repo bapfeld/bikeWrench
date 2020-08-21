@@ -64,6 +64,19 @@ def update_rider(current_nm, nm, units, db_path):
         c.execute(q)
 
 
+def update_bike(b_id, nm, color, purchase, price, mfg, db_path):
+    q = f"""UPDATE bikes 
+            SET name = '{nm}', 
+                color = '{color}',
+                purchased = '{purchase}',
+                price = '{price}',
+                mfg = '{mfg}'
+            WHERE bike_id = '{b_id}'"""
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(q)
+
+
 def get_all_bike_ids(db_path):
     query = "SELECT bike_id, name FROM bikes"
     with sqlite3.connect(db_path) as conn:
