@@ -1,5 +1,4 @@
 import os
-import sqlite3
 import datetime
 import dateparser
 from dotenv import load_dotenv, find_dotenv
@@ -38,6 +37,7 @@ def units_text(unit_type):
         elev_unit = 'meters'
     return (speed_unit, dist_unit, elev_unit)
 
+
 ###########################################################################
 # Flask definition                                                        #
 ###########################################################################
@@ -52,7 +52,8 @@ def rider():
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('rider.html', rider=res[0], max_speed=res[4],
                            avg_speed=res[5], tot_dist=res[6], tot_climb=res[7],
-                           speed_unit=speed_unit, dist_unit=dist_unit, elev_unit=elev_unit)
+                           speed_unit=speed_unit, dist_unit=dist_unit,
+                           elev_unit=elev_unit)
 
 
 @app.route('/edit_rider', methods=['GET', 'POST'])
@@ -144,7 +145,8 @@ def edit_bike_success():
             price = bike_details[4]
         if (mfg in ['None', '']) or mfg is None:
             mfg = bike_details[1]
-        db.update_bike(bike_details[0], nm, color, purchase, price, mfg, db_path)
+        db.update_bike(bike_details[0], nm, color, purchase, price,
+                       mfg, db_path)
         return bikes()
 
 
@@ -166,8 +168,9 @@ def bike():
         stats = db.get_ride_data_for_bike(db_path, b_id)
         speed_unit, dist_unit, elev_unit = units_text(res[1])
         return render_template('bike.html', parts=parts, bike_details=deets,
-                               stats=stats, speed_unit=speed_unit, dist_unit=dist_unit,
-                               elev_unit=elev_unit, maint=maint)
+                               stats=stats, speed_unit=speed_unit,
+                               dist_unit=dist_unit, elev_unit=elev_unit,
+                               maint=maint)
 
 
 @app.route('/part', methods=['GET', 'POST'])
@@ -218,9 +221,9 @@ def add_part():
         except:
             model = None
         purchase = datetime.datetime.today().strftime('%Y-%m-%d')
-        return render_template('add_part.html', bike_id=b_id, part_type=part_type,
-                               brand=brand, weight=weight, size=size, model=model,
-                               purchase=purchase)
+        return render_template('add_part.html', bike_id=b_id,
+                               part_type=part_type, brand=brand, weight=weight,
+                               size=size, model=model, purchase=purchase)
 
 
 @app.route('/add_part_success', methods=['GET', 'POST'])
@@ -252,7 +255,8 @@ def add_part_success():
         bike = request.form.get('bike_id')
         if bike in ['None', '']:
             bike = None
-        vals = (part_type, purchase, brand, price, weight, size, model, bike, 'TRUE')
+        vals = (part_type, purchase, brand, price, weight, size,
+                model, bike, 'TRUE')
         db.add_part(db_path, vals)
         return bikes()
 
