@@ -86,7 +86,7 @@ def edit_part_success():
         p_id = request.form.get('id')
         part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
         p_type = request.form.get('p_type')
-        purchase = request.form.get('purchase')
+        added = request.form.get('added')
         brand = request.form.get('brand')
         price = request.form.get('price')
         weight = request.form.get('weight')
@@ -94,8 +94,8 @@ def edit_part_success():
         model = request.form.get('model')
         if (p_type in ['None', '']) or p_type is None:
             p_type = part_details[1]
-        if (purchase in ['None', '']) or purchase is None:
-            purchase = part_details[2]
+        if (added in ['None', '']) or added is None:
+            added = part_details[2]
         if (brand in ['None', '']) or brand is None:
             brand = part_details[3]
         if (price in ['None', '']) or price is None:
@@ -106,7 +106,7 @@ def edit_part_success():
             size = part_details[6]
         if (model in ['None', '']) or model is None:
             model = part_details[7]
-        db.update_part(p_id, p_type, purchase, brand, price, weight,
+        db.update_part(p_id, p_type, added, brand, price, weight,
                        size, model, db_path)
         return bikes()
 
@@ -179,7 +179,10 @@ def part(p_id=None):
         p_id = request.args['id']
     part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
     early_date = part_details[2]
-    stats = db.get_ride_data_for_part(db_path, b_id, early_date)
+    late_date = part_details[9]
+    if (late_date in ['None', '']) or late_date is None:
+        late_date = datetime.datetime.today().strftime("%Y-%m-%d")
+    stats = db.get_ride_data_for_part(db_path, b_id, early_date, late_date)
     maint = db.get_maintenance(db_path, list(p_id))
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,
@@ -220,10 +223,10 @@ def add_part():
                 model = None
         except:
             model = None
-        purchase = datetime.datetime.today().strftime('%Y-%m-%d')
+        added = datetime.datetime.today().strftime('%Y-%m-%d')
         return render_template('add_part.html', bike_id=b_id,
                                part_type=part_type, brand=brand, weight=weight,
-                               size=size, model=model, purchase=purchase)
+                               size=size, model=model, added=added)
 
 
 @app.route('/add_part_success', methods=['GET', 'POST'])
@@ -232,11 +235,11 @@ def add_part_success():
         part_type = request.form.get('p_type')
         if part_type in ['None', '']:
             part_type = None
-        purchase = request.form.get('purchase')
-        if purchase in ['None', '']:
-            purchase = None
+        added = request.form.get('added')
+        if added in ['None', '']:
+            added = None
         else:
-            purchase = dateparser.parse(purchase)
+            added = dateparser.parse(added)
         brand = request.form.get('brand')
         if brand in ['None', '']:
             brand = None
@@ -255,7 +258,7 @@ def add_part_success():
         bike = request.form.get('bike_id')
         if bike in ['None', '']:
             bike = None
-        vals = (part_type, purchase, brand, price, weight, size,
+        vals = (part_type, added, brand, price, weight, size,
                 model, bike, 'TRUE')
         db.add_part(db_path, vals)
         return bikes()

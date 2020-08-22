@@ -37,14 +37,14 @@ CREATE TABLE rides (
 CREATE TABLE parts (
     part_id      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     type         TEXT,
-    purchased    DATE,
+    added        DATE,
     brand        TEXT,
     price        REAL,
     weight       REAL,
     size         TEXT,
     model        TEXT,
     bike         TEXT NOT NULL REFERENCES bikes(bike_id),
-    inuse        TEXT
+    retired      DATE
 );
 
 -- Maintenance tasks record things that happen to parts

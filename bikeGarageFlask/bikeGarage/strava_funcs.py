@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 import requests
+from stravalib.client import Client
 from bikeGarage.database import get_all_ride_ids
 
 
@@ -55,7 +56,7 @@ def fetch_new_activities(client, client_id, client_secret, code,
                 new_id_list = [x.id for x in activity_list
                                if (x.id not in id_list and x.type == "Ride")]
             else:
-                new_id_list = [x.id for x in activity_list]
+                new_id_list = [x.id for x in activity_list if x.type == 'Ride']
             if len(new_id_list) > 0:
                 new_activities = [client.get_activity(id) for id
                                   in new_id_list]
