@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+import dateparser
 from stravalib import unithelper
 
 
@@ -123,11 +124,20 @@ def get_bike_details(db_path, bike_id):
 
 def get_all_ride_ids(db_path, rider_name):
     query = f"SELECT ride_id FROM rides WHERE rider='{rider_name}'"
+    max_dt_query = f"SELECT MAX(date) FROM rides WHERE rider='{rider_name}'"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         id_list = [x[0] for x in c.fetchall()]
-    return id_list
+        if len(id_list) > 0:
+            c.execute(max_dt_query)
+            max_dt_res = c.fetchone()
+            max_dt = dateparser.parse(max_dt_res[0])
+            max_dt = max_dt - datetime.timedelta(days=1)
+            max_dt = max_dt.strftime('%Y-%m-%d')
+        else:
+            max_dt = None
+    return (id_list, max_dt)
 
 
 def edit_entry(db_path, sql, values):

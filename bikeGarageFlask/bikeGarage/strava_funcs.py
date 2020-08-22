@@ -47,10 +47,10 @@ def gen_secrets(client, client_id, client_secret, code, db_path, rider_name):
 
 def fetch_new_activities(client, client_id, client_secret, code,
                          db_path, rider_name):
-    id_list = get_all_ride_ids(db_path, rider_name)
+    id_list, max_dt = get_all_ride_ids(db_path, rider_name)
     if test_conn():
         gen_secrets(client, client_id, client_secret, code, db_path, rider_name)
-        activity_list = client.get_activities()
+        activity_list = client.get_activities(after=max_dt)
         if activity_list is not None:
             if id_list is not None:
                 new_id_list = [x.id for x in activity_list
