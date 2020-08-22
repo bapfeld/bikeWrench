@@ -249,7 +249,7 @@ def add_multiple_rides(db_path, rider_name, activity_list):
                gear_try(a),
                unit_try(a.distance, 'long_dist'),
                a.name,
-               a.start_date.strftime("%Y-%M-%d"),
+               a.start_date.strftime("%Y-%m-%d"),
                a.moving_time.seconds / 3600,
                a.elapsed_time.seconds / 3600,
                unit_try(a.total_elevation_gain, 'short_dist'),
