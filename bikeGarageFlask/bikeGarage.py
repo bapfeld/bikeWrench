@@ -179,7 +179,83 @@ def part():
         stats = db.get_ride_data_for_part(db_path, b_id, early_date)
         maint = db.get_maintenance(db_path, list(p_id))
         return render_template('part.html', bike_name=b_nm, part_details=part_details,
-                               maint=maint, stats=stats)
+                               maint=maint, stats=stats, bike_id=b_id)
+
+
+@app.route('/add_part', methods=['GET', 'POST'])
+def add_part():
+    if 'bike_id' in request.args:
+        b_id = request.args['bike_id']
+        try:
+            part_type = request.args['tp']
+            if part_type in ['None', '']:
+                part_type = None
+        except:
+            part_type = None
+        try:
+            brand = request.args['brand']
+            if brand in ['None', '']:
+                brand = None
+        except:
+            brand = None
+        try:
+            weight = request.args['weight']
+            if weight in ['None', '']:
+                weight = None
+        except:
+            weight = None
+        try:
+            size = request.args['size']
+            if size in ['None', '']:
+                size = None
+        except:
+            size = None
+        try:
+            model = request.args['model']
+            if model in ['None', '']:
+                model = None
+        except:
+            model = None
+        purchase = datetime.datetime.today().strftime('%Y-%m-%d')
+        return render_template('add_part.html', bike_id=b_id, part_type=part_type,
+                               brand=brand, weight=weight, size=size, model=model,
+                               purchase=purchase)
+
+
+@app.route('/add_part_success', methods=['GET', 'POST'])
+def add_part_success():
+    if request.method == 'POST':
+        part_type = request.form.get('p_type')
+        if part_type in ['None', '']:
+            part_type = None
+        purchase = request.form.get('purchase')
+        if purchase in ['None', '']:
+            purchase = None
+        else:
+            purchase = dateparser.parse(purchase)
+        brand = request.form.get('brand')
+        if brand in ['None', '']:
+            brand = None
+        price = request.form.get('price')
+        if price in ['None', '']:
+            price = None
+        weight = request.form.get('weight')
+        if weight in ['None', '']:
+            weight = None
+        size = request.form.get('size')
+        if size in ['None', '']:
+            size = None
+        model = request.form.get('model')
+        if model in ['None', '']:
+            model = None
+        bike = request.form.get('bike_id')
+        if bike in ['None', '']:
+            bike = None
+        vals = (part_type, purchase, brand, price, weight, size, model, bike, 'TRUE')
+        # for v in vals:
+        #     print(v, type(v))
+        db.add_part(db_path, vals)
+        return bikes()
 
 
 ###########################################################################

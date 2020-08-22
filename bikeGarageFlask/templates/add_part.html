@@ -73,86 +73,70 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">{{ bike_details[1] }}</h2>
-                <p class="lead">Here's what we know about your bike {{ bike_details[1] }}</p>
+                <h2 class="display-3">Add part</h2>
+                <p class="lead">Add a new part</p>
+            </div>
+            <div>
+                <form action="{{ url_for('add_part_success') }}" method="POST" role="form">
+                    <!-- part type -->
+                    <div class="text-left form-group">
+                        <span class="lead">Part type:</span>
+                        <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_type }}">
+                    </div>
+
+                    <!-- purchase date -->
+                    <div class="text-left form-group">
+                        <span class="lead">Date purchased:</span>
+                        <input class="form-control" type="text" for="purchase" name="purchase" destination="purchase" placeholder="{{ purchase }}">
+                    </div>
+
+                    <!-- brand -->
+                    <div class="text-left form-group">
+                        <span class="lead">Brand:</span>
+                        <input class="form-control" type="text" for="brand" name="brand" destination="brand" placeholder="{{ brand }}">
+                    </div>
+
+                    <!-- price -->
+                    <div class="text-left form-group">
+                        <span class="lead">Price:</span>
+                        <input class="form-control" type="text" for="price" name="price" destination="price" placeholder="">
+                    </div>
+
+                    <!-- weight -->
+                    <div class="text-left form-group">
+                        <span class="lead">Weight:</span>
+                        <input class="form-control" type="text" for="weight" name="weight" destination="weight" placeholder="{{ weight }}">
+                    </div>
+
+                    <!-- size -->
+                    <div class="text-left form-group">
+                        <span class="lead">Size:</span>
+                        <input class="form-control" type="text" for="size" name="size" destination="size" placeholder="{{ size }}">
+                    </div>
+
+                    <!-- model -->
+                    <div class="text-left form-group">
+                        <span class="lead">Model:</span>
+                        <input class="form-control" type="text" for="model" name="model" destination="model" placeholder="{{ model }}">
+                    </div>
+
+                    <!-- hidden label for bike id -->
+                    <div class="col text-center form-group">
+                        <input type="hidden" name="bike_id" destination="bike_id" value="{{ bike_id }}">
+                    </div>
+                   
+                    
+
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Add part</button>
+                </form>
             </div>
 
-            <!-- Bike details -->
+            <!-- Buttons at bottom -->
             <div class="row">
-                <div class="col">
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Bike id</b>:</td> <td>{{ bike_details[0] }}</td></tr>
-                            <tr><td><b>Name</b>:</td> <td>{{ bike_details[1] }}</td></tr>
-                            <tr><td><b>Manufacturer</b>:</td> <td>{{ bike_details[5] }}</td></tr>
-                            <tr><td><b>Color</b>:</td> <td>{{ bike_details[2] }}</td></tr>
-                            <tr><td><b>Purchase date</b>:</td> <td>{{ bike_details[3] }}</td></tr>
-                            <tr><td><b>Purchase price</b>:</td> <td>{{ bike_details[4] }}</td></tr>
-                        </tbody>
-                    </table>
+                <div class="col text-center" style="margin-top:.5cm;">
+                    <a class="btn btn-secondary btn-lg btn-block" role="button" href="/bikes"> Cancel (return to bike list) </a>
                 </div>
-            </div>
-
-            <!-- Basic statistics -->
-            <div class="row">
-                <div class="col">
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Total Distance</b>:</td> <td>{{ stats[0] }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Earliest Ride</b>:</td> <td>{{ stats[1] }}</td></tr>
-                            <tr><td><b>Most recent ride</b>:</td> <td>{{ stats[2] }}</td></tr>
-                            <tr><td><b>Total climbing</b>:</td> <td>{{ stats[3] }} {{ elev_unit }}</td></tr>
-                            <tr><td><b>Total moving time</b>:</td> <td>{{ stats[4] }}</td></tr>
-                            <tr><td><b>Total elapsed time</b>:</td> <td>{{ stats[5] }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats[6] }} {{ speed_unit }}</td></tr>
-                            <tr><td><b>Total calories</b>:</td> <td>{{ stats[7] }}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Table with the parts -->
-            <div class="row">
-                <!-- Left column with table -->
-                <div class="col">
-                    <table class="table table-hover">
-                        <thead> <tr><th>Type</th><th>Purchae date</th><th>Brand</th><th>Price</th><th>Weight</th><th>Size</th><th>Model</th></tr>
-                        </thead>
-                        <tbody>
-                            {% for part in parts %}
-                            <tr><td><a href="/part?id={{ part[0] }}">{{ part[1] }}</a></td><td>{{ part[2]}}</td><td>{{ part[3] }}</td><td>{{ part[4] }}</td><td>{{ part[5] }}</td><td>{{ part[6] }}</td><td>{{ part[7] }}</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Table with the maintenance-->
-            <div class="row">
-                <!-- Left column with table -->
-                <div class="col">
-                    <table class="table table-hover">
-                        <thead> <tr><th>Part</th><th>Work</th><th>date</th></tr>
-                        </thead>
-                        <tbody>
-                            {% for m in maint %}
-                            <tr><td>{{ m[1]}}</td><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Buttons at bottom -->
-        <div class="row" style="margin-top:.5cm;">
-            <div class="col text-center">
-                <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_details[0] }}"> Add new part</a>
-            </div>
-        </div>
-        <div class="row" style="margin-top:.5cm;">
-            <div class="col text-center">
-                <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_bike?id={{ bike_details[0] }}"> Edit bike</a>
             </div>
         </div>
 
