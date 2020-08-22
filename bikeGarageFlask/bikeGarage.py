@@ -171,15 +171,16 @@ def bike():
 
 
 @app.route('/part', methods=['GET', 'POST'])
-def part():
+def part(p_id=None):
     if 'id' in request.args:
         p_id = request.args['id']
-        part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
-        early_date = part_details[2]
-        stats = db.get_ride_data_for_part(db_path, b_id, early_date)
-        maint = db.get_maintenance(db_path, list(p_id))
-        return render_template('part.html', bike_name=b_nm, part_details=part_details,
-                               maint=maint, stats=stats, bike_id=b_id)
+    part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
+    early_date = part_details[2]
+    stats = db.get_ride_data_for_part(db_path, b_id, early_date)
+    maint = db.get_maintenance(db_path, list(p_id))
+    return render_template('part.html', bike_name=b_nm,
+                           part_details=part_details, maint=maint,
+                           stats=stats, bike_id=b_id)
 
 
 @app.route('/add_part', methods=['GET', 'POST'])
@@ -288,6 +289,26 @@ def add_bike_success():
             b_id = None
         db.add_new_bike(db_path, b_id, nm, color, purchase, price, mfg)
         return bikes()
+
+
+@app.route('/add_maintenance', methods=['GET', 'POST'])
+def add_maintenance():
+    dt = datetime.datetime.today().strftime('%Y-%m-%d')
+    if request.method == 'GET':
+        p_id = request.args['id']
+        return render_template('add_maintenance.html', part_id=p_id, dt=dt)
+    elif request.method == 'POST':
+        p_id = request.form.get('p_id')
+        new_dt = request.form.get('dt')
+        work = request.form.get('work')
+        if new_dt in ['None', '']:
+            new_dt = dt
+        else:
+            new_dt = dateparser.parse(new_dt)
+        if work in ['None', '']:
+            work = None
+        db.add_maintenance(db_path, p_id, work, new_dt)
+        return part(p_id)
 
 
 ###########################################################################

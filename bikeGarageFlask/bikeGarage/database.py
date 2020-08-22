@@ -55,9 +55,9 @@ def convert_rider_info(units, max_speed, avg_speed, tot_dist, tot_climb):
 
 
 def update_rider(current_nm, nm, units, db_path):
-    q = f"""UPDATE riders 
-            SET name = '{nm}', 
-                units = '{units}' 
+    q = f"""UPDATE riders
+            SET name = '{nm}',
+                units = '{units}'
             WHERE name = '{current_nm}'"""
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
@@ -65,8 +65,8 @@ def update_rider(current_nm, nm, units, db_path):
 
 
 def update_bike(b_id, nm, color, purchase, price, mfg, db_path):
-    q = f"""UPDATE bikes 
-            SET name = '{nm}', 
+    q = f"""UPDATE bikes
+            SET name = '{nm}',
                 color = '{color}',
                 purchased = '{purchase}',
                 price = '{price}',
@@ -79,8 +79,8 @@ def update_bike(b_id, nm, color, purchase, price, mfg, db_path):
 
 def update_part(p_id, p_type, purchase, brand, price, weight,
                 size, model, db_path):
-    q = f"""UPDATE parts 
-            SET type = '{p_type}', 
+    q = f"""UPDATE parts
+            SET type = '{p_type}',
                 purchased = '{purchase}',
                 brand = '{brand}',
                 price = '{price}',
@@ -143,21 +143,21 @@ def replace_part(old_part=None):
 def add_part(db_path, part_values):
     with sqlite3.connect(db_path) as conn:
         conn.execute("""INSERT INTO parts (
-                            type, 
-                            purchased, 
-                            brand, 
-                            price, 
-                            weight, 
-                            size, 
-                            model, 
-                            bike, 
-                            inuse) 
+                            type,
+                            purchased,
+                            brand,
+                            price,
+                            weight,
+                            size,
+                            model,
+                            bike,
+                            inuse)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", part_values)
 
 
 def get_all_bike_parts(db_path, current_bike):
     query = f"""SELECT *
-                FROM parts 
+                FROM parts
                 WHERE bike = '{current_bike}'
                 AND inuse = 'TRUE'"""
     with sqlite3.connect(db_path) as conn:
@@ -169,7 +169,7 @@ def get_all_bike_parts(db_path, current_bike):
 
 def get_maintenance(db_path, part_ids):
     query = """SELECT *
-                FROM maintenance 
+                FROM maintenance
                 WHERE part in (
             """
     for p in part_ids:
@@ -236,6 +236,7 @@ def add_multiple_rides(db_path, rider_name, activity_list):
         except AttributeError:
             out = 'Unknown'
         return out
+
     def unit_try(num, t):
         if t == 'long_dist':
             return float(unithelper.kilometers(num))
@@ -258,28 +259,42 @@ def add_multiple_rides(db_path, rider_name, activity_list):
                rider_name, ) for a in activity_list]
 
     with sqlite3.connect(db_path) as conn:
-        sql = """INSERT INTO rides 
+        sql = """INSERT INTO rides
                  (ride_id, bike, distance, name, date, moving_time,
                   elapsed_time, elev, type, avg_speed, max_speed,
-                  calories, rider) 
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""" 
+                  calories, rider)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"""
         conn.executemany(sql, a_list)
 
 
 def add_new_bike(db_path, bike_id, bike_name, bike_color,
                  bike_purchase, bike_price, bike_mfg):
     q = """INSERT INTO bikes
-               (bike_id, name, color, purchased, price, mfg) 
-           VALUES 
+               (bike_id, name, color, purchased, price, mfg)
+           VALUES
                (?, ?, ?, ?, ?, ?)"""
-    vals = (bike_id, bike_name, bike_color, bike_purchase, bike_price, bike_mfg)
-    with sqlite3.connect(self.db_path) as conn:
+    vals = (bike_id, bike_name, bike_color, bike_purchase, bike_price,
+            bike_mfg)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(q, vals)
+        conn.commit()
+
+
+def add_maintenance(db_path, part_id, work, dt):
+    q = """INSERT INTO maintenance
+               (part, work, date)
+           VALUES
+               (?, ?, ?)"""
+    vals = (part_id, work, dt)
+    with sqlite3.connect(db_path) as conn:
         conn.execute(q, vals)
         conn.commit()
 
 
 def find_new_bikes(db_path):
-    """Simple function to determine if there are any bikes that haven't been added"""
+    """Simple function to determine if there are any bikes
+       that haven't been added
+     """
 
     # Check what bikes already exist
     all_bike_ids = get_all_bike_ids()
@@ -292,7 +307,7 @@ def find_new_bikes(db_path):
                    SUM(elev),
                    MIN(date),
                    MAX(date)
-               FROM 
+               FROM
                    rides
                GROUP BY
                    1;"""
@@ -318,4 +333,3 @@ def get_part_details(db_path, part_id):
         res_2 = c.fetchone()
         b_id, b_nm = res_2[0], res_2[1]
     return (res, b_id, b_nm)
-    
