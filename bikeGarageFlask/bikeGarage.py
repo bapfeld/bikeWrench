@@ -252,9 +252,41 @@ def add_part_success():
         if bike in ['None', '']:
             bike = None
         vals = (part_type, purchase, brand, price, weight, size, model, bike, 'TRUE')
-        # for v in vals:
-        #     print(v, type(v))
         db.add_part(db_path, vals)
+        return bikes()
+
+
+@app.route('/add_bike', methods=['GET', 'POST'])
+def add_bike():
+    if request.method == 'POST':
+        b_id = request.args['id']
+        return render_template('add_bike.html', bike_id=b_id)
+
+
+@app.route('/add_bike_success', methods=['GET', 'POST'])
+def add_bike_success():
+    if request.method == 'POST':
+        nm = request.form.get('nm')
+        if nm in ['None', '']:
+            nm = None
+        color = request.form.get('color')
+        if color in ['None', '']:
+            color = None
+        purchase = request.form.get('purchase')
+        if purchase in ['None', '']:
+            purchase = None
+        else:
+            purchase = dateparser.parse(purchase)
+        mfg = request.form.get('mfg')
+        if mfg in ['None', '']:
+            mfg = None
+        price = request.form.get('price')
+        if price in ['None', '']:
+            price = None
+        b_id = request.form.get('bike_id')
+        if b_id in ['None', '']:
+            b_id = None
+        db.add_new_bike(db_path, b_id, nm, color, purchase, price, mfg)
         return bikes()
 
 

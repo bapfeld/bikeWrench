@@ -266,13 +266,13 @@ def add_multiple_rides(db_path, rider_name, activity_list):
         conn.executemany(sql, a_list)
 
 
-def add_new_bike(db_path, units, bike_id, bike_name, bike_color,
-                 bike_purchase, bike_price):
+def add_new_bike(db_path, bike_id, bike_name, bike_color,
+                 bike_purchase, bike_price, bike_mfg):
     q = """INSERT INTO bikes
-               (bike_id, name, color, purchased, price) 
+               (bike_id, name, color, purchased, price, mfg) 
            VALUES 
-               (?, ?, ?, ?, ?)"""
-    vals = (bike_id, bike_name, bike_color, bike_purchase, bike_price)
+               (?, ?, ?, ?, ?, ?)"""
+    vals = (bike_id, bike_name, bike_color, bike_purchase, bike_price, bike_mfg)
     with sqlite3.connect(self.db_path) as conn:
         conn.execute(q, vals)
         conn.commit()
