@@ -339,6 +339,9 @@ def fetch_rides():
     if new_activities is not None:
         db.add_multiple_rides(db_path, new_activities)
 
+    # check for new bikes
+    db.find_new_bikes(db_path)
+    
     return render_template('index.html')
 
 

@@ -95,12 +95,12 @@ def update_part(p_id, p_type, purchase, brand, price, weight,
 
 
 def get_all_bike_ids(db_path):
-    query = "SELECT bike_id, name FROM bikes"
+    query = "SELECT bike_id FROM bikes"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
         res = c.fetchall()
-    all_bike_ids = {x[0]: x[1] for x in res}
+    all_bike_ids = [x[0] for x in res]
     return all_bike_ids
 
 
@@ -306,29 +306,28 @@ def find_new_bikes(db_path):
      """
 
     # Check what bikes already exist
-    all_bike_ids = get_all_bike_ids()
+    all_bike_ids = get_all_bike_ids(db_path)
 
     # And see what bikes appear in rides
     with sqlite3.connect(db_path) as conn:
-        q = """SELECT
-                   bike,
-                   SUM(distance),
-                   SUM(elev),
-                   MIN(date),
-                   MAX(date)
+        q = """SELECT DISTINCT
+                   bike
                FROM
-                   rides
-               GROUP BY
-                   1;"""
+                   rides;
+            """
         c = conn.cursor()
         c.execute(q)
         res = c.fetchall()
-        # Make sure that unknown bike is always last
-        res.sort(key=lambda tup: tup[0], reverse=True)
 
-    bike_id_keys = list(all_bike_ids.keys())
-    new_bikes = [x for x in res if x[0] not in list(all_bike_ids.keys())]
-    return new_bikes
+    new_bikes = [x[0] for x in res if x[0] not in list(all_bike_ids.keys())]
+    if len(new_bikes) > 0:
+        b_list = [(b, f'tmp_nm_{b}') for b in new_bikes]
+        with sqlite3.connect(db_path) as conn:
+            q = """INSERT INTO bikes
+                   (bike_id, name)
+                   VALUES (?, ?);
+                """
+            c.executemany(q, b_list)
 
 
 def get_part_details(db_path, part_id):
