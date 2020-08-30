@@ -29,8 +29,7 @@ CREATE TABLE rides (
     type         TEXT,
     avg_speed    REAL,
     max_speed    REAL,
-    calories     REAL,
-    rider        TEXT NOT NULL REFERENCES rider(name)
+    calories     REAL
 );
 
 -- Parts belong to bikes

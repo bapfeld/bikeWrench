@@ -3,9 +3,11 @@ import datetime
 import dateparser
 from dotenv import load_dotenv, find_dotenv
 from flask import Flask, render_template, request, url_for
+from stravalib.client import Client
 # from wtforms import (Form, TextField, TextAreaField,
 #                      validators, StringField, SubmitField)
 from bikeGarage import database as db
+from bikeGarage.strava_funcs import fetch_new_activities
 
 
 ###########################################################################
@@ -16,6 +18,9 @@ load_dotenv(find_dotenv())
 db_path = os.environ.get('STRAVA_DB_PATH')
 bdr = os.environ.get('BDR')
 schema_path = os.environ.get('SCHEMA_PATH')
+client_id = os.environ.get('STRAVA_CLIENT_ID')
+client_secret = os.environ.get('CLIENT_SECRET')
+code = os.environ.get('STRAVA_APPLICATION_CODE')
 
 
 ###########################################################################
@@ -316,6 +321,25 @@ def add_maintenance():
             work = None
         db.add_maintenance(db_path, p_id, work, new_dt)
         return part(p_id)
+
+
+@app.route('/fetch_rides', methods=['GET'])
+def fetch_rides():
+    # establish client
+    cl = Client()
+
+    # get rider info
+    res = db.get_rider_info(db_path)
+    cl.refresh_token = res[2]
+    cl.expires_at = res[3]
+
+    # run updater
+    new_activities = fetch_new_activities(cl, client_id, client_secret,
+                                          code, db_path, res[0])
+    if new_activities is not None:
+        db.add_multiple_rides(db_path, new_activities)
+
+    return render_template('index.html')
 
 
 ###########################################################################

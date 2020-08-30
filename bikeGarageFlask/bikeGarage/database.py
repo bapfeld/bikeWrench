@@ -122,9 +122,9 @@ def get_bike_details(db_path, bike_id):
     return res
 
 
-def get_all_ride_ids(db_path, rider_name):
-    query = f"SELECT ride_id FROM rides WHERE rider='{rider_name}'"
-    max_dt_query = f"SELECT MAX(date) FROM rides WHERE rider='{rider_name}'"
+def get_all_ride_ids(db_path):
+    query = "SELECT ride_id FROM rides"
+    max_dt_query = "SELECT MAX(date) FROM rides"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
@@ -160,16 +160,15 @@ def add_part(db_path, part_values):
                             weight,
                             size,
                             model,
-                            bike,
-                            inuse)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", part_values)
+                            bike)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", part_values)
 
 
 def get_all_bike_parts(db_path, current_bike):
     query = f"""SELECT *
                 FROM parts
                 WHERE bike = '{current_bike}'
-                AND inuse = 'TRUE'"""
+                AND retired IS NULL"""
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
@@ -193,8 +192,8 @@ def get_maintenance(db_path, part_ids):
     return res
 
 
-def get_all_ride_data(db_path, rider_name):
-    query = f"SELECT * FROM rides WHERE rider='{rider_name}'"
+def get_all_ride_data(db_path):
+    query = "SELECT * FROM rides'"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
@@ -231,7 +230,7 @@ def get_ride_data_for_part(db_path, bike_id, early_date, late_date):
                        SUM(calories) AS calories
                 FROM rides
                 WHERE bike = '{bike_id}'
-                AND date >= '{early_date}
+                AND date >= '{early_date}'
                 AND date <= '{late_date}'"""
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
@@ -240,7 +239,7 @@ def get_ride_data_for_part(db_path, bike_id, early_date, late_date):
     return res
 
 
-def add_multiple_rides(db_path, rider_name, activity_list):
+def add_multiple_rides(db_path, activity_list):
     def gear_try(x):
         try:
             out = x.gear.id
@@ -266,15 +265,14 @@ def add_multiple_rides(db_path, rider_name, activity_list):
                a.type,
                unit_try(a.average_speed, 'speed'),
                unit_try(a.max_speed, 'speed'),
-               float(a.calories),
-               rider_name, ) for a in activity_list]
+               float(a.calories), ) for a in activity_list]
 
     with sqlite3.connect(db_path) as conn:
         sql = """INSERT INTO rides
                  (ride_id, bike, distance, name, date, moving_time,
                   elapsed_time, elev, type, avg_speed, max_speed,
-                  calories, rider)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+                  calories)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"""
         conn.executemany(sql, a_list)
 
 
