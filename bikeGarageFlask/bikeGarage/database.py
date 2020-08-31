@@ -334,58 +334,18 @@ def get_part_details(db_path, part_id):
     return (res, b_id, b_nm)
 
 
-def get_part_averages(db_path, part_type):
-    q = f"""SELECT AVG(price), AVG(weight), AVG(retired - added)
-            FROM parts
-            WHERE type = '{part_type}'
+def get_part_averages(db_path):
+    q = f"""SELECT type, AVG(price), AVG(weight),
+                   AVG(dist), AVG(elev), AVG(retired - added)
+            FROM retired_parts
+            GROUP BY 1
          """
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(q)
-        averages = c.fetchone()
-    price = averages[0]
-    weight = averages[1]
-    in_use = averages[2]
+        averages = c.fetchmany()
 
-    # hacky way to get the distance info
-    q = f"""SELECT part_id, bike, added, retired
-            FROM parts
-            WHERE type = '{part_type}'
-         """
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute(q)
-        parts = c.fetchall()
-    dists = []
-    elevs = []
-    for p in parts:
-        if p[3] is not None:
-            q = f"""SELECT SUM(distance), SUM(elev)
-                    FROM rides
-                    WHERE bike = '{p[1]}'
-                    AND date >= '{p[2]}'"""
-        else:
-            q = f"""SELECT SUM(distance), SUM(elev)
-                    FROM rides
-                    WHERE bike = '{p[1]}'
-                    AND date >= '{p[2]}'
-                    AND date <= '{p[3]}'"""
-        with sqlite3.connect(db_path) as conn:
-            c = conn.cursor()
-            c.execute(q)
-            res = c.fetchone()
-        dists.append(float(res[0]))
-        elevs.append(float(res[1]))
-    if len(dists) > 0:
-        dist = np.mean(dists)
-    else:
-        dist = None
-    if len(elevs) > 0:
-        elev = np.mean(elevs)
-    else:
-        elev = None
-
-    return (price, weight, in_use, dist, elev)
+    return averages
 
 
 def retire(db_path, retired_part, date_retired):

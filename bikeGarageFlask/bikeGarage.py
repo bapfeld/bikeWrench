@@ -352,8 +352,14 @@ def fetch_rides():
 
     # check for new bikes
     db.find_new_bikes(db_path)
-    
+
     return render_template('index.html')
+
+
+@app.route('/part_averages', methods=['GET', 'POST'])
+def part_averages():
+    avgs = db.get_part_averages(db_path)
+    return render_template('part_averages.html', avgs=avgs)
 
 
 ###########################################################################
