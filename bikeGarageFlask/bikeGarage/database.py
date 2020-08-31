@@ -140,16 +140,6 @@ def get_all_ride_ids(db_path):
     return (id_list, max_dt)
 
 
-def edit_entry(db_path, sql, values):
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(sql, values)
-
-
-def replace_part(old_part=None):
-    """Function not yet implemented"""
-    pass
-
-
 def add_part(db_path, part_values):
     with sqlite3.connect(db_path) as conn:
         conn.execute("""INSERT INTO parts (
