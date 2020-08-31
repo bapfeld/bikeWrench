@@ -228,15 +228,24 @@ def add_part():
                 model = None
         except:
             model = None
+        try:
+            retire = int(request.args['retire'])
+            retired_part = request.args['part_id']
+        except:
+            retire = 0
+            retired_part = None
         added = datetime.datetime.today().strftime('%Y-%m-%d')
         return render_template('add_part.html', bike_id=b_id,
                                part_type=part_type, brand=brand, weight=weight,
-                               size=size, model=model, added=added)
+                               size=size, model=model, added=added, retire=retire,
+                               retired_part=retired_part)
 
 
 @app.route('/add_part_success', methods=['GET', 'POST'])
 def add_part_success():
     if request.method == 'POST':
+        retire = request.form.get('retire')
+        retired_part = request.form.get('retired_part')
         part_type = request.form.get('p_type')
         if part_type in ['None', '']:
             part_type = None
@@ -266,6 +275,8 @@ def add_part_success():
         vals = (part_type, added, brand, price, weight, size,
                 model, bike, 'TRUE')
         db.add_part(db_path, vals)
+        if int(retire) == 1:
+            db.retire(db_path, retired_part, added)
         return bikes()
 
 

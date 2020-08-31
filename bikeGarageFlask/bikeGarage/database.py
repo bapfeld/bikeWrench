@@ -386,3 +386,30 @@ def get_part_averages(db_path, part_type):
         elev = None
 
     return (price, weight, in_use, dist, elev)
+
+
+def retire(db_path, retired_part, date_retired):
+    q1 = f"""UPDATE parts 
+             SET retired = '{date_retired}'
+             WHERE part_id = '{retired_part}'
+          """
+    q2 = f"""SELECT * FROM parts WHERE part_id = '{retired_part}'"""
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(q1)
+        c.execute(q2)
+        p = c.fetchone()
+        q3 = f"""SELECT SUM(distance), SUM(elev)
+                 FROM rides
+                 WHERE bike = '{p[8]}'
+                 AND date >= '{p[2]}'
+                 AND date <= '{p[9]}'"""
+        c.execute(q3)
+        part_summary = c.fetchone()
+        res_out = list(p) + list(part_summary)
+        q4 = """INSERT INTO retired_parts
+                    (part_id, type, added, brand, price, weight,
+                     size, model, bike, retired, dist, elev)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+             """
+        c.execute(q4, res_out)
