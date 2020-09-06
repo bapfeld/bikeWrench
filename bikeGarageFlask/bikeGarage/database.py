@@ -1,7 +1,6 @@
 import sqlite3
 import datetime
 import dateparser
-import numpy as np
 from stravalib import unithelper
 
 
