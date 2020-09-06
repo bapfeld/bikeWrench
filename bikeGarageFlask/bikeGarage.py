@@ -63,9 +63,21 @@ def rider():
 
 @app.route('/edit_rider', methods=['GET', 'POST'])
 def edit_rider():
-    res = db.get_rider_info(db_path)
-    speed_unit, dist_unit, elev_unit = units_text(res[1])
-    return render_template('edit_rider.html', rider=res[0], units=res[1])
+    if request.method == 'GET':
+        res = db.get_rider_info(db_path)
+        speed_unit, dist_unit, elev_unit = units_text(res[1])
+        return render_template('edit_rider.html', rider=res[0], units=res[1])
+    elif request.method == 'POST':
+        res = db.get_rider_info(db_path)
+        current_nm = res[0]
+        nm = request.form.get('rider_name')
+        units = request.form.get('units')
+        if (nm in ['None', '']) or nm is None:
+            nm = current_nm
+        if (units in ['None', '']) or units is None:
+            units = res[1]
+        db.update_rider(current_nm, nm, units, db_path)
+        return rider()
 
 
 @app.route('/edit_bike', methods=['GET', 'POST'])
@@ -113,21 +125,6 @@ def edit_part():
         db.update_part(p_id, p_type, added, brand, price, weight,
                        size, model, db_path)
         return part(p_id)
-
-
-@app.route('/edit_rider_success', methods=['GET', 'POST'])
-def edit_rider_success():
-    if request.method == 'POST':
-        res = db.get_rider_info(db_path)
-        current_nm = res[0]
-        nm = request.form.get('rider_name')
-        units = request.form.get('units')
-        if (nm in ['None', '']) or nm is None:
-            nm = current_nm
-        if (units in ['None', '']) or units is None:
-            units = res[1]
-        db.update_rider(current_nm, nm, units, db_path)
-        return rider()
 
 
 @app.route('/edit_bike_success', methods=['GET', 'POST'])
