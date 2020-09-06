@@ -7,7 +7,7 @@ from stravalib.client import Client
 # from wtforms import (Form, TextField, TextAreaField,
 #                      validators, StringField, SubmitField)
 from bikeGarage import database as db
-from bikeGarage.strava_funcs import fetch_new_activities
+from bikeGarage.strava_funcs import stravaConnection
 
 
 ###########################################################################
@@ -327,17 +327,13 @@ def add_maintenance():
 
 @app.route('/fetch_rides', methods=['GET'])
 def fetch_rides():
-    # establish client
-    cl = Client()
-
     # get rider info
     res = db.get_rider_info(db_path)
-    cl.refresh_token = res[2]
-    cl.expires_at = res[3]
 
     # run updater
-    new_activities = fetch_new_activities(cl, client_id, client_secret,
-                                          code, db_path, res[0])
+    s = stravaConnection(client_id, client_secret, code, db_path, res)
+    s.fetch_new_activities()
+
     if new_activities is not None:
         db.add_multiple_rides(db_path, new_activities)
 
