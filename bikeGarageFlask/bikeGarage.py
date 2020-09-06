@@ -192,54 +192,53 @@ def part(p_id=None):
 
 @app.route('/add_part', methods=['GET', 'POST'])
 def add_part():
-    if 'bike_id' in request.args:
-        b_id = request.args['bike_id']
-        try:
-            part_type = request.args['tp']
-            if part_type in ['None', '']:
+    if request.method == 'GET':
+        if 'bike_id' in request.args:
+            b_id = request.args['bike_id']
+            try:
+                part_type = request.args['tp']
+                if part_type in ['None', '']:
+                    part_type = None
+            except:
                 part_type = None
-        except:
-            part_type = None
-        try:
-            brand = request.args['brand']
-            if brand in ['None', '']:
+            try:
+                brand = request.args['brand']
+                if brand in ['None', '']:
+                    brand = None
+            except:
                 brand = None
-        except:
-            brand = None
-        try:
-            weight = request.args['weight']
-            if weight in ['None', '']:
+            try:
+                weight = request.args['weight']
+                if weight in ['None', '']:
+                    weight = None
+            except:
                 weight = None
-        except:
-            weight = None
-        try:
-            size = request.args['size']
-            if size in ['None', '']:
+            try:
+                size = request.args['size']
+                if size in ['None', '']:
+                    size = None
+            except:
                 size = None
-        except:
-            size = None
-        try:
-            model = request.args['model']
-            if model in ['None', '']:
+            try:
+                model = request.args['model']
+                if model in ['None', '']:
+                    model = None
+            except:
                 model = None
-        except:
-            model = None
-        try:
-            retire = int(request.args['retire'])
-            retired_part = request.args['part_id']
-        except:
-            retire = 0
-            retired_part = None
-        added = datetime.datetime.today().strftime('%Y-%m-%d')
-        return render_template('add_part.html', bike_id=b_id,
-                               part_type=part_type, brand=brand, weight=weight,
-                               size=size, model=model, added=added, retire=retire,
-                               retired_part=retired_part)
-
-
-@app.route('/add_part_success', methods=['GET', 'POST'])
-def add_part_success():
-    if request.method == 'POST':
+            try:
+                retire = int(request.args['retire'])
+                retired_part = request.args['part_id']
+            except:
+                retire = 0
+                retired_part = None
+            added = datetime.datetime.today().strftime('%Y-%m-%d')
+            return render_template('add_part.html', bike_id=b_id,
+                                   part_type=part_type, brand=brand, weight=weight,
+                                   size=size, model=model, added=added, retire=retire,
+                                   retired_part=retired_part)
+        else:
+            return render_template('404.html')
+    elif request.method == 'POST':
         retire = request.form.get('retire')
         retired_part = request.form.get('retired_part')
         part_type = request.form.get('p_type')
