@@ -78,16 +78,15 @@ def edit_bike():
 
 @app.route('/edit_part', methods=['GET', 'POST'])
 def edit_part():
-    if 'id' in request.args:
-        p_id = request.args['id']
-        part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
-        return render_template('edit_part.html', part_details=part_details,
-                               part_id=p_id, bike_name=b_nm)
-
-
-@app.route('/edit_part_success', methods=['GET', 'POST'])
-def edit_part_success():
-    if request.method == 'POST':
+    if request.method == 'GET':
+        if 'id' in request.args:
+            p_id = request.args['id']
+            part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
+            return render_template('edit_part.html', part_details=part_details,
+                                   part_id=p_id, bike_name=b_nm)
+        else:
+            return render_template('404.html')
+    elif request.method == 'POST':
         p_id = request.form.get('id')
         part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
         p_type = request.form.get('p_type')
@@ -113,7 +112,7 @@ def edit_part_success():
             model = part_details[7]
         db.update_part(p_id, p_type, added, brand, price, weight,
                        size, model, db_path)
-        return bikes()
+        return part(p_id)
 
 
 @app.route('/edit_rider_success', methods=['GET', 'POST'])
