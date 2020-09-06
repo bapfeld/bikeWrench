@@ -78,11 +78,11 @@ def update_bike(b_id, nm, color, purchase, price, mfg, db_path):
         c.execute(q)
 
 
-def update_part(p_id, p_type, purchase, brand, price, weight,
+def update_part(p_id, p_type, added, brand, price, weight,
                 size, model, db_path):
     q = f"""UPDATE parts
             SET type = '{p_type}',
-                purchased = '{purchase}',
+                added = '{added}',
                 brand = '{brand}',
                 price = '{price}',
                 weight = '{weight}',
