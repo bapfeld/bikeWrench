@@ -277,14 +277,10 @@ def add_part():
 
 @app.route('/add_bike', methods=['GET', 'POST'])
 def add_bike():
-    if request.method == 'POST':
+    if request.method == 'GET':
         b_id = request.args['id']
         return render_template('add_bike.html', bike_id=b_id)
-
-
-@app.route('/add_bike_success', methods=['GET', 'POST'])
-def add_bike_success():
-    if request.method == 'POST':
+    elif request.method == 'POST':
         nm = request.form.get('nm')
         if nm in ['None', '']:
             nm = None
@@ -306,7 +302,7 @@ def add_bike_success():
         if b_id in ['None', '']:
             b_id = None
         db.add_new_bike(db_path, b_id, nm, color, purchase, price, mfg)
-        return bikes()
+        return bikes()        
 
 
 @app.route('/add_maintenance', methods=['GET', 'POST'])
