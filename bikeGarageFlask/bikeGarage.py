@@ -1,13 +1,14 @@
 import os
 import datetime
 import dateparser
+import keyring
 from dotenv import load_dotenv, find_dotenv
 from flask import Flask, render_template, request, url_for
 from stravalib.client import Client
 # from wtforms import (Form, TextField, TextAreaField,
 #                      validators, StringField, SubmitField)
 from bikeGarage import database as db
-from bikeGarage.strava_funcs import stravaConnection
+from bikeGarage.strava_funcs import stravaConnection, generate_auth_url
 
 
 ###########################################################################
@@ -20,7 +21,7 @@ bdr = os.environ.get('BDR')
 schema_path = os.environ.get('SCHEMA_PATH')
 client_id = os.environ.get('STRAVA_CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
-code = os.environ.get('STRAVA_APPLICATION_CODE')
+code = keyring.get_password('bikeGarage', 'code')
 
 
 ###########################################################################
@@ -347,6 +348,19 @@ def fetch_rides():
 def part_averages():
     avgs = db.get_part_averages(db_path)
     return render_template('part_averages.html', avgs=avgs)
+
+
+@app.route('/strava_funcs', methods=['GET', 'POST'])
+def strava_funcs():
+    auth_url = generate_auth_url(client_id)
+    return render_template('strava_funcs.html', auth_url=auth_url)
+
+
+@app.route('/strava_auth', methods=['GET'])
+def strava_auth():
+    code = request.args['code']
+    keyring.set_password('bikeGarage', 'code', code)
+    return render_template('index.html')
 
 
 ###########################################################################

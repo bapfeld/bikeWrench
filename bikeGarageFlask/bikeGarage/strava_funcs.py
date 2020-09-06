@@ -71,3 +71,10 @@ class stravaConnection():
         else:
             new_activities = None
         return new_activities
+
+
+def generate_auth_url(client_id):
+    client = Client()
+    url = client.authorization_url(client_id=client_id,
+                                   redirect_uri='http://127.0.0.1:5002/strava_auth')
+    return url
