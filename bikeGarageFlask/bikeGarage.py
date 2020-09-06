@@ -82,10 +82,34 @@ def edit_rider():
 
 @app.route('/edit_bike', methods=['GET', 'POST'])
 def edit_bike():
-    if 'id' in request.args:
-        b_id = request.args['id']
-        bike_details = db.get_bike_details(db_path, b_id)
-        return render_template('edit_bike.html', bike_details=bike_details)
+    if request.method == 'GET':
+        if 'id' in request.args:
+            b_id = request.args['id']
+            bike_details = db.get_bike_details(db_path, b_id)
+            return render_template('edit_bike.html', bike_details=bike_details)
+        else:
+            return render_template('404.html')
+    elif request.method == 'POST':
+        bike_details = db.get_bike_details(db_path, request.form.get('id'))
+        nm = request.form.get('bike_name')
+        color = request.form.get('color')
+        purchase = request.form.get('purchase')
+        price = request.form.get('price')
+        mfg = request.form.get('mfg')
+        if (nm in ['None', '']) or nm is None:
+            nm = bike_details[1]
+        if (color in ['None', '']) or color is None:
+            color = bike_details[2]
+        if (purchase in ['None', '']) or purchase is None:
+            purchase = bike_details[3]
+        if (price in ['None', '']) or price is None:
+            price = bike_details[4]
+        if (mfg in ['None', '']) or mfg is None:
+            mfg = bike_details[1]
+        db.update_bike(bike_details[0], nm, color, purchase, price,
+                       mfg, db_path)
+        return bike(bike_detail[0])
+        
 
 
 @app.route('/edit_part', methods=['GET', 'POST'])
@@ -127,30 +151,6 @@ def edit_part():
         return part(p_id)
 
 
-@app.route('/edit_bike_success', methods=['GET', 'POST'])
-def edit_bike_success():
-    if request.method == 'POST':
-        bike_details = db.get_bike_details(db_path, request.form.get('id'))
-        nm = request.form.get('bike_name')
-        color = request.form.get('color')
-        purchase = request.form.get('purchase')
-        price = request.form.get('price')
-        mfg = request.form.get('mfg')
-        if (nm in ['None', '']) or nm is None:
-            nm = bike_details[1]
-        if (color in ['None', '']) or color is None:
-            color = bike_details[2]
-        if (purchase in ['None', '']) or purchase is None:
-            purchase = bike_details[3]
-        if (price in ['None', '']) or price is None:
-            price = bike_details[4]
-        if (mfg in ['None', '']) or mfg is None:
-            mfg = bike_details[1]
-        db.update_bike(bike_details[0], nm, color, purchase, price,
-                       mfg, db_path)
-        return bikes()
-
-
 @app.route('/bikes', methods=['GET', 'POST'])
 def bikes():
     res = db.get_all_bikes(db_path)
@@ -158,20 +158,20 @@ def bikes():
 
 
 @app.route('/bike', methods=['GET', 'POST'])
-def bike():
+def bike(b_id=None):
     if 'id' in request.args:
-        res = db.get_rider_info(db_path)
         b_id = request.args['id']
-        deets = db.get_bike_details(db_path, b_id)
-        parts = db.get_all_bike_parts(db_path, b_id)
-        part_ids = [p[0] for p in parts]
-        maint = db.get_maintenance(db_path, part_ids)
-        stats = db.get_ride_data_for_bike(db_path, b_id)
-        speed_unit, dist_unit, elev_unit = units_text(res[1])
-        return render_template('bike.html', parts=parts, bike_details=deets,
-                               stats=stats, speed_unit=speed_unit,
-                               dist_unit=dist_unit, elev_unit=elev_unit,
-                               maint=maint)
+    res = db.get_rider_info(db_path)
+    deets = db.get_bike_details(db_path, b_id)
+    parts = db.get_all_bike_parts(db_path, b_id)
+    part_ids = [p[0] for p in parts]
+    maint = db.get_maintenance(db_path, part_ids)
+    stats = db.get_ride_data_for_bike(db_path, b_id)
+    speed_unit, dist_unit, elev_unit = units_text(res[1])
+    return render_template('bike.html', parts=parts, bike_details=deets,
+                           stats=stats, speed_unit=speed_unit,
+                           dist_unit=dist_unit, elev_unit=elev_unit,
+                           maint=maint)
 
 
 @app.route('/part', methods=['GET', 'POST'])
