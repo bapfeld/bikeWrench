@@ -91,10 +91,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <!-- Basic statistics -->
-            <div class="row">
+                <!-- Basic statistics -->
                 <div class="col">
                     <table class="table table-hover table-sm">
                         <tbody>
@@ -108,6 +105,31 @@
                             <tr><td><b>Total calories</b>:</td> <td>{{ stats[7] }}</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Update stats -->
+                <div class="col">
+                    <h4>Update stats</h4>
+                    <p>Use these input boxes to change the date range used to compile bike statistics </p>
+                    <form action="{{ url_for('bike') }}" method="POST" role="form">
+                        <!-- start date -->
+                        <div class="text-left form-group">
+                            <span class="lead">Start Date:</span>
+                            <input class="form-control" type="text" for="start_date" name="start_date" destination="start_date">
+                        </div>
+                        <!-- end date -->
+                        <div class="text-left form-group">
+                            <span class="lead">End Date:</span>
+                            <input class="form-control" type="text" for="end_date" name="end_date" destination="end_date">
+                        </div>
+                        <!-- hidden label for bike id -->
+                        <div class="col text-center form-group">
+                            <input type="hidden" name="bike_id" destination="bike_id" value="{{ bike_details[0] }}">
+                        </div>
+
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">Refresh Details</button>
+                    </form>
                 </div>
             </div>
 

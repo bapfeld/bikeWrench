@@ -160,14 +160,31 @@ def bikes():
 
 @app.route('/bike', methods=['GET', 'POST'])
 def bike(b_id=None):
-    if 'id' in request.args:
+    if request.method == 'GET':
         b_id = request.args['id']
+        start_date = None
+        end_date = None
+    elif request.method == 'POST':
+        b_id = request.form.get('bike_id')
+        start_date = request.form.get('start_date')
+        if start_date in ['None', '']:
+            start_date = None
+        else:
+            start_date = dateparser.parse(start_date).strftime('%Y-%m-%d')
+        end_date = request.form.get('end_date')
+        if end_date in ['None', '']:
+            end_date = None
+        else:
+            end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
+    else:
+        start_date = None
+        end_date = None
     res = db.get_rider_info(db_path)
     deets = db.get_bike_details(db_path, b_id)
     parts = db.get_all_bike_parts(db_path, b_id)
     part_ids = [p[0] for p in parts]
     maint = db.get_maintenance(db_path, part_ids)
-    stats = db.get_ride_data_for_bike(db_path, b_id)
+    stats = db.get_ride_data_for_bike(db_path, b_id, start_date, end_date)
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('bike.html', parts=parts, bike_details=deets,
                            stats=stats, speed_unit=speed_unit,
@@ -177,13 +194,31 @@ def bike(b_id=None):
 
 @app.route('/part', methods=['GET', 'POST'])
 def part(p_id=None):
-    if 'id' in request.args:
+    end_date = None
+    start_date = None
+    if request.method == 'GET':
         p_id = request.args['id']
+    elif request.method == 'POST':
+        p_id = request.form.get('part_id')
+        start_date = request.form.get('start_date')
+        if start_date in ['None', '']:
+            start_date = None
+        else:
+            start_date = dateparser.parse(start_date).strftime('%Y-%m-%d')
+        end_date = request.form.get('end_date')
+        if end_date in ['None', '']:
+            end_date = None
+        else:
+            end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
     part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
     early_date = part_details[2]
     late_date = part_details[9]
     if (late_date in ['None', '']) or late_date is None:
         late_date = datetime.datetime.today().strftime("%Y-%m-%d")
+    if end_date is not None:
+        late_date = min([max([end_date, early_date]), late_date])
+    if start_date is not None:
+        early_date = max([min([start_date, late_date]), early_date])
     stats = db.get_ride_data_for_part(db_path, b_id, early_date, late_date)
     maint = db.get_maintenance(db_path, list(p_id))
     return render_template('part.html', bike_name=b_nm,

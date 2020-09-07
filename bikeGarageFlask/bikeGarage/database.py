@@ -191,7 +191,7 @@ def get_all_ride_data(db_path):
     return all_rides
 
 
-def get_ride_data_for_bike(db_path, bike_id):
+def get_ride_data_for_bike(db_path, bike_id, start_date=None, end_date=None):
     query = f"""SELECT SUM(distance) AS dist,
                        MIN(date) AS earliest_ride,
                        MAX(date) AS recent_ride,
@@ -202,6 +202,10 @@ def get_ride_data_for_bike(db_path, bike_id):
                        SUM(calories) AS calories
                 FROM rides
                 WHERE bike = '{bike_id}'"""
+    if start_date is not None:
+        query += f" AND date >= '{start_date}'"
+    if end_date is not None:
+        query += f" AND date <= '{end_date}'"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
