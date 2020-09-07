@@ -109,6 +109,8 @@ def edit_bike():
             color = bike_details[2]
         if (purchase in ['None', '']) or purchase is None:
             purchase = bike_details[3]
+        else:
+            purchase = dateparser.parse(purchase).strftime("%Y-%m-%d")
         if (price in ['None', '']) or price is None:
             price = bike_details[4]
         if (mfg in ['None', '']) or mfg is None:
