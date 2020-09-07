@@ -75,14 +75,16 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">Part Stats</h2>
+                <h1>Part Stats</h1>
                 <p class="lead">Here are some statistics about retired parts</p>
             </div>
 
             <!-- Table with the parts -->
             <div class="row">
+                <div class="col-sm-2">
+                </div>
                 <!-- Left column with table -->
-                <div class="col">
+                <div class="col-sm-8">
                     <table class="table table-hover">
                         <thead> <tr><th>Type</th><th>Price</th><th>Weight</th><th>Distance</th><th>Elevation</th><th>Time in use</th></tr>
                         </thead>
@@ -92,6 +94,8 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+                <div class="col-sm-2">
                 </div>
             </div>
         </div>
