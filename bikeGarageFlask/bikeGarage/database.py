@@ -174,7 +174,7 @@ def get_maintenance(db_path, part_ids):
     for p in part_ids:
         query += f"'{p}', "
     query = query.strip(', ')
-    query += ');'
+    query += ') ORDER BY date desc;'
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
