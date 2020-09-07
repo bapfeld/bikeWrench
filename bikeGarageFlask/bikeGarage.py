@@ -21,7 +21,7 @@ bdr = os.environ.get('BDR')
 schema_path = os.environ.get('SCHEMA_PATH')
 client_id = os.environ.get('STRAVA_CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
-code = keyring.get_password('bikeGarage', 'code')
+app_code = keyring.get_password('bikeGarage', 'code')
 
 
 ###########################################################################
@@ -387,16 +387,19 @@ def fetch_rides():
     res = db.get_rider_info(db_path)
 
     # run updater
-    s = stravaConnection(client_id, client_secret, code, db_path, res)
-    s.fetch_new_activities()
+    s = stravaConnection(client_id, client_secret, app_code, db_path, res)
+    new_activities = s.fetch_new_activities()
 
     if new_activities is not None:
         db.add_multiple_rides(db_path, new_activities)
+        msg = f'{len(new_activities)} new activities added!'
+    else:
+        msg = "No new activities found. Go ride your bike!"
 
     # check for new bikes
     db.find_new_bikes(db_path)
 
-    return render_template('index.html')
+    return render_template('index.html', msg=msg)
 
 
 @app.route('/part_averages', methods=['GET', 'POST'])

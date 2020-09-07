@@ -313,7 +313,7 @@ def find_new_bikes(db_path):
         c.execute(q)
         res = c.fetchall()
 
-    new_bikes = [x[0] for x in res if x[0] not in list(all_bike_ids.keys())]
+    new_bikes = [x[0] for x in res if x[0] not in all_bike_ids]
     if len(new_bikes) > 0:
         b_list = [(b, f'tmp_nm_{b}') for b in new_bikes]
         with sqlite3.connect(db_path) as conn:
