@@ -75,69 +75,79 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">Edit part</h2>
+                <h1>Edit part</h1>
                 <p class="lead">Edit details for {{ part_details[1] }} on bike {{ bike_name }}:</p>
             </div>
             <div>
-                <form action="{{ url_for('edit_part') }}" method="POST" role="form">
-                    <!-- part type -->
-                    <div class="text-left form-group">
-                        <span class="lead">Part type:</span>
-                        <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_details[1] }}">
+                <div class="row">
+                    <div class="col-sm-2">
                     </div>
+                    <div class="col-sm-8">
+                        <form action="{{ url_for('edit_part') }}" method="POST" role="form">
+                            <!-- part type -->
+                            <div class="text-left form-group">
+                                <span class="lead">Part type:</span>
+                                <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_details[1] }}">
+                            </div>
 
-                    <!-- purchase date -->
-                    <div class="text-left form-group">
-                        <span class="lead">Date added:</span>
-                        <input class="form-control" type="text" for="added" name="added" destination="added" placeholder="{{ part_details[2] }}">
+                            <!-- purchase date -->
+                            <div class="text-left form-group">
+                                <span class="lead">Date added:</span>
+                                <input class="form-control" type="text" for="added" name="added" destination="added" placeholder="{{ part_details[2] }}">
+                            </div>
+
+                            <!-- brand -->
+                            <div class="text-left form-group">
+                                <span class="lead">Brand:</span>
+                                <input class="form-control" type="text" for="brand" name="brand" destination="brand" placeholder="{{ part_details[3] }}">
+                            </div>
+
+                            <!-- price -->
+                            <div class="text-left form-group">
+                                <span class="lead">Price:</span>
+                                <input class="form-control" type="text" for="price" name="price" destination="price" placeholder="{{ part_details[4] }}">
+                            </div>
+
+                            <!-- weight -->
+                            <div class="text-left form-group">
+                                <span class="lead">Weight:</span>
+                                <input class="form-control" type="text" for="weight" name="weight" destination="weight" placeholder="{{ part_details[5] }}">
+                            </div>
+
+                            <!-- size -->
+                            <div class="text-left form-group">
+                                <span class="lead">Size:</span>
+                                <input class="form-control" type="text" for="size" name="size" destination="size" placeholder="{{ part_details[6] }}">
+                            </div>
+
+                            <!-- model -->
+                            <div class="text-left form-group">
+                                <span class="lead">Model:</span>
+                                <input class="form-control" type="text" for="model" name="model" destination="model" placeholder="{{ part_details[7] }}">
+                            </div>
+
+                            <!-- hidden label for bike id -->
+                            <div class="col text-center form-group">
+                                <input type="hidden" name="id" destination="id" value="{{ part_id }}">
+                            </div>
+                            
+                            
+
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">Update part info</button>
+                        </form>
                     </div>
-
-                    <!-- brand -->
-                    <div class="text-left form-group">
-                        <span class="lead">Brand:</span>
-                        <input class="form-control" type="text" for="brand" name="brand" destination="brand" placeholder="{{ part_details[3] }}">
-                    </div>
-
-                    <!-- price -->
-                    <div class="text-left form-group">
-                        <span class="lead">Price:</span>
-                        <input class="form-control" type="text" for="price" name="price" destination="price" placeholder="{{ part_details[4] }}">
-                    </div>
-
-                    <!-- weight -->
-                    <div class="text-left form-group">
-                        <span class="lead">Weight:</span>
-                        <input class="form-control" type="text" for="weight" name="weight" destination="weight" placeholder="{{ part_details[5] }}">
-                    </div>
-
-                    <!-- size -->
-                    <div class="text-left form-group">
-                        <span class="lead">Size:</span>
-                        <input class="form-control" type="text" for="size" name="size" destination="size" placeholder="{{ part_details[6] }}">
-                    </div>
-
-                    <!-- model -->
-                    <div class="text-left form-group">
-                        <span class="lead">Model:</span>
-                        <input class="form-control" type="text" for="model" name="model" destination="model" placeholder="{{ part_details[7] }}">
-                    </div>
-
-                    <!-- hidden label for bike id -->
-                    <div class="col text-center form-group">
-                        <input type="hidden" name="id" destination="id" value="{{ part_id }}">
-                    </div>
-                   
-                    
-
-                    <!-- Submit button -->
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Update part info</button>
-                </form>
+                </div>
             </div>
 
             <!-- Buttons at bottom -->
             <div class="row">
-                <div class="col text-center" style="margin-top:.5cm;">
+                <div class="col-sm-2">
+                </div>
+                <div class="col col-sm-8 text-center" style="margin-top:.5cm;">
                     <a class="btn btn-secondary btn-lg btn-block" role="button" href="/part?id={{ part_id }}"> Cancel (return to part info) </a>
+                </div>
+                <div class="col-sm-2">
                 </div>
             </div>
         </div>

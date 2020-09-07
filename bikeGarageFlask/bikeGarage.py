@@ -145,6 +145,8 @@ def edit_part():
             p_type = part_details[1]
         if (added in ['None', '']) or added is None:
             added = part_details[2]
+        else:
+            added = dateparser.parse(added).strftime('%Y-%m-%d')
         if (brand in ['None', '']) or brand is None:
             brand = part_details[3]
         if (price in ['None', '']) or price is None:
