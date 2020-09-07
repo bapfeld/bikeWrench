@@ -115,7 +115,7 @@ def edit_bike():
             mfg = bike_details[1]
         db.update_bike(bike_details[0], nm, color, purchase, price,
                        mfg, db_path)
-        return bike(bike_detail[0])
+        return bike(bike_details[0])
         
 
 
@@ -169,7 +169,10 @@ def bikes():
 @app.route('/bike', methods=['GET', 'POST'])
 def bike(b_id=None):
     bike_list = db.get_all_bikes(db_path)
-    if request.method == 'GET':
+    if b_id is not None:
+        start_date = None
+        end_date = None
+    elif request.method == 'GET':
         b_id = request.args['id']
         start_date = None
         end_date = None
