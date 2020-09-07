@@ -75,19 +75,23 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">{{ rider }}</h2>
+                <h1>{{ rider }}</h1>
                 <p class="lead">Edit details for {{ rider }}:</p>
             </div>
             <div>
-                <form action="{{ url_for('edit_rider') }}" method="POST" role="form">
-                    <!-- rider name -->
-                    <div class="text-left form-group">
-                        <span class="lead">Rider name:</span>
-                        <input class="form-control" type="text" for="rider_name" name="rider_name" destination="rider_name" placeholder="{{ rider }}">
+                <div class="row">
+                    <div class="col-sm-2">
                     </div>
+                    <div class="col-sm-8">
+                        <form action="{{ url_for('edit_rider') }}" method="POST" role="form">
+                            <!-- rider name -->
+                            <div class="text-left form-group">
+                                <span class="lead">Rider name:</span>
+                                <input class="form-control" type="text" for="rider_name" name="rider_name" destination="rider_name" placeholder="{{ rider }}">
+                        </div>
 
-                    
-                    <!-- units -->
+                        
+                        <!-- units -->
                     <div class="form-group">
                         <span class="lead">Unit type preference:</span>
                         <div class="form-check">
@@ -106,13 +110,21 @@
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Update rider info</button>
-                </form>
+                    </form>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
             </div>
 
             <!-- Buttons at bottom -->
             <div class="row">
-                <div class="col text-center" style="margin-top:.5cm;">
+                <div class="col-sm-2">
+                </div>
+                <div class="col col-sm-8 text-center" style="margin-top:.5cm;">
                     <a class="btn btn-secondary btn-lg btn-block" role="button" href="/rider"> Cancel (return to rider info) </a>
+                </div>
+                <div class="col-sm-2">
                 </div>
             </div>
         </div>
