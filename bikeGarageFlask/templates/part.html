@@ -42,7 +42,9 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="/bikes">Bike list</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Add new bike</a>
+                            {% for b in bike_menu_list %}
+                            <a class="dropdown-item" href="/bike?id={{ b[0] }}">{{ b[1] }}</a>
+                            {% endfor %}
                         </div>
                     </li>
                     <!-- Parts dropdown menu -->

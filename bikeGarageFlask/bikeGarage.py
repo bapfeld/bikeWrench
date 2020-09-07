@@ -49,25 +49,29 @@ def units_text(unit_type):
 ###########################################################################
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    bike_list = db.get_all_bikes(db_path)
+    return render_template('index.html', bike_menu_list=bike_list)
 
 
 @app.route('/rider', methods=['GET', 'POST'])
 def rider():
     res = db.get_rider_info(db_path)
+    bike_list = db.get_all_bikes(db_path)
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('rider.html', rider=res[0], max_speed=res[4],
                            avg_speed=res[5], tot_dist=res[6], tot_climb=res[7],
                            speed_unit=speed_unit, dist_unit=dist_unit,
-                           elev_unit=elev_unit)
+                           elev_unit=elev_unit, bike_menu_list=bike_list)
 
 
 @app.route('/edit_rider', methods=['GET', 'POST'])
 def edit_rider():
+    bike_list = db.get_all_bikes(db_path)
     if request.method == 'GET':
         res = db.get_rider_info(db_path)
         speed_unit, dist_unit, elev_unit = units_text(res[1])
-        return render_template('edit_rider.html', rider=res[0], units=res[1])
+        return render_template('edit_rider.html', rider=res[0], units=res[1],
+                               bike_menu_list=bike_list)
     elif request.method == 'POST':
         res = db.get_rider_info(db_path)
         current_nm = res[0]
@@ -83,11 +87,13 @@ def edit_rider():
 
 @app.route('/edit_bike', methods=['GET', 'POST'])
 def edit_bike():
+    bike_list = db.get_all_bikes(db_path)
     if request.method == 'GET':
         if 'id' in request.args:
             b_id = request.args['id']
             bike_details = db.get_bike_details(db_path, b_id)
-            return render_template('edit_bike.html', bike_details=bike_details)
+            return render_template('edit_bike.html', bike_details=bike_details,
+                                   bike_menu_list=bike_list)
         else:
             return render_template('404.html')
     elif request.method == 'POST':
@@ -115,12 +121,14 @@ def edit_bike():
 
 @app.route('/edit_part', methods=['GET', 'POST'])
 def edit_part():
+    bike_list = db.get_all_bikes(db_path)
     if request.method == 'GET':
         if 'id' in request.args:
             p_id = request.args['id']
             part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
             return render_template('edit_part.html', part_details=part_details,
-                                   part_id=p_id, bike_name=b_nm)
+                                   part_id=p_id, bike_name=b_nm,
+                                   bike_menu_list=bike_list)
         else:
             return render_template('404.html')
     elif request.method == 'POST':
@@ -155,11 +163,12 @@ def edit_part():
 @app.route('/bikes', methods=['GET', 'POST'])
 def bikes():
     res = db.get_all_bikes(db_path)
-    return render_template('bikes.html', bikes=res)
+    return render_template('bikes.html', bikes=res, bike_menu_list=res)
 
 
 @app.route('/bike', methods=['GET', 'POST'])
 def bike(b_id=None):
+    bike_list = db.get_all_bikes(db_path)
     if request.method == 'GET':
         b_id = request.args['id']
         start_date = None
@@ -189,11 +198,12 @@ def bike(b_id=None):
     return render_template('bike.html', parts=parts, bike_details=deets,
                            stats=stats, speed_unit=speed_unit,
                            dist_unit=dist_unit, elev_unit=elev_unit,
-                           maint=maint)
+                           maint=maint, bike_menu_list=bike_list)
 
 
 @app.route('/part', methods=['GET', 'POST'])
 def part(p_id=None):
+    bike_list = db.get_all_bikes(db_path)
     end_date = None
     start_date = None
     if request.method == 'GET':
@@ -223,11 +233,13 @@ def part(p_id=None):
     maint = db.get_maintenance(db_path, list(p_id))
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,
-                           stats=stats, bike_id=b_id)
+                           stats=stats, bike_id=b_id,
+                           bike_menu_list=bike_list)
 
 
 @app.route('/add_part', methods=['GET', 'POST'])
 def add_part():
+    bike_list = db.get_all_bikes(db_path)
     if request.method == 'GET':
         if 'bike_id' in request.args:
             b_id = request.args['bike_id']
@@ -271,7 +283,8 @@ def add_part():
             return render_template('add_part.html', bike_id=b_id,
                                    part_type=part_type, brand=brand, weight=weight,
                                    size=size, model=model, added=added, retire=retire,
-                                   retired_part=retired_part)
+                                   retired_part=retired_part,
+                                   bike_menu_list=bike_list)
         else:
             return render_template('404.html')
     elif request.method == 'POST':
@@ -315,7 +328,9 @@ def add_part():
 def add_bike():
     if request.method == 'GET':
         b_id = request.args['id']
-        return render_template('add_bike.html', bike_id=b_id)
+        bike_list = db.get_all_bikes(db_path)
+        return render_template('add_bike.html', bike_id=b_id,
+                               bike_menu_list=bike_list)
     elif request.method == 'POST':
         nm = request.form.get('nm')
         if nm in ['None', '']:
@@ -344,9 +359,11 @@ def add_bike():
 @app.route('/add_maintenance', methods=['GET', 'POST'])
 def add_maintenance():
     dt = datetime.datetime.today().strftime('%Y-%m-%d')
+    bike_list = db.get_all_bikes(db_path)
     if request.method == 'GET':
         p_id = request.args['id']
-        return render_template('add_maintenance.html', part_id=p_id, dt=dt)
+        return render_template('add_maintenance.html', part_id=p_id, dt=dt,
+                               bike_menu_list=bike_list)
     elif request.method == 'POST':
         p_id = request.form.get('p_id')
         new_dt = request.form.get('dt')
@@ -381,14 +398,18 @@ def fetch_rides():
 
 @app.route('/part_averages', methods=['GET', 'POST'])
 def part_averages():
+    bike_list = db.get_all_bikes(db_path)
     avgs = db.get_part_averages(db_path)
-    return render_template('part_averages.html', avgs=avgs)
+    return render_template('part_averages.html', avgs=avgs,
+                           bike_menu_list=bike_list)
 
 
 @app.route('/strava_funcs', methods=['GET', 'POST'])
 def strava_funcs():
+    bike_list = db.get_all_bikes(db_path)
     auth_url = generate_auth_url(client_id)
-    return render_template('strava_funcs.html', auth_url=auth_url)
+    return render_template('strava_funcs.html', auth_url=auth_url,
+                           bike_menu_list=bike_list)
 
 
 @app.route('/strava_auth', methods=['GET'])
