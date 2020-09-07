@@ -75,19 +75,23 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">Add part</h2>
+                <h1>Add part</h1>
                 <p class="lead">Add a new part</p>
             </div>
             <div>
-                <form action="{{ url_for('add_part') }}" method="POST" role="form">
-                    <!-- part type -->
-                    <div class="text-left form-group">
-                        <span class="lead">Part type:</span>
-                        <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_type }}">
+                <div class="row">
+                    <div class="col-sm-2">
                     </div>
+                    <div class="col-sm-8">
+                        <form action="{{ url_for('add_part') }}" method="POST" role="form">
+                            <!-- part type -->
+                            <div class="text-left form-group">
+                                <span class="lead">Part type:</span>
+                                <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_type }}">
+                            </div>
 
-                    <!-- added date -->
-                    <div class="text-left form-group">
+                            <!-- added date -->
+                            <div class="text-left form-group">
                         <span class="lead">Date added:</span>
                         <input class="form-control" type="text" for="added" name="added" destination="added" placeholder="{{ added }}">
                     </div>
@@ -139,7 +143,11 @@
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Add part</button>
-                </form>
+                        </form>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
             </div>
 
             <!-- Buttons at bottom -->

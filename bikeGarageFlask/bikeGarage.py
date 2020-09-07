@@ -324,7 +324,7 @@ def add_part():
         db.add_part(db_path, vals)
         if int(retire) == 1:
             db.retire(db_path, retired_part, added)
-        return bikes()
+        return bike(bike)
 
 
 @app.route('/add_bike', methods=['GET', 'POST'])
