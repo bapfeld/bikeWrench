@@ -75,39 +75,51 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">Add part maintenance</h2>
+                <h1>Add part maintenance</h1>
                 <p class="lead">Add a new maintenance record</p>
             </div>
             <div>
-                <form action="{{ url_for('add_maintenance') }}" method="POST" role="form">
-                    <!-- bike name -->
-                    <div class="text-left form-group">
-                        <span class="lead">Work performed:</span>
-                        <textarea class="form-control" for="work" name="work" destination="work" rows="3"> </textarea>
+                <div class="row">
+                    <div class="col-sm-2">
                     </div>
+                    <div class="col-sm-8">
+                        <form action="{{ url_for('add_maintenance') }}" method="POST" role="form">
+                            <!-- bike name -->
+                            <div class="text-left form-group">
+                                <span class="lead">Work performed:</span>
+                                <textarea class="form-control" for="work" name="work" destination="work" rows="3"> </textarea>
+                            </div>
 
-                    <!-- purchase date -->
-                    <div class="text-left form-group">
-                        <span class="lead">Date maintaned:</span>
-                        <input class="form-control" type="text" for="dt" name="dt" destination="dt" placeholder="{{ dt }}">
+                            <!-- purchase date -->
+                            <div class="text-left form-group">
+                                <span class="lead">Date maintaned:</span>
+                                <input class="form-control" type="text" for="dt" name="dt" destination="dt" placeholder="{{ dt }}">
+                            </div>
+
+                            <!-- hidden label for bike id -->
+                            <div class="col text-center form-group">
+                                <input type="hidden" name="p_id" destination="p_id" value="{{ part_id }}">
+                            </div>
+                            
+                            
+
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">Add maintenance log</button>
+                        </form>
                     </div>
-
-                    <!-- hidden label for bike id -->
-                    <div class="col text-center form-group">
-                        <input type="hidden" name="p_id" destination="p_id" value="{{ part_id }}">
+                    <div class="col-sm-2">
                     </div>
-                   
-                    
-
-                    <!-- Submit button -->
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Add maintenance log</button>
-                </form>
+                </div>
             </div>
 
             <!-- Buttons at bottom -->
             <div class="row">
-                <div class="col text-center" style="margin-top:.5cm;">
+                <div class="col-sm-2">
+                </div>
+                <div class="col col-sm-8 text-center" style="margin-top:.5cm;">
                     <a class="btn btn-secondary btn-lg btn-block" role="button" href="/parts?id={{ part_id }}"> Cancel (return to part details) </a>
+                </div>
+                <div class="col-sm-2">
                 </div>
             </div>
         </div>
