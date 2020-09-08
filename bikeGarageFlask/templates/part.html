@@ -75,46 +75,50 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3"> Part details </h2>
+                <h1> Part details </h1>
                 <p class="lead">Here's what we know about your part</p>
             </div>
 
             <!-- Bike details -->
             <div class="row">
-                <div class="col">
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-4">
+                    <h4>Part details</h4>
                     <table class="table table-hover table-sm">
                         <tbody>
                             <tr><td><b>Part id</b>:</td> <td>{{ part_details[0] }}</td></tr>
-                            <tr><td><b>Type</b>:</td> <td>{{ part_details[1] }}</td></tr>
                             <tr><td><b>Added date</b>:</td> <td>{{ part_details[2] }}</td></tr>
+                            <tr><td><b>Type</b>:</td> <td>{{ part_details[1] }}</td></tr>
                             <tr><td><b>Brand</b>:</td> <td>{{ part_details[3] }}</td></tr>
-                            <tr><td><b>Price</b>:</td> <td>{{ part_details[4] }}</td></tr>
-                            <tr><td><b>Weight</b>:</td> <td>{{ part_details[5] }}</td></tr>
-                            <tr><td><b>Size</b>:</td> <td>{{ part_details[6] }}</td></tr>
                             <tr><td><b>Model</b>:</td> <td>{{ part_details[7] }}</td></tr>
+                            <tr><td><b>Size</b>:</td> <td>{{ part_details[6] }}</td></tr>
+                            <tr><td><b>Weight</b>:</td> <td>{{ part_details[5] }}</td></tr>
+                            <tr><td><b>Price</b>:</td> <td>{{ part_details[4] }}</td></tr>
                             <tr><td><b>Bike</b>:</td> <td>{{ bike_name }}</td></tr>
                         </tbody>
                     </table>
                 </div>
                 
                 <!-- Basic statistics -->
-                <div class="col">
+                <div class="col-sm-4">
+                    <h4>Part stats</h4>
                     <table class="table table-hover table-sm">
                         <tbody>
-                            <tr><td><b>Total Distance</b>:</td> <td>{{ stats[0] }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Earliest Ride</b>:</td> <td>{{ stats[1] }}</td></tr>
-                            <tr><td><b>Most recent ride</b>:</td> <td>{{ stats[2] }}</td></tr>
+                            <tr><td><b>Total distance</b>:</td> <td>{{ stats[0] }} {{ dist_unit }}</td></tr>
                             <tr><td><b>Total climbing</b>:</td> <td>{{ stats[3] }} {{ elev_unit }}</td></tr>
                             <tr><td><b>Total moving time</b>:</td> <td>{{ stats[4] }}</td></tr>
                             <tr><td><b>Total elapsed time</b>:</td> <td>{{ stats[5] }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats[6] }} {{ speed_unit }}</td></tr>
                             <tr><td><b>Total calories</b>:</td> <td>{{ stats[7] }}</td></tr>
+                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats[6] }} {{ speed_unit }}</td></tr>
+                            <tr><td><b>Earliest ride</b>:</td> <td>{{ stats[1] }}</td></tr>
+                            <tr><td><b>Most recent ride</b>:</td> <td>{{ stats[2] }}</td></tr>
                         </tbody>
                     </table>
                 </div>
                 
                 <!-- Update stats -->
-                <div class="col">
+                <div class="col-sm-2">
                     <h4>Update stats</h4>
                     <p>Use these input boxes to change the date range used to compile part statistics </p>
                     <form action="{{ url_for('part') }}" method="POST" role="form">
@@ -137,6 +141,8 @@
                         <button type="submit" class="btn btn-primary btn-lg btn-block">Refresh Details</button>
                     </form>
                 </div>
+                <div class="col-sm-1">
+                </div>
             </div>
 
 
@@ -145,11 +151,11 @@
                 <!-- Left column with table -->
                 <div class="col">
                     <table class="table table-hover">
-                        <thead> <tr><th>Part</th><th>Work</th><th>date</th></tr>
+                        <thead> <tr><th>Work</th><th>date</th></tr>
                         </thead>
                         <tbody>
                             {% for m in maint %}
-                            <tr><td>{{ m[1]}}</td><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
+                            <tr><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -159,18 +165,30 @@
         
         <!-- Buttons at bottom -->
         <div class="row" style="margin-top:.5cm;">
-            <div class="col text-center">
+            <div class="col-sm-2">
+            </div>
+            <div class="col col-sm-8 text-center">
                 <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_maintenance?id={{ part_details[0] }}"> Maintain current part</a>
             </div>
-        </div>
-        <div class="row" style="margin-top:.5cm;">
-            <div class="col text-center">
-                <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_part?id={{ part_details[0] }}"> Edit current part</a>
+            <div class="col-sm-2">
             </div>
         </div>
         <div class="row" style="margin-top:.5cm;">
-            <div class="col text-center">
+            <div class="col-sm-2">
+            </div>
+            <div class="col col-sm-8 text-center">
+                <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_part?id={{ part_details[0] }}"> Edit current part</a>
+            </div>
+            <div class="col-sm-2">
+            </div>
+        </div>
+        <div class="row" style="margin-top:.5cm;">
+            <div class="col-sm-2">
+            </div>
+            <div class="col col-sm-8 text-center">
                 <a class="btn btn-secondary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_id }}&tp={{ part_details[1] }}&brand={{ part_details[3] }}&weight={{ part_details[5] }}&size={{ part_details[6] }}&model={{ part_details[7] }}&retire=1&part_id={{ part_details[0] }}" ="> Replace current part</a>
+            </div>
+            <div class="col-sm-2">
             </div>
         </div>
 
