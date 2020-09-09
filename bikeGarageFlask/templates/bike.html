@@ -75,13 +75,16 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h2 class="display-3">{{ bike_details[1] }}</h2>
+                <h1>{{ bike_details[1] }}</h1>
                 <p class="lead">Here's what we know about your bike {{ bike_details[1] }}</p>
             </div>
 
             <!-- Bike details -->
             <div class="row">
-                <div class="col">
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-4">
+                    <h4>Bike details</h4>
                     <table class="table table-hover table-sm">
                         <tbody>
                             <tr><td><b>Bike id</b>:</td> <td>{{ bike_details[0] }}</td></tr>
@@ -94,23 +97,24 @@
                     </table>
                 </div>
                 <!-- Basic statistics -->
-                <div class="col">
+                <div class="col-sm-4">
+                    <h4>Bike stats</h4>
                     <table class="table table-hover table-sm">
                         <tbody>
-                            <tr><td><b>Total Distance</b>:</td> <td>{{ stats[0] }} {{ dist_unit }}</td></tr>
+                            <tr><td><b>Total distance</b>:</td> <td>{{ stats[0] }} {{ dist_unit }}</td></tr>
                             <tr><td><b>Total climbing</b>:</td> <td>{{ stats[3] }} {{ elev_unit }}</td></tr>
                             <tr><td><b>Total moving time</b>:</td> <td>{{ stats[4] }} hours</td></tr>
                             <tr><td><b>Total elapsed time</b>:</td> <td>{{ stats[5] }} hours</td></tr>
                             <tr><td><b>Total calories</b>:</td> <td>{{ stats[7] }}</td></tr>
                             <tr><td><b>Maximum speed</b>:</td> <td>{{ stats[6] }} {{ speed_unit }}</td></tr>
-                            <tr><td><b>Earliest Ride</b>:</td> <td>{{ stats[1] }}</td></tr>
+                            <tr><td><b>Earliest ride</b>:</td> <td>{{ stats[1] }}</td></tr>
                             <tr><td><b>Most recent ride</b>:</td> <td>{{ stats[2] }}</td></tr>
-                       </tbody>
+                        </tbody>
                     </table>
                 </div>
 
                 <!-- Update stats -->
-                <div class="col">
+                <div class="col-sm-2">
                     <h4>Update stats</h4>
                     <p>Use these input boxes to change the date range used to compile bike statistics </p>
                     <form action="{{ url_for('bike') }}" method="POST" role="form">
@@ -133,12 +137,16 @@
                         <button type="submit" class="btn btn-primary btn-lg btn-block">Refresh Details</button>
                     </form>
                 </div>
+                <div class="col-sm-1">
+                </div>
             </div>
 
             <!-- Table with the parts -->
             <div class="row">
+                <div class="col-sm-1">
+                </div>
                 <!-- Left column with table -->
-                <div class="col">
+                <div class="col-sm-8">
                     <table class="table table-hover">
                         <thead> <tr><th>Type</th><th>Added date</th><th>Brand</th><th>Price</th><th>Weight</th><th>Size</th><th>Model</th></tr>
                         </thead>
@@ -149,34 +157,48 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="col-sm-1">
+                </div>
             </div>
 
             <!-- Table with the maintenance-->
             <div class="row">
+                <div class="col-sm-1">
+                </div>
                 <!-- Left column with table -->
-                <div class="col">
+                <div class="col-sm-8">
                     <table class="table table-hover">
-                        <thead> <tr><th>Part</th><th>Work</th><th>date</th></tr>
+                        <thead> <tr><th>Work</th><th>date</th></tr>
                         </thead>
                         <tbody>
                             {% for m in maint %}
-                            <tr><td>{{ m[1]}}</td><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
+                            <tr><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+                <div class="col-sm-1">
                 </div>
             </div>
         </div>
         
         <!-- Buttons at bottom -->
         <div class="row" style="margin-top:.5cm;">
-            <div class="col text-center">
+            <div class="col-sm-1">
+            </div>
+            <div class="col col-sm-8 text-center">
                 <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_details[0] }}"> Add new part</a>
+            </div>
+            <div class="col-sm-1">
             </div>
         </div>
         <div class="row" style="margin-top:.5cm;">
-            <div class="col text-center">
+            <div class="col-sm-1">
+            </div>
+            <div class="col col-sm-8 text-center">
                 <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_bike?id={{ bike_details[0] }}"> Edit bike</a>
+            </div>
+            <div class="col-sm-1">
             </div>
         </div>
 
