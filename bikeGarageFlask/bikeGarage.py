@@ -17,7 +17,6 @@ from bikeGarage.strava_funcs import stravaConnection, generate_auth_url
 app = Flask(__name__)
 load_dotenv(find_dotenv())
 db_path = os.environ.get('STRAVA_DB_PATH')
-bdr = os.environ.get('BDR')
 schema_path = os.environ.get('SCHEMA_PATH')
 client_id = os.environ.get('STRAVA_CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')

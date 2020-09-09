@@ -2,40 +2,36 @@
 
 This is a project aimed at tracking wear and usage of different bike components.
 
-I'm taking this in a new direction: instead of trying to force a GUI, I'm going to switch to a Flask app. I think that should get me up and running a lot faster.
-
 * Overview
 The idea here is to create a lightweight way to track maintenance. I want to limit external dependencies and basically just get the minimum info from the activities and log it, with the ability then to see wear and tear by part, last time various maintenance tasks were performed, etc. 
 
 
 * Installation/Usage Requirements
 ** Python requirements
-Until this is bundled into a standalone binary, the following python libraries are required:
+The following python libraries are required:
 - =stravalib=
 - =numpy=
-- =pandas=
 - =dateparser=
-
-Requirements.txt includes specific version for these modules to make creation of a virtual environment simple. Other version may work, but these are the ones that the project is built against and are known to work.
+- python-dotenv
+- keyring
 
 ** Strava API
 The first step is to create an "app" with strava in order to access the API. Go to [[https://www.strava.com/settings/api][https://www.strava.com/settings/api]] and follow the directions for creating an application. Choose any name you want and set the callback domain to =localhost=. You'll need the client id and client secret later in this process.
 
-You will also need to get a special authorization code for your application. Assuming you've already installed stravalib, run the following code (replacing the client_id with your application's client_id), then paste the url it generates into a browser and hit enter. This will "fail" in that you'll end up with an angry looking webpage. You need to grab the "code" parameter from within the url of the page that loads --- the url should contain something like =?code=StringOfNumbersAndLetters=. 
-
-#+BEGIN_EXAMPLE python
-  from stravalib.client import Client
-
-  client = Client()
-
-  url = client.authorization_url(client_id=YourClientID,
-                                 redirect_uri='http://127.0.0.1:5000/authorization')
-  url
-#+END_EXAMPLE
+Once you have this the application provides a function for authorizing and getting the application code, as well as exchanging that code for a refresh token. 
 
 ** Secrets!
-The application will attempt to use your machine's keyring to store the client credentials. You will be prompted to enter these (from the previous step) the first time you launch the application.
+The application will attempt to use your machine's keyring to store the client credentials. 
 
 The application will also store your refresh token in the database file. It expires every 6 hours and without the client id or client secret it won't do much good. Still, you probably don't want to go around sharing this.
+
+Finally, the project requires a =.env= file to exist at the project root. It should take the following form:
+#+begin_example
+export BDR=/path/to/project/directory/root
+export STRAVA_DB_PATH=/path/to/bike_garage.db
+export SCHEMA_PATH=$BDR/bikeGarageFlask/create_db.sql
+export CLIENT_SECRET='long$tringfromStrav@123456'
+export STRAVA_CLIENT_ID='12345'
+#+end_example
 
 
