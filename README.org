@@ -12,8 +12,8 @@ The following python libraries are required:
 - =stravalib=
 - =numpy=
 - =dateparser=
-- python-dotenv
-- keyring
+- =python-dotenv=
+- =keyring=
 
 ** Strava API
 The first step is to create an "app" with strava in order to access the API. Go to [[https://www.strava.com/settings/api][https://www.strava.com/settings/api]] and follow the directions for creating an application. Choose any name you want and set the callback domain to =localhost=. You'll need the client id and client secret later in this process.
