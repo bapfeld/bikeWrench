@@ -172,6 +172,7 @@ def bikes():
 
 @app.route('/bike', methods=['GET', 'POST'])
 def bike(b_id=None):
+    rider = db.get_rider_info(db_path)
     bike_list = db.get_all_bikes(db_path)
     if b_id is not None:
         start_date = None
@@ -200,7 +201,8 @@ def bike(b_id=None):
     parts = db.get_all_bike_parts(db_path, b_id)
     part_ids = [p[0] for p in parts]
     maint = db.get_maintenance(db_path, part_ids)
-    stats = db.get_ride_data_for_bike(db_path, b_id, start_date, end_date)
+    stats = db.get_ride_data_for_bike(db_path, b_id, rider[1],
+                                      start_date, end_date)
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('bike.html', parts=parts, bike_details=deets,
                            stats=stats, speed_unit=speed_unit,
@@ -210,6 +212,7 @@ def bike(b_id=None):
 
 @app.route('/part', methods=['GET', 'POST'])
 def part(p_id=None):
+    rider = db.get_rider_info(db_path)
     bike_list = db.get_all_bikes(db_path)
     end_date = None
     start_date = None
@@ -236,7 +239,8 @@ def part(p_id=None):
         late_date = min([max([end_date, early_date]), late_date])
     if start_date is not None:
         early_date = max([min([start_date, late_date]), early_date])
-    stats = db.get_ride_data_for_part(db_path, b_id, early_date, late_date)
+    stats = db.get_ride_data_for_part(db_path, b_id, early_date, late_date,
+                                      units=rider[1])
     maint = db.get_maintenance(db_path, list(p_id))
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,

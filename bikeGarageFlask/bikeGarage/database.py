@@ -52,7 +52,54 @@ def convert_rider_info(units, max_speed, avg_speed, tot_dist, tot_climb):
         avg_speed = round(avg_speed / 1.609, 2)
         tot_dist = round(tot_dist / 1.609, 2)
         tot_climb = round(tot_climb * 3.281, 2)
+    else:
+        max_speed = round(max_speed, 2)
+        avg_speed = round(avg_speed, 2)
+        tot_dist = round(tot_dist, 2)
+        tot_climb = round(tot_climb, 2)
     return (max_speed, avg_speed, tot_dist, tot_climb)
+
+
+def convert_summary_units(units, res):
+    if units == 'imperial':
+        try:
+            dist = round(res[0] / 1.609, 2)
+        except TypeError:
+            dist = None
+        try:
+            climb = round(res[3] * 3.281, 2)
+        except TypeError:
+            climb = None
+        try:
+            mx_speed = round(res[6] / 1.609, 2)
+        except TypeError:
+            mx_speed = None
+    else:
+        try:
+            dist = round(res[0], 2)
+        except TypeError:
+            dist = None
+        try:
+            climb = round(res[3], 2)
+        except TypeError:
+            climb = None
+        try:
+            mx_speed = round(res[6], 2)
+        except TypeError:
+            mx_speed = None
+    try:
+        mv_time = round(res[4], 1)
+    except TypeError:
+        mv_time = None
+    try:
+        s_time = round(res[5], 1)
+    except TypeError:
+        s_time = None
+    try:
+        cal = round(res[7], 2)
+    except TypeError:
+        cal = None
+    return (dist, res[1], res[2], climb, mv_time, s_time, mx_speed, cal)
 
 
 def update_rider(current_nm, nm, units, db_path):
@@ -191,7 +238,7 @@ def get_all_ride_data(db_path):
     return all_rides
 
 
-def get_ride_data_for_bike(db_path, bike_id, start_date=None, end_date=None):
+def get_ride_data_for_bike(db_path, bike_id, units, start_date=None, end_date=None):
     query = f"""SELECT SUM(distance) AS dist,
                        MIN(date) AS earliest_ride,
                        MAX(date) AS recent_ride,
@@ -210,10 +257,11 @@ def get_ride_data_for_bike(db_path, bike_id, start_date=None, end_date=None):
         c = conn.cursor()
         c.execute(query)
         res = c.fetchone()
-    return res
+    res_out = convert_summary_units(units, res)
+    return res_out
 
 
-def get_ride_data_for_part(db_path, bike_id, early_date, late_date):
+def get_ride_data_for_part(db_path, bike_id, early_date, late_date, units):
     query = f"""SELECT SUM(distance) AS dist,
                        MIN(date) AS earliest_ride,
                        MAX(date) AS recent_ride,
@@ -230,7 +278,8 @@ def get_ride_data_for_part(db_path, bike_id, early_date, late_date):
         c = conn.cursor()
         c.execute(query)
         res = c.fetchone()
-    return res
+    res_out = convert_summary_units(units, res)
+    return res_out
 
 
 def add_multiple_rides(db_path, activity_list):
