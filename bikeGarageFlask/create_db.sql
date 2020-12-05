@@ -43,7 +43,8 @@ CREATE TABLE parts (
     size         TEXT,
     model        TEXT,
     bike         TEXT NOT NULL REFERENCES bikes(bike_id),
-    retired      DATE
+    retired      DATE,
+    virtual      INTEGER
 );
 
 -- Record retired parts separately
@@ -59,7 +60,8 @@ CREATE TABLE retired_parts (
     bike         TEXT NOT NULL REFERENCES bikes(bike_id),
     retired      DATE,
     dist         REAL,
-    elev         REAL
+    elev         REAL,
+    virtual      INTEGER
 );
 
 -- Maintenance tasks record things that happen to parts
