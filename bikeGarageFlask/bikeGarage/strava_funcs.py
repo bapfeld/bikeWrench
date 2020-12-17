@@ -15,6 +15,7 @@ class stravaConnection():
         self.rider_name = rider_info[0]
         self.cl.refresh_token = rider_info[2]
         self.cl.expires_at = rider_info[3]
+        self.ride_types = ['Ride', 'VirtualRide']
 
     def test_conn(self):
         try:
@@ -59,11 +60,14 @@ class stravaConnection():
             if activity_list is not None:
                 if id_list is not None:
                     new_id_list = [x.id for x in activity_list
-                                   if (x.id not in id_list and x.type == "Ride")]
+                                   if (x.id not in id_list
+                                       and x.type in self.ride_types)]
                 else:
-                    new_id_list = [x.id for x in activity_list if x.type == 'Ride']
+                    new_id_list = [x.id for x in activity_list
+                                   if x.type in self.ride_types]
                 if len(new_id_list) > 0:
-                    new_activities = [self.cl.get_activity(id) for id in new_id_list]
+                    new_activities = [self.cl.get_activity(id) for id
+                                      in new_id_list]
                 else:
                     new_activities = None
             else:
