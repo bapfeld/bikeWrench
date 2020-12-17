@@ -427,7 +427,7 @@ def retire(db_path, retired_part, date_retired):
         res_out = list(p) + list(part_summary)
         q4 = """INSERT INTO retired_parts
                     (part_id, type, added, brand, price, weight,
-                     size, model, bike, retired, dist, elev)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                     size, model, bike, retired, virtual, dist, elev)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
              """
         c.execute(q4, res_out)
