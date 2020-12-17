@@ -264,7 +264,8 @@ def get_ride_data_for_bike(db_path, bike_id, units, start_date=None,
     return res_out
 
 
-def get_ride_data_for_part(db_path, bike_id, early_date, late_date, units):
+def get_ride_data_for_part(db_path, bike_id, early_date, late_date, units,
+                           exclude_virtual=True):
     query = f"""SELECT SUM(distance) AS dist,
                        MIN(date) AS earliest_ride,
                        MAX(date) AS recent_ride,
@@ -277,6 +278,8 @@ def get_ride_data_for_part(db_path, bike_id, early_date, late_date, units):
                 WHERE bike = '{bike_id}'
                 AND date >= '{early_date}'
                 AND date <= '{late_date}'"""
+    if exclude_virtual:
+        query += " AND virtual = 0"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)

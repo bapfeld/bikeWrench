@@ -202,9 +202,13 @@ def bike(b_id=None):
     maint = db.get_maintenance(db_path, part_ids)
     stats = db.get_ride_data_for_bike(db_path, b_id, rider[1],
                                       start_date, end_date)
+    stats_all = db.get_ride_data_for_bike(db_path, b_id, rider[1],
+                                          start_date, end_date,
+                                          exclude_virtual=False)
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('bike.html', parts=parts, bike_details=deets,
-                           stats=stats, speed_unit=speed_unit,
+                           stats=stats, stats_all=stats_all,
+                           speed_unit=speed_unit,
                            dist_unit=dist_unit, elev_unit=elev_unit,
                            maint=maint, bike_menu_list=bike_list)
 
@@ -240,10 +244,12 @@ def part(p_id=None):
         early_date = max([min([start_date, late_date]), early_date])
     stats = db.get_ride_data_for_part(db_path, b_id, early_date, late_date,
                                       units=rdr[1])
+    stats_all = db.get_ride_data_for_part(db_path, b_id, early_date, late_date,
+                                          units=rdr[1], exclude_virtual=False)
     maint = db.get_maintenance(db_path, list(p_id))
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,
-                           stats=stats, bike_id=b_id,
+                           stats=stats, stats_all=stats_all, bike_id=b_id,
                            bike_menu_list=bike_list)
 
 
