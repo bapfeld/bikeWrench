@@ -238,7 +238,8 @@ def get_all_ride_data(db_path):
     return all_rides
 
 
-def get_ride_data_for_bike(db_path, bike_id, units, start_date=None, end_date=None):
+def get_ride_data_for_bike(db_path, bike_id, units, start_date=None,
+                           end_date=None, exclude_virtual=True):
     query = f"""SELECT SUM(distance) AS dist,
                        MIN(date) AS earliest_ride,
                        MAX(date) AS recent_ride,
@@ -249,6 +250,8 @@ def get_ride_data_for_bike(db_path, bike_id, units, start_date=None, end_date=No
                        SUM(calories) AS calories
                 FROM rides
                 WHERE bike = '{bike_id}'"""
+    if exclude_virtual:
+        query += " AND type != 'VirtualRide'"
     if start_date is not None:
         query += f" AND date >= '{start_date}'"
     if end_date is not None:
