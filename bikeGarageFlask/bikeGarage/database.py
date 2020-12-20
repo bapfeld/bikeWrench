@@ -60,45 +60,50 @@ def convert_rider_info(units, max_speed, avg_speed, tot_dist, tot_climb):
     return (max_speed, avg_speed, tot_dist, tot_climb)
 
 
-def convert_summary_units(units, res):
+def none_or_zero(z):
+    if z:
+        return 0
+
+
+def convert_summary_units(units, res, zeros=False):
     if units == 'imperial':
         try:
             dist = round(res[0] / 1.609, 2)
         except TypeError:
-            dist = None
+            dist = none_or_zero(zeros)
         try:
             climb = round(res[3] * 3.281, 2)
         except TypeError:
-            climb = None
+            climb = none_or_zero(zeros)
         try:
             mx_speed = round(res[6] / 1.609, 2)
         except TypeError:
-            mx_speed = None
+            mx_speed = none_or_zero(zeros)
     else:
         try:
             dist = round(res[0], 2)
         except TypeError:
-            dist = None
+            dist = none_or_zero(zeros)
         try:
             climb = round(res[3], 2)
         except TypeError:
-            climb = None
+            climb = none_or_zero(zeros)
         try:
             mx_speed = round(res[6], 2)
         except TypeError:
-            mx_speed = None
+            mx_speed = none_or_zero(zeros)
     try:
         mv_time = round(res[4], 1)
     except TypeError:
-        mv_time = None
+        mv_time = none_or_zero(zeros)
     try:
         s_time = round(res[5], 1)
     except TypeError:
-        s_time = None
+        s_time = none_or_zero(zeros)
     try:
         cal = round(res[7], 2)
     except TypeError:
-        cal = None
+        cal = none_or_zero(zeros)
     return (dist, res[1], res[2], climb, mv_time, s_time, mx_speed, cal)
 
 
@@ -108,11 +113,15 @@ def combine_res(n_all, n_virt):
 
 def summary_stats_combo(r_all, r_virt, u):
     r_all = convert_summary_units(u, r_all)
-    r_virt = convert_summary_units(u, r_virt)
+    r_virt = convert_summary_units(u, r_virt, zeros=True)
     out = dict()
     out['dist'] = combine_res(r_all[0], r_virt[0])
-    out['min_dt'] = min([r_all[1], r_virt[1]])
-    out['max_dt'] = max([r_all[2], r_virt[2]])
+    try:
+        out['min_dt'] = min([r_all[1], r_virt[1]])
+        out['max_dt'] = max([r_all[2], r_virt[2]])
+    except TypeError:
+        out['min_dt'] = r_all[1]
+        out['max_dt'] = r_all[2]
     out['elev'] = combine_res(r_all[3], r_virt[3])
     out['moving_time'] = combine_res(r_all[4], r_virt[4])
     out['elapsed_time'] = combine_res(r_all[5], r_virt[5])
