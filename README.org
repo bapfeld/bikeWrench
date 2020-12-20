@@ -3,14 +3,13 @@
 This is a project aimed at tracking wear and usage of different bike components.
 
 * Overview
-The idea here is to create a lightweight way to track maintenance. I want to limit external dependencies and basically just get the minimum info from the activities and log it, with the ability then to see wear and tear by part, last time various maintenance tasks were performed, etc. 
+The idea here is to create a lightweight way to track usage and maintenance for individual bicycle components. I want to limit external dependencies and basically just get the minimum info from the activities and log it, with the ability then to see wear and tear by part, last time various maintenance tasks were performed, etc. 
 
 
 * Installation/Usage Requirements
 ** Python requirements
 The following python libraries are required:
 - =stravalib=
-- =numpy=
 - =dateparser=
 - =python-dotenv=
 - =keyring=
