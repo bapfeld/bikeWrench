@@ -142,6 +142,7 @@ def edit_part():
         weight = request.form.get('weight')
         size = request.form.get('size')
         model = request.form.get('model')
+        virtual = request.form.get('virtual')
         if (p_type in ['None', '']) or p_type is None:
             p_type = part_details[1]
         if (added in ['None', '']) or added is None:
@@ -158,9 +159,13 @@ def edit_part():
             size = part_details[6]
         if (model in ['None', '']) or model is None:
             model = part_details[7]
+        if (virtual in ['None', '']) or virtual is None:
+            virtual = part_details[10]
+        else:
+            virtual = int(virtual)
         db.update_part(p_id, p_type, added, brand, price, weight,
-                       size, model, db_path)
-        return part(p_id)
+                       size, model, virtual, db_path)
+        return part(p_id, edit=True)
 
 
 @app.route('/bikes', methods=['GET', 'POST'])
@@ -171,7 +176,7 @@ def bikes():
 
 @app.route('/bike', methods=['GET', 'POST'])
 def bike(b_id=None):
-    rider = db.get_rider_info(db_path)
+    rdr = db.get_rider_info(db_path)
     bike_list = db.get_all_bikes(db_path)
     if b_id is not None:
         start_date = None
@@ -200,7 +205,7 @@ def bike(b_id=None):
     parts = db.get_all_bike_parts(db_path, b_id)
     part_ids = [p[0] for p in parts]
     maint = db.get_maintenance(db_path, part_ids)
-    stats = db.get_ride_data_for_bike(db_path, b_id, rider[1],
+    stats = db.get_ride_data_for_bike(db_path, b_id, rdr[1],
                                       start_date, end_date)
     ms = max(stats['max_speed'])
     speed_unit, dist_unit, elev_unit = units_text(res[1])
@@ -211,30 +216,28 @@ def bike(b_id=None):
 
 
 @app.route('/part', methods=['GET', 'POST'])
-def part(p_id=None):
+def part(p_id=None, end_date=None, start_date=None, edit=False):
     rdr = db.get_rider_info(db_path)
     bike_list = db.get_all_bikes(db_path)
-    end_date = None
-    start_date = None
     if request.method == 'GET':
         p_id = request.args['id']
     elif request.method == 'POST':
-        p_id = request.form.get('part_id')
-        start_date = request.form.get('start_date')
-        if start_date in ['None', '']:
-            start_date = None
+        if edit:
+            pass
         else:
-            start_date = dateparser.parse(start_date).strftime('%Y-%m-%d')
-        end_date = request.form.get('end_date')
-        if end_date in ['None', '']:
-            end_date = None
-        else:
-            end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
+            p_id = request.form.get('part_id')
+            start_date = request.form.get('start_date')
+            if start_date in ['None', ''] or start_date is None:
+                start_date = None
+            else:
+                start_date = dateparser.parse(start_date).strftime('%Y-%m-%d')
+            end_date = request.form.get('end_date')
+            if end_date in ['None', ''] or end_date is None:
+                end_date = None
+            else:
+                end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
     part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
-    if part_details[10] == 1:
-        virt = True
-    else:
-        virt = False
+    virt = bool(part_details[10] == 1)
     early_date = part_details[2]
     late_date = part_details[9]
     if (late_date in ['None', '']) or late_date is None:

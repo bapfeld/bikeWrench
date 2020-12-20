@@ -145,7 +145,7 @@ def update_bike(b_id, nm, color, purchase, price, mfg, db_path):
 
 
 def update_part(p_id, p_type, added, brand, price, weight,
-                size, model, db_path):
+                size, model, virtual, db_path):
     q = f"""UPDATE parts
             SET type = '{p_type}',
                 added = '{added}',
@@ -153,7 +153,8 @@ def update_part(p_id, p_type, added, brand, price, weight,
                 price = '{price}',
                 weight = '{weight}',
                 size = '{size}',
-                model = '{model}'
+                model = '{model}',
+                virtual = '{virtual}'
             WHERE part_id = '{p_id}'"""
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
