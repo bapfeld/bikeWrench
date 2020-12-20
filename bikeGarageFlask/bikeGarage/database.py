@@ -102,6 +102,25 @@ def convert_summary_units(units, res):
     return (dist, res[1], res[2], climb, mv_time, s_time, mx_speed, cal)
 
 
+def combine_res(n_all, n_virt):
+    return (round(n_all - n_virt, 1), n_virt, n_all)
+
+
+def summary_stats_combo(r_all, r_virt, u):
+    r_all = convert_summary_units(u, r_all)
+    r_virt = convert_summary_units(u, r_virt)
+    out = dict()
+    out['dist'] = combine_res(r_all[0], r_virt[0])
+    out['min_dt'] = min([r_all[1], r_virt[1]])
+    out['max_dt'] = max([r_all[2], r_virt[2]])
+    out['elev'] = combine_res(r_all[3], r_virt[3])
+    out['moving_time'] = combine_res(r_all[4], r_virt[4])
+    out['elapsed_time'] = combine_res(r_all[5], r_virt[5])
+    out['max_speed'] = (r_all[6], r_virt[6])
+    out['cal'] = combine_res(r_all[7], r_virt[7])
+    return out
+
+
 def update_rider(current_nm, nm, units, db_path):
     q = f"""UPDATE riders
             SET name = '{nm}',
@@ -239,19 +258,19 @@ def get_all_ride_data(db_path):
 
 
 def get_ride_data_for_bike(db_path, bike_id, units, start_date=None,
-                           end_date=None, exclude_virtual=True):
-    query = f"""SELECT SUM(distance) AS dist,
-                       MIN(date) AS earliest_ride,
-                       MAX(date) AS recent_ride,
-                       SUM(elev) AS climb,
-                       SUM(moving_time) AS mov_saddle_time,
-                       SUM(elapsed_time) AS saddle_time,
-                       MAX(max_speed) AS max_speed,
-                       SUM(calories) AS calories
+                           end_date=None):
+    query = f"""SELECT
+                    SUM(distance) AS dist,
+                    MIN(date) AS earliest_ride,
+                    MAX(date) AS recent_ride,
+                    SUM(elev) AS climb,
+                    SUM(moving_time) AS mov_saddle_time,
+                    SUM(elapsed_time) AS saddle_time,
+                    MAX(max_speed) AS max_speed,
+                    SUM(calories) AS calories
                 FROM rides
                 WHERE bike = '{bike_id}'"""
-    if exclude_virtual:
-        query += " AND type != 'VirtualRide'"
+    query_virt = query + " AND type = 'VirtualRide'"
     if start_date is not None:
         query += f" AND date >= '{start_date}'"
     if end_date is not None:
@@ -259,32 +278,35 @@ def get_ride_data_for_bike(db_path, bike_id, units, start_date=None,
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
-        res = c.fetchone()
-    res_out = convert_summary_units(units, res)
+        res_all = c.fetchone()
+        c.execute(query_virt)
+        res_virt = c.fetchone()
+    res_out = summary_stats_combo(res_all, res_virt, units)
     return res_out
 
 
-def get_ride_data_for_part(db_path, bike_id, early_date, late_date, units,
-                           exclude_virtual=True):
-    query = f"""SELECT SUM(distance) AS dist,
-                       MIN(date) AS earliest_ride,
-                       MAX(date) AS recent_ride,
-                       SUM(elev) AS climb,
-                       SUM(moving_time) AS mov_saddle_time,
-                       SUM(elapsed_time) AS saddle_time,
-                       MAX(max_speed) AS max_speed,
-                       SUM(calories) AS calories
+def get_ride_data_for_part(db_path, bike_id, early_date, late_date, units):
+    query = f"""SELECT
+                    SUM(distance) AS dist,
+                    MIN(date) AS earliest_ride,
+                    MAX(date) AS recent_ride,
+                    SUM(elev) AS climb,
+                    SUM(moving_time) AS mov_saddle_time,
+                    SUM(elapsed_time) AS saddle_time,
+                    MAX(max_speed) AS max_speed,
+                    SUM(calories) AS calories
                 FROM rides
                 WHERE bike = '{bike_id}'
-                AND date >= '{early_date}'
-                AND date <= '{late_date}'"""
-    if exclude_virtual:
-        query += " AND virtual = 0"
+                  AND date >= '{early_date}'
+                  AND date <= '{late_date}'"""
+    query_virt = query + " AND type = 'VirtualRide'"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
-        res = c.fetchone()
-    res_out = convert_summary_units(units, res)
+        res_all = c.fetchone()
+        c.execute(query_virt)
+        res_virt = c.fetchone()
+    res_out = summary_stats_combo(res_all, res_virt, units)
     return res_out
 
 

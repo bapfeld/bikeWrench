@@ -202,13 +202,10 @@ def bike(b_id=None):
     maint = db.get_maintenance(db_path, part_ids)
     stats = db.get_ride_data_for_bike(db_path, b_id, rider[1],
                                       start_date, end_date)
-    stats_all = db.get_ride_data_for_bike(db_path, b_id, rider[1],
-                                          start_date, end_date,
-                                          exclude_virtual=False)
+    ms = max(stats['max_speed'])
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('bike.html', parts=parts, bike_details=deets,
-                           stats=stats, stats_all=stats_all,
-                           speed_unit=speed_unit,
+                           stats=stats, speed_unit=speed_unit, ms=ms,
                            dist_unit=dist_unit, elev_unit=elev_unit,
                            maint=maint, bike_menu_list=bike_list)
 
@@ -234,6 +231,10 @@ def part(p_id=None):
         else:
             end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
     part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
+    if part_details[10] == 1:
+        virt = True
+    else:
+        virt = False
     early_date = part_details[2]
     late_date = part_details[9]
     if (late_date in ['None', '']) or late_date is None:
@@ -244,12 +245,10 @@ def part(p_id=None):
         early_date = max([min([start_date, late_date]), early_date])
     stats = db.get_ride_data_for_part(db_path, b_id, early_date, late_date,
                                       units=rdr[1])
-    stats_all = db.get_ride_data_for_part(db_path, b_id, early_date, late_date,
-                                          units=rdr[1], exclude_virtual=False)
     maint = db.get_maintenance(db_path, list(p_id))
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,
-                           stats=stats, stats_all=stats_all, bike_id=b_id,
+                           stats=stats, bike_id=b_id, virtual=virt,
                            bike_menu_list=bike_list)
 
 

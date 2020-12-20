@@ -96,21 +96,7 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- Basic statistics -->
-                <div class="col-sm-4">
-                    <h4>Bike stats</h4>
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Total distance</b>:</td> <td>{{ stats[0] }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Total climbing</b>:</td> <td>{{ stats[3] }} {{ elev_unit }}</td></tr>
-                            <tr><td><b>Total moving time</b>:</td> <td>{{ stats[4] }} hours</td></tr>
-                            <tr><td><b>Total elapsed time</b>:</td> <td>{{ stats[5] }} hours</td></tr>
-                            <tr><td><b>Total calories</b>:</td> <td>{{ stats[7] }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats[6] }} {{ speed_unit }}</td></tr>
-                            <tr><td><b>Earliest ride</b>:</td> <td>{{ stats[1] }}</td></tr>
-                            <tr><td><b>Most recent ride</b>:</td> <td>{{ stats[2] }}</td></tr>
-                        </tbody>
-                    </table>
+                <div class="col-sm-2">
                 </div>
 
                 <!-- Update stats -->
@@ -140,6 +126,69 @@
                 <div class="col-sm-1">
                 </div>
             </div>
+            <div class="row">
+                <p></p>
+                <p></p>
+            </div>
+
+            <!-- Row with bike stats -->
+            <div class="row">
+                <div class="col-sm-1">
+                </div>
+                <!-- Basic statistics -->
+                <div class="col-sm-2">
+                    <h4>Live ride stats</h4>
+                    <table class="table table-hover table-sm">
+                        <tbody>
+                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][0] }} {{ dist_unit }}</td></tr>
+                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][0] }} {{ elev_unit }}</td></tr>
+                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][0] }} hours</td></tr>
+                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][0] }} hours</td></tr>
+                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][0] }}</td></tr>
+                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][0] }} {{ speed_unit }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-2">
+                    <h4>Virtual ride stats</h4>
+                    <table class="table table-hover table-sm">
+                        <tbody>
+                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][1] }} {{ dist_unit }}</td></tr>
+                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][1] }} {{ elev_unit }}</td></tr>
+                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][1] }} hours</td></tr>
+                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][1] }} hours</td></tr>
+                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][1] }}</td></tr>
+                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][1] }} {{ speed_unit }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-1">
+                </div>
+                <h4> </h4>
+                <div class="col-sm-2">
+                    <h4>All ride stats</h4>
+                    <table class="table table-hover table-sm">
+                        <tbody>
+                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][2] }} {{ dist_unit }}</td></tr>
+                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][2] }} {{ elev_unit }}</td></tr>
+                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][2] }} hours</td></tr>
+                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][2] }} hours</td></tr>
+                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][2] }}</td></tr>
+                            <tr><td><b>Maximum speed</b>:</td> <td>{{ ms }} {{ speed_unit }}</td></tr>
+                            <tr><td><b>Earliest ride</b>:</td> <td>{{ stats['min_dt'] }}</td></tr>
+                            <tr><td><b>Recent ride</b>:</td> <td>{{ stats['max_dt'] }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-1">
+                </div>
+            </div>
+            <div class="row">
+                <p></p>
+                <p></p>
+            </div>
 
             <!-- Table with the parts -->
             <div class="row">
@@ -147,6 +196,7 @@
                 </div>
                 <!-- Left column with table -->
                 <div class="col-sm-8">
+                    <h4>Parts list</h4>
                     <table class="table table-hover">
                         <thead> <tr><th>Type</th><th>Added date</th><th>Brand</th><th>Price</th><th>Weight</th><th>Size</th><th>Model</th></tr>
                         </thead>
@@ -181,7 +231,6 @@
                 </div>
             </div>
         </div>
-        
         <!-- Buttons at bottom -->
         <div class="row" style="margin-top:.5cm;">
             <div class="col-sm-1">
