@@ -297,18 +297,23 @@ def add_part():
             except:
                 retire = 0
                 retired_part = None
+            try:
+                virt = int(request.args['virtual'])
+            except:
+                virt = 0
             added = datetime.datetime.today().strftime('%Y-%m-%d')
             return render_template('add_part.html', bike_id=b_id,
                                    part_type=part_type, brand=brand, weight=weight,
                                    size=size, model=model, added=added, retire=retire,
                                    retired_part=retired_part,
-                                   bike_menu_list=bike_list)
+                                   bike_menu_list=bike_list, virtual=virt)
         else:
             return render_template('404.html')
     elif request.method == 'POST':
         retire = request.form.get('retire')
         retired_part = request.form.get('retired_part')
         part_type = request.form.get('p_type')
+        b_id = request.form.get('bike_id')
         if part_type in ['None', '']:
             part_type = None
         added = request.form.get('added')
@@ -331,15 +336,17 @@ def add_part():
         model = request.form.get('model')
         if model in ['None', '']:
             model = None
-        bike = request.form.get('bike_id')
-        if bike in ['None', '']:
-            bike = None
+        virtual = request.form.get('virtual')
+        if virtual in ['0', 0]:
+            virtual = 0
+        else:
+            virtual = 1
         vals = (part_type, added, brand, price, weight, size,
-                model, bike, 'TRUE')
+                model, b_id, virtual)
         db.add_part(db_path, vals)
         if int(retire) == 1:
             db.retire(db_path, retired_part, added)
-        return bike(bike)
+        return bike(b_id)
 
 
 @app.route('/add_bike', methods=['GET', 'POST'])

@@ -220,14 +220,15 @@ def add_part(db_path, part_values):
     with sqlite3.connect(db_path) as conn:
         conn.execute("""INSERT INTO parts (
                             type,
-                            purchased,
+                            added,
                             brand,
                             price,
                             weight,
                             size,
                             model,
-                            bike)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", part_values)
+                            bike,
+                            virtual)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", part_values)
 
 
 def get_all_bike_parts(db_path, current_bike):
