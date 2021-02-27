@@ -80,5 +80,7 @@ class stravaConnection():
 def generate_auth_url(client_id):
     client = Client()
     url = client.authorization_url(client_id=client_id,
-                                   redirect_uri='http://127.0.0.1:5002/strava_auth')
+                                   redirect_uri='http://127.0.0.1:5002/strava_auth',
+                                   scope=['read', 'read_all', 'activity:read_all',
+                                          'profile:read_all'])
     return url
