@@ -296,7 +296,7 @@ def get_ride_data_for_bike(db_path, bike_id, units, start_date=None,
     return res_out
 
 
-def get_ride_data_for_part(db_path, bike_id, early_date, late_date, units):
+def get_ride_data_for_part(db_path, bike_id, units, early_date, late_date):
     query = f"""SELECT
                     SUM(distance) AS dist,
                     MIN(date) AS earliest_ride,

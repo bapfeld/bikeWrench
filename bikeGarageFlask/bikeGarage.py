@@ -246,8 +246,9 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
         late_date = min([max([end_date, early_date]), late_date])
     if start_date is not None:
         early_date = max([min([start_date, late_date]), early_date])
-    stats = db.get_ride_data_for_part(db_path, b_id, early_date, late_date,
-                                      units=rdr[1])
+    stats = db.get_ride_data_for_part(db_path, b_id, units=rdr[1],
+                                      early_date=early_date,
+                                      late_date=late_date)
     maint = db.get_maintenance(db_path, list(p_id))
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,
