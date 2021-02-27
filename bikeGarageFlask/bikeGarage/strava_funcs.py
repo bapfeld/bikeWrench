@@ -13,6 +13,8 @@ class stravaConnection():
         self.code = code
         self.db_path = db_path
         self.rider_name = rider_info[0]
+        self.tkn = None
+        self.activity_list = None
         self.cl.refresh_token = rider_info[2]
         self.cl.expires_at = rider_info[3]
         self.ride_types = ['Ride', 'VirtualRide']
@@ -52,18 +54,21 @@ class stravaConnection():
                                                     refresh_token=self.cl.refresh_token)
             self.reset_secrets()
 
-    def fetch_new_activities(self):
+    def fetch_new_activities(self, recent_only=True):
         id_list, max_dt = get_all_ride_ids(self.db_path)
         if self.test_conn():
             self.gen_secrets()
-            activity_list = self.cl.get_activities(after=max_dt)
-            if activity_list is not None:
+            if recent_only:
+                self.activity_list = self.cl.get_activities(after=max_dt)
+            else:
+                self.activity_list = self.cl.get_activities()
+            if self.activity_list is not None:
                 if id_list is not None:
-                    new_id_list = [x.id for x in activity_list
+                    new_id_list = [x.id for x in self.activity_list
                                    if (x.id not in id_list
                                        and x.type in self.ride_types)]
                 else:
-                    new_id_list = [x.id for x in activity_list
+                    new_id_list = [x.id for x in self.activity_list
                                    if x.type in self.ride_types]
                 if len(new_id_list) > 0:
                     new_activities = [self.cl.get_activity(id) for id
