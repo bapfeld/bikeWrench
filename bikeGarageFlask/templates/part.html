@@ -137,7 +137,7 @@
                 <div class="col-sm-1">
                 </div>
                 <!-- Basic statistics -->
-                {% if virt %}
+                {% if virtual %}
                 <h4>Live ride stats</h4>
                 <div class="col-sm-2">
                     <table class="table table-hover table-sm">
@@ -168,7 +168,6 @@
                 </div>
                 <div class="col-sm-1">
                 </div>
-                {% endif %}
                 <h4> </h4>
                 <div class="col-sm-2">
                     <h4>All ride stats</h4>
@@ -185,6 +184,25 @@
                         </tbody>
                     </table>
                 </div>
+                {% endif %}
+                {% if not virtual %}
+                <h4>Live ride stats</h4>
+                <div class="col-sm-2">
+                    <table class="table table-hover table-sm">
+                        <tbody>
+                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][0] }} {{ dist_unit }}</td></tr>
+                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][0] }} {{ elev_unit }}</td></tr>
+                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][0] }} hours</td></tr>
+                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][0] }} hours</td></tr>
+                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][0] }}</td></tr>
+                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][0] }} {{ speed_unit }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-1">
+                </div>
+                {% endif %}
+                
                 <div class="col-sm-1">
                 </div>
             </div>
