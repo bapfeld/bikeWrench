@@ -11,12 +11,12 @@
 
         
         <!-- <link href="../static/cover.css" rel="stylesheet"> -->
-        <title>Bike Garage</title>
+        <title>Bike Wrench</title>
     </head>
     <body>
         <!-- Page Content -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand">Bike Garage</a>
+            <a class="navbar-brand">Bike Wrench</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -75,36 +75,54 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h1>Add part maintenance</h1>
-                <p class="lead">Add a new maintenance record</p>
+                <h1>{{ bike_details[1] }}</h1>
+                <p class="lead">Edit details for {{ bike_details[1] }}:</p>
             </div>
             <div>
                 <div class="row">
                     <div class="col-sm-2">
                     </div>
                     <div class="col-sm-8">
-                        <form action="{{ url_for('add_maintenance') }}" method="POST" role="form">
-                            <!-- bike name -->
+                        <form action="{{ url_for('edit_bike') }}" method="POST" role="form">
+                            <!-- rider name -->
                             <div class="text-left form-group">
-                                <span class="lead">Work performed:</span>
-                                <textarea class="form-control" for="work" name="work" destination="work" rows="3"> </textarea>
+                                <span class="lead">Bike name:</span>
+                                <input class="form-control" type="text" for="bike_name" name="bike_name" destination="bike_name" placeholder="{{ bike_details[1] }}">
                             </div>
 
-                            <!-- purchase date -->
+                            <!-- color -->
                             <div class="text-left form-group">
-                                <span class="lead">Date maintaned:</span>
-                                <input class="form-control" type="text" for="dt" name="dt" destination="dt" placeholder="{{ dt }}">
+                                <span class="lead">Color:</span>
+                                <input class="form-control" type="text" for="color" name="color" destination="color" placeholder="{{ bike_details[2] }}">
                             </div>
 
-                            <!-- hidden label for bike id -->
-                            <div class="col text-center form-group">
-                                <input type="hidden" name="p_id" destination="p_id" value="{{ part_id }}">
-                            </div>
-                            
-                            
+                            <!-- purchased -->
+                        <div class="text-left form-group">
+                            <span class="lead">Date purchased:</span>
+                            <input class="form-control" type="text" for="purchase" name="purchase" destination="purchase" placeholder="{{ bike_details[3] }}">
+                        </div>
 
-                            <!-- Submit button -->
-                            <button type="submit" class="btn btn-primary btn-lg btn-block">Add maintenance log</button>
+                        <!-- price -->
+                        <div class="text-left form-group">
+                            <span class="lead">Price:</span>
+                            <input class="form-control" type="text" for="price" name="price" destination="price" placeholder="{{ bike_details[4] }}">
+                        </div>
+
+                        <!-- Manufacturer -->
+                        <div class="text-left form-group">
+                            <span class="lead">Manufacturer:</span>
+                            <input class="form-control" type="text" for="mfg" name="mfg" destination="mfg" placeholder="{{ bike_details[5] }}">
+                        </div>
+
+                        <!-- hidden label for bike id -->
+                        <div class="col text-center form-group">
+                            <input type="hidden" name="id" destination="id" value="{{ bike_details[0] }}">
+                        </div>
+                        
+                        
+
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">Update bike info</button>
                         </form>
                     </div>
                     <div class="col-sm-2">
@@ -117,7 +135,7 @@
                 <div class="col-sm-2">
                 </div>
                 <div class="col col-sm-8 text-center" style="margin-top:.5cm;">
-                    <a class="btn btn-secondary btn-lg btn-block" role="button" href="/parts?id={{ part_id }}"> Cancel (return to part details) </a>
+                    <a class="btn btn-secondary btn-lg btn-block" role="button" href="/bike?id={{ bike_details[0] }}"> Cancel (return to bike info) </a>
                 </div>
                 <div class="col-sm-2">
                 </div>

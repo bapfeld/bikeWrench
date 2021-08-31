@@ -11,12 +11,12 @@
 
         
         <!-- <link href="../static/cover.css" rel="stylesheet"> -->
-        <title>Bike Garage</title>
+        <title>Bike Wrench</title>
     </head>
     <body>
         <!-- Page Content -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand">Bike Garage</a>
+            <a class="navbar-brand">Bike Wrench</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -56,7 +56,7 @@
                             <a class="dropdown-item" href="#">Parts by type</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Part stats by part</a>
-                            <a class="dropdown-item" href="#">Part stats by type</a>
+                            <a class="dropdown-item" href="/part_averages">Part stats by type</a>
                         </div>
                     </li>
                     <!-- Strava dropdown menu -->
@@ -75,8 +75,8 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h1> Part details </h1>
-                <p class="lead">Here's what we know about your part</p>
+                <h1>{{ bike_details[1] }}</h1>
+                <p class="lead">Here's what we know about your bike {{ bike_details[1] }}</p>
             </div>
 
             <!-- Bike details -->
@@ -84,27 +84,26 @@
                 <div class="col-sm-1">
                 </div>
                 <div class="col-sm-4">
-                    <h4>Part details</h4>
+                    <h4>Bike details</h4>
                     <table class="table table-hover table-sm">
                         <tbody>
-                            <tr><td><b>Part id</b>:</td> <td>{{ part_details[0] }}</td></tr>
-                            <tr><td><b>Added date</b>:</td> <td>{{ part_details[2] }}</td></tr>
-                            <tr><td><b>Type</b>:</td> <td>{{ part_details[1] }}</td></tr>
-                            <tr><td><b>Brand</b>:</td> <td>{{ part_details[3] }}</td></tr>
-                            <tr><td><b>Model</b>:</td> <td>{{ part_details[7] }}</td></tr>
-                            <tr><td><b>Size</b>:</td> <td>{{ part_details[6] }}</td></tr>
-                            <tr><td><b>Weight</b>:</td> <td>{{ part_details[5] }}</td></tr>
-                            <tr><td><b>Price</b>:</td> <td>{{ part_details[4] }}</td></tr>
-                            <tr><td><b>Virtual</b>:</td> <td>{{ part_details[10] }}</td></tr>
-                            <tr><td><b>Bike</b>:</td> <td>{{ bike_name }}</td></tr>
+                            <tr><td><b>Bike id</b>:</td> <td>{{ bike_details[0] }}</td></tr>
+                            <tr><td><b>Name</b>:</td> <td>{{ bike_details[1] }}</td></tr>
+                            <tr><td><b>Manufacturer</b>:</td> <td>{{ bike_details[5] }}</td></tr>
+                            <tr><td><b>Color</b>:</td> <td>{{ bike_details[2] }}</td></tr>
+                            <tr><td><b>Purchase date</b>:</td> <td>{{ bike_details[3] }}</td></tr>
+                            <tr><td><b>Purchase price</b>:</td> <td>{{ bike_details[4] }}</td></tr>
                         </tbody>
                     </table>
                 </div>
+                <div class="col-sm-2">
+                </div>
+
                 <!-- Update stats -->
                 <div class="col-sm-2">
                     <h4>Update stats</h4>
-                    <p>Use these input boxes to change the date range used to compile part statistics </p>
-                    <form action="{{ url_for('part') }}" method="POST" role="form">
+                    <p>Use these input boxes to change the date range used to compile bike statistics </p>
+                    <form action="{{ url_for('bike') }}" method="POST" role="form">
                         <!-- start date -->
                         <div class="text-left form-group">
                             <span class="lead">Start Date:</span>
@@ -117,7 +116,7 @@
                         </div>
                         <!-- hidden label for bike id -->
                         <div class="col text-center form-group">
-                            <input type="hidden" name="part_id" destination="part_id" value="{{ part_details[0] }}">
+                            <input type="hidden" name="bike_id" destination="bike_id" value="{{ bike_details[0] }}">
                         </div>
 
                         <!-- Submit button -->
@@ -132,14 +131,13 @@
                 <p></p>
             </div>
 
+            <!-- Row with bike stats -->
             <div class="row">
-                <!-- Row with part stats -->
                 <div class="col-sm-1">
                 </div>
                 <!-- Basic statistics -->
-                {% if virtual %}
-                <h4>Live ride stats</h4>
                 <div class="col-sm-2">
+                    <h4>Live ride stats</h4>
                     <table class="table table-hover table-sm">
                         <tbody>
                             <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][0] }} {{ dist_unit }}</td></tr>
@@ -154,7 +152,7 @@
                 <div class="col-sm-1">
                 </div>
                 <div class="col-sm-2">
-                    <h4>Virtual Ride Stats</h4>
+                    <h4>Virtual ride stats</h4>
                     <table class="table table-hover table-sm">
                         <tbody>
                             <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][1] }} {{ dist_unit }}</td></tr>
@@ -184,25 +182,6 @@
                         </tbody>
                     </table>
                 </div>
-                {% endif %}
-                {% if not virtual %}
-                <h4>Live ride stats</h4>
-                <div class="col-sm-2">
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][0] }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][0] }} {{ elev_unit }}</td></tr>
-                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][0] }} hours</td></tr>
-                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][0] }} hours</td></tr>
-                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][0] }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][0] }} {{ speed_unit }}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-1">
-                </div>
-                {% endif %}
-                
                 <div class="col-sm-1">
                 </div>
             </div>
@@ -211,6 +190,26 @@
                 <p></p>
             </div>
 
+            <!-- Table with the parts -->
+            <div class="row">
+                <div class="col-sm-1">
+                </div>
+                <!-- Left column with table -->
+                <div class="col-sm-8">
+                    <h4>Parts list</h4>
+                    <table class="table table-hover">
+                        <thead> <tr><th>Type</th><th>Added date</th><th>Brand</th><th>Price</th><th>Weight</th><th>Size</th><th>Model</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for part in parts %}
+                            <tr><td><a href="/part?id={{ part[0] }}">{{ part[1] }}</a></td><td>{{ part[2]}}</td><td>{{ part[3] }}</td><td>{{ part[4] }}</td><td>{{ part[5] }}</td><td>{{ part[6] }}</td><td>{{ part[7] }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-1">
+                </div>
+            </div>
 
             <!-- Table with the maintenance-->
             <div class="row">
@@ -232,33 +231,23 @@
                 </div>
             </div>
         </div>
-        
         <!-- Buttons at bottom -->
         <div class="row" style="margin-top:.5cm;">
-            <div class="col-sm-2">
+            <div class="col-sm-1">
             </div>
             <div class="col col-sm-8 text-center">
-                <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_maintenance?id={{ part_details[0] }}"> Maintain current part</a>
+                <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_details[0] }}"> Add new part</a>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
             </div>
         </div>
         <div class="row" style="margin-top:.5cm;">
-            <div class="col-sm-2">
+            <div class="col-sm-1">
             </div>
             <div class="col col-sm-8 text-center">
-                <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_part?id={{ part_details[0] }}"> Edit current part</a>
+                <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_bike?id={{ bike_details[0] }}"> Edit bike</a>
             </div>
-            <div class="col-sm-2">
-            </div>
-        </div>
-        <div class="row" style="margin-top:.5cm;">
-            <div class="col-sm-2">
-            </div>
-            <div class="col col-sm-8 text-center">
-                <a class="btn btn-secondary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_id }}&tp={{ part_details[1] }}&brand={{ part_details[3] }}&weight={{ part_details[5] }}&size={{ part_details[6] }}&model={{ part_details[7] }}&retire=1&part_id={{ part_details[0] }}" ="> Replace current part</a>
-            </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
             </div>
         </div>
 

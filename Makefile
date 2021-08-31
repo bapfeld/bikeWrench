@@ -5,7 +5,7 @@
 #################################################################################
 
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-PROJECT_NAME = bikeGarage
+PROJECT_NAME = bikeWrench
 PYTHON_INTERPRETER = python3
 VENV_PATH = ~/.virtualenvs/stravadb/
 
@@ -36,16 +36,16 @@ css: bootstrap theme_css
 bootstrap:
 	curl -L https://github.com/twbs/bootstrap/releases/download/v4.5.0/bootstrap-4.5.0-dist.zip -o /tmp/bootstrap_files.zip
 	unzip /tmp/bootstrap_files.zip -d /tmp/bootstrap_files
-	cp -r /tmp/bootstrap_files/bootstrap-4.5.0-dist bikeGarageFlask/static
-	curl https://code.jquery.com/jquery-3.3.1.slim.min.js -o bikeGarageFlask/static/js/jquery-3.3.1.slim.min.js
+	cp -r /tmp/bootstrap_files/bootstrap-4.5.0-dist bikeWrenchFlask/static
+	curl https://code.jquery.com/jquery-3.3.1.slim.min.js -o bikeWrenchFlask/static/js/jquery-3.3.1.slim.min.js
 
 ## Download and install theme css
 theme_css:
-	mkdir bikeGarage/static/scss
-	curl https://bootswatch.com/4/superhero/bootstrap.min.css -o bikeGarageFlask/static/css/bootstrap.min.css
-	curl https://bootswatch.com/4/superhero/bootstrap.css -o bikeGarageFlask/static/css/bootstrap.css
-	curl https://bootswatch.com/4/superhero/_variables.scss -o bikeGarageFlask/static/scss/_variables.scss
-	curl https://bootswatch.com/4/superhero/_bootswatch.scss -o bikeGarageFlask/static/scss/_bootswatch.scss
+	mkdir bikeWrench/static/scss
+	curl https://bootswatch.com/4/superhero/bootstrap.min.css -o bikeWrenchFlask/static/css/bootstrap.min.css
+	curl https://bootswatch.com/4/superhero/bootstrap.css -o bikeWrenchFlask/static/css/bootstrap.css
+	curl https://bootswatch.com/4/superhero/_variables.scss -o bikeWrenchFlask/static/scss/_variables.scss
+	curl https://bootswatch.com/4/superhero/_bootswatch.scss -o bikeWrenchFlask/static/scss/_bootswatch.scss
 
 #################################################################################
 # Self Documenting Commands                                                     #

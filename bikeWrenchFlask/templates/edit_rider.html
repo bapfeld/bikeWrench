@@ -11,12 +11,12 @@
 
         
         <!-- <link href="../static/cover.css" rel="stylesheet"> -->
-        <title>Bike Garage</title>
+        <title>Bike Wrench</title>
     </head>
     <body>
         <!-- Page Content -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand">Bike Garage</a>
+            <a class="navbar-brand">Bike Wrench</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -56,7 +56,7 @@
                             <a class="dropdown-item" href="#">Parts by type</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Part stats by part</a>
-                            <a class="dropdown-item" href="#">Part stats by type</a>
+                            <a class="dropdown-item" href="/part_averages">Part stats by type</a>
                         </div>
                     </li>
                     <!-- Strava dropdown menu -->
@@ -75,32 +75,60 @@
         <!-- Page Features -->
         <div>
             <div class="jumbotron">
-                <h1>Part Stats</h1>
-                <p class="lead">Here are some statistics about retired parts</p>
+                <h1>{{ rider }}</h1>
+                <p class="lead">Edit details for {{ rider }}:</p>
+            </div>
+            <div>
+                <div class="row">
+                    <div class="col-sm-2">
+                    </div>
+                    <div class="col-sm-8">
+                        <form action="{{ url_for('edit_rider') }}" method="POST" role="form">
+                            <!-- rider name -->
+                            <div class="text-left form-group">
+                                <span class="lead">Rider name:</span>
+                                <input class="form-control" type="text" for="rider_name" name="rider_name" destination="rider_name" placeholder="{{ rider }}">
+                        </div>
+
+                        
+                        <!-- units -->
+                    <div class="form-group">
+                        <span class="lead">Unit type preference:</span>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="units" id="units" value="imperial" {% if units == "imperial" %} checked {% endif %}>
+                            <label class="form-check-label" for="cover">
+                                Imperial
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="units" id="units" value="metric" {% if units == "metric" %} checked {% endif %}>
+                            <label class="form-check-label" for="cover">
+                                Metric
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Update rider info</button>
+                    </form>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
             </div>
 
-            <!-- Table with the parts -->
+            <!-- Buttons at bottom -->
             <div class="row">
                 <div class="col-sm-2">
                 </div>
-                <!-- Left column with table -->
-                <div class="col-sm-8">
-                    <table class="table table-hover">
-                        <thead> <tr><th>Type</th><th>Price</th><th>Weight</th><th>Distance</th><th>Elevation</th><th>Time in use</th></tr>
-                        </thead>
-                        <tbody>
-                            {% for avg in avgs %}
-                            <tr><td>{{ avg[0] }}</a></td><td>{{ avg[1]}}</td><td>{{ avg[2] }}</td><td>{{ avg[3] }}</td><td>{{ avg[4] }}</td><td>{{ avg[5] }}</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="col col-sm-8 text-center" style="margin-top:.5cm;">
+                    <a class="btn btn-secondary btn-lg btn-block" role="button" href="/rider"> Cancel (return to rider info) </a>
                 </div>
                 <div class="col-sm-2">
                 </div>
             </div>
         </div>
-        
-        
+
         <footer class="page-footer font-small">
             <!-- Copyright -->
             <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>

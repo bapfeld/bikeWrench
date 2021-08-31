@@ -27,8 +27,8 @@ The application will also store your refresh token in the database file. It expi
 Finally, the project requires a =.env= file to exist at the project root. It should take the following form:
 #+begin_example
 export BDR=/path/to/project/directory/root
-export STRAVA_DB_PATH=/path/to/bike_garage.db
-export SCHEMA_PATH=$BDR/bikeGarageFlask/create_db.sql
+export STRAVA_DB_PATH=/path/to/bike_wrench.db
+export SCHEMA_PATH=$BDR/bikeWrenchFlask/create_db.sql
 export CLIENT_SECRET='long$tringfromStrav@123456'
 export STRAVA_CLIENT_ID='12345'
 #+end_example

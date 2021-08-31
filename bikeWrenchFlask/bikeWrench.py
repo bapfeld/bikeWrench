@@ -7,8 +7,8 @@ from flask import Flask, render_template, request, url_for
 from stravalib.client import Client
 # from wtforms import (Form, TextField, TextAreaField,
 #                      validators, StringField, SubmitField)
-from bikeGarage import database as db
-from bikeGarage.strava_funcs import stravaConnection, generate_auth_url
+from bikeWrench import database as db
+from bikeWrench.strava_funcs import stravaConnection, generate_auth_url
 
 
 ###########################################################################
@@ -20,7 +20,7 @@ db_path = os.environ.get('STRAVA_DB_PATH')
 schema_path = os.environ.get('SCHEMA_PATH')
 client_id = os.environ.get('STRAVA_CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
-app_code = keyring.get_password('bikeGarage', 'code')
+app_code = keyring.get_password('bikeWrench', 'code')
 
 
 ###########################################################################
@@ -444,7 +444,7 @@ def strava_funcs():
 @app.route('/strava_auth', methods=['GET'])
 def strava_auth():
     code = request.args['code']
-    keyring.set_password('bikeGarage', 'code', code)
+    keyring.set_password('bikeWrench', 'code', code)
     return render_template('index.html')
 
 
