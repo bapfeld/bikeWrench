@@ -2,7 +2,7 @@ import os
 import datetime
 import dateparser
 import keyring
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, make_response
 from dotenv import load_dotenv, find_dotenv
 from stravalib.client import Client
 # from wtforms import (Form, TextField, TextAreaField,
@@ -448,6 +448,12 @@ def strava_auth():
     code = request.args['code']
     keyring.set_password('bikeWrench', 'code', code)
     return render_template('index.html')
+
+
+@app.errorhandler(404)
+def not_found():
+    """Page not found."""
+    return make_response(render_template("404.html"), 404)
 
 
 ###########################################################################
