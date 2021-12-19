@@ -3,6 +3,7 @@ import datetime
 import dateparser
 import keyring
 from flask import Flask, render_template, request, url_for
+from dotenv import load_dotenv, find_dotenv
 from stravalib.client import Client
 # from wtforms import (Form, TextField, TextAreaField,
 #                      validators, StringField, SubmitField)
@@ -14,6 +15,7 @@ from bikeWrench.strava_funcs import stravaConnection, generate_auth_url
 # Initial Setup                                                           #
 ###########################################################################
 app = Flask(__name__)
+load_dotenv(find_dotenv())
 db_path = os.environ.get('STRAVA_DB_PATH')
 schema_path = os.environ.get('SCHEMA_PATH')
 client_id = os.environ.get('STRAVA_CLIENT_ID')
