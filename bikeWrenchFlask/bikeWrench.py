@@ -47,6 +47,8 @@ def units_text(unit_type):
 # Flask definition                                                        #
 ###########################################################################
 @app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
+@app.route('/home', methods=['GET'])
 def index():
     bike_list = db.get_all_bikes(db_path)
     return render_template('index.html', bike_menu_list=bike_list)
