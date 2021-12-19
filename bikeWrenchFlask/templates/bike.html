@@ -1,265 +1,181 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% extends 'layout.html' %}
+{% block content %}
+<div>
+    <div class="jumbotron">
+        <h1>{{ bike_details[1] }}</h1>
+        <p class="lead">Here's what we know about your bike {{ bike_details[1] }}</p>
+    </div>
 
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="../static/css/bootstrap.css">
-        <link rel="stylesheet" href="../static/css/bootstrap.min.css">
-
-        
-        <!-- <link href="../static/cover.css" rel="stylesheet"> -->
-        <title>Bike Wrench</title>
-    </head>
-    <body>
-        <!-- Page Content -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand">Bike Wrench</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarColor01">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <!-- Rider dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Rider</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/rider">Rider Info</a>
-                            <a class="dropdown-item" href="/edit_rider">Edit Rider</a>
-                        </div>
-                    </li>
-                    <!-- Bike dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Bikes</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/bikes">Bike list</a>
-                            <div class="dropdown-divider"></div>
-                            {% for b in bike_menu_list %}
-                            <a class="dropdown-item" href="/bike?id={{ b[0] }}">{{ b[1] }}</a>
-                            {% endfor %}
-                        </div>
-                    </li>
-                    <!-- Parts dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Parts</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Parts by bike</a>
-                            <a class="dropdown-item" href="#">Parts by type</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Part stats by part</a>
-                            <a class="dropdown-item" href="/part_averages">Part stats by type</a>
-                        </div>
-                    </li>
-                    <!-- Strava dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Strava</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/fetch_rides">Fetch new rides</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/strava_funcs">Strava app credentials</a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        <!-- Page Features -->
-        <div>
-            <div class="jumbotron">
-                <h1>{{ bike_details[1] }}</h1>
-                <p class="lead">Here's what we know about your bike {{ bike_details[1] }}</p>
-            </div>
-
-            <!-- Bike details -->
-            <div class="row">
-                <div class="col-sm-1">
-                </div>
-                <div class="col-sm-4">
-                    <h4>Bike details</h4>
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Bike id</b>:</td> <td>{{ bike_details[0] }}</td></tr>
-                            <tr><td><b>Name</b>:</td> <td>{{ bike_details[1] }}</td></tr>
-                            <tr><td><b>Manufacturer</b>:</td> <td>{{ bike_details[5] }}</td></tr>
-                            <tr><td><b>Color</b>:</td> <td>{{ bike_details[2] }}</td></tr>
-                            <tr><td><b>Purchase date</b>:</td> <td>{{ bike_details[3] }}</td></tr>
-                            <tr><td><b>Purchase price</b>:</td> <td>{{ bike_details[4] }}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-2">
-                </div>
-
-                <!-- Update stats -->
-                <div class="col-sm-2">
-                    <h4>Update stats</h4>
-                    <p>Use these input boxes to change the date range used to compile bike statistics </p>
-                    <form action="{{ url_for('bike') }}" method="POST" role="form">
-                        <!-- start date -->
-                        <div class="text-left form-group">
-                            <span class="lead">Start Date:</span>
-                            <input class="form-control" type="text" for="start_date" name="start_date" destination="start_date">
-                        </div>
-                        <!-- end date -->
-                        <div class="text-left form-group">
-                            <span class="lead">End Date:</span>
-                            <input class="form-control" type="text" for="end_date" name="end_date" destination="end_date">
-                        </div>
-                        <!-- hidden label for bike id -->
-                        <div class="col text-center form-group">
-                            <input type="hidden" name="bike_id" destination="bike_id" value="{{ bike_details[0] }}">
-                        </div>
-
-                        <!-- Submit button -->
-                        <button type="submit" class="btn btn-primary btn-lg btn-block">Refresh Details</button>
-                    </form>
-                </div>
-                <div class="col-sm-1">
-                </div>
-            </div>
-            <div class="row">
-                <p></p>
-                <p></p>
-            </div>
-
-            <!-- Row with bike stats -->
-            <div class="row">
-                <div class="col-sm-1">
-                </div>
-                <!-- Basic statistics -->
-                <div class="col-sm-2">
-                    <h4>Live ride stats</h4>
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][0] }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][0] }} {{ elev_unit }}</td></tr>
-                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][0] }} hours</td></tr>
-                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][0] }} hours</td></tr>
-                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][0] }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][0] }} {{ speed_unit }}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-1">
-                </div>
-                <div class="col-sm-2">
-                    <h4>Virtual ride stats</h4>
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][1] }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][1] }} {{ elev_unit }}</td></tr>
-                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][1] }} hours</td></tr>
-                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][1] }} hours</td></tr>
-                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][1] }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][1] }} {{ speed_unit }}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-1">
-                </div>
-                <h4> </h4>
-                <div class="col-sm-2">
-                    <h4>All ride stats</h4>
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                            <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][2] }} {{ dist_unit }}</td></tr>
-                            <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][2] }} {{ elev_unit }}</td></tr>
-                            <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][2] }} hours</td></tr>
-                            <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][2] }} hours</td></tr>
-                            <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][2] }}</td></tr>
-                            <tr><td><b>Maximum speed</b>:</td> <td>{{ ms }} {{ speed_unit }}</td></tr>
-                            <tr><td><b>Earliest ride</b>:</td> <td>{{ stats['min_dt'] }}</td></tr>
-                            <tr><td><b>Recent ride</b>:</td> <td>{{ stats['max_dt'] }}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-1">
-                </div>
-            </div>
-            <div class="row">
-                <p></p>
-                <p></p>
-            </div>
-
-            <!-- Table with the parts -->
-            <div class="row">
-                <div class="col-sm-1">
-                </div>
-                <!-- Left column with table -->
-                <div class="col-sm-8">
-                    <h4>Parts list</h4>
-                    <table class="table table-hover">
-                        <thead> <tr><th>Type</th><th>Added date</th><th>Brand</th><th>Price</th><th>Weight</th><th>Size</th><th>Model</th></tr>
-                        </thead>
-                        <tbody>
-                            {% for part in parts %}
-                            <tr><td><a href="/part?id={{ part[0] }}">{{ part[1] }}</a></td><td>{{ part[2]}}</td><td>{{ part[3] }}</td><td>{{ part[4] }}</td><td>{{ part[5] }}</td><td>{{ part[6] }}</td><td>{{ part[7] }}</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-1">
-                </div>
-            </div>
-
-            <!-- Table with the maintenance-->
-            <div class="row">
-                <div class="col-sm-1">
-                </div>
-                <!-- Left column with table -->
-                <div class="col-sm-8">
-                    <table class="table table-hover">
-                        <thead> <tr><th>Work</th><th>date</th></tr>
-                        </thead>
-                        <tbody>
-                            {% for m in maint %}
-                            <tr><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-1">
-                </div>
-            </div>
+    <!-- Bike details -->
+    <div class="row">
+        <div class="col-sm-1">
         </div>
-        <!-- Buttons at bottom -->
-        <div class="row" style="margin-top:.5cm;">
-            <div class="col-sm-1">
-            </div>
-            <div class="col col-sm-8 text-center">
-                <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_details[0] }}"> Add new part</a>
-            </div>
-            <div class="col-sm-1">
-            </div>
+        <div class="col-sm-4">
+            <h4>Bike details</h4>
+            <table class="table table-hover table-sm">
+                <tbody>
+                    <tr><td><b>Bike id</b>:</td> <td>{{ bike_details[0] }}</td></tr>
+                    <tr><td><b>Name</b>:</td> <td>{{ bike_details[1] }}</td></tr>
+                    <tr><td><b>Manufacturer</b>:</td> <td>{{ bike_details[5] }}</td></tr>
+                    <tr><td><b>Color</b>:</td> <td>{{ bike_details[2] }}</td></tr>
+                    <tr><td><b>Purchase date</b>:</td> <td>{{ bike_details[3] }}</td></tr>
+                    <tr><td><b>Purchase price</b>:</td> <td>{{ bike_details[4] }}</td></tr>
+                </tbody>
+            </table>
         </div>
-        <div class="row" style="margin-top:.5cm;">
-            <div class="col-sm-1">
-            </div>
-            <div class="col col-sm-8 text-center">
-                <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_bike?id={{ bike_details[0] }}"> Edit bike</a>
-            </div>
-            <div class="col-sm-1">
-            </div>
+        <div class="col-sm-2">
         </div>
 
-        <footer class="page-footer font-small">
-            <!-- Copyright -->
-            <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>
-            </div>
-            <!-- Copyright -->
-        </footer>
+        <!-- Update stats -->
+        <div class="col-sm-2">
+            <h4>Update stats</h4>
+            <p>Use these input boxes to change the date range used to compile bike statistics </p>
+            <form action="{{ url_for('bike') }}" method="POST" role="form">
+                <!-- start date -->
+                <div class="text-left form-group">
+                    <span class="lead">Start Date:</span>
+                    <input class="form-control" type="text" for="start_date" name="start_date" destination="start_date">
+                </div>
+                <!-- end date -->
+                <div class="text-left form-group">
+                    <span class="lead">End Date:</span>
+                    <input class="form-control" type="text" for="end_date" name="end_date" destination="end_date">
+                </div>
+                <!-- hidden label for bike id -->
+                <div class="col text-center form-group">
+                    <input type="hidden" name="bike_id" destination="bike_id" value="{{ bike_details[0] }}">
+                </div>
 
-        <!-- Scripts -->
-        <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
-        <script src="../static/js/bootstrap.bundle.min.js"></script>
-    </body>
-</html>
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Refresh Details</button>
+            </form>
+        </div>
+        <div class="col-sm-1">
+        </div>
+    </div>
+    <div class="row">
+        <p></p>
+        <p></p>
+    </div>
+
+    <!-- Row with bike stats -->
+    <div class="row">
+        <div class="col-sm-1">
+        </div>
+        <!-- Basic statistics -->
+        <div class="col-sm-2">
+            <h4>Live ride stats</h4>
+            <table class="table table-hover table-sm">
+                <tbody>
+                    <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][0] }} {{ dist_unit }}</td></tr>
+                    <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][0] }} {{ elev_unit }}</td></tr>
+                    <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][0] }} hours</td></tr>
+                    <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][0] }} hours</td></tr>
+                    <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][0] }}</td></tr>
+                    <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][0] }} {{ speed_unit }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-1">
+        </div>
+        <div class="col-sm-2">
+            <h4>Virtual ride stats</h4>
+            <table class="table table-hover table-sm">
+                <tbody>
+                    <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][1] }} {{ dist_unit }}</td></tr>
+                    <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][1] }} {{ elev_unit }}</td></tr>
+                    <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][1] }} hours</td></tr>
+                    <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][1] }} hours</td></tr>
+                    <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][1] }}</td></tr>
+                    <tr><td><b>Maximum speed</b>:</td> <td>{{ stats['max_speed'][1] }} {{ speed_unit }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-1">
+        </div>
+        <h4> </h4>
+        <div class="col-sm-2">
+            <h4>All ride stats</h4>
+            <table class="table table-hover table-sm">
+                <tbody>
+                    <tr><td><b>Distance</b>:</td> <td>{{ stats['dist'][2] }} {{ dist_unit }}</td></tr>
+                    <tr><td><b>Climbing</b>:</td> <td>{{ stats['elev'][2] }} {{ elev_unit }}</td></tr>
+                    <tr><td><b>Moving time</b>:</td> <td>{{ stats['moving_time'][2] }} hours</td></tr>
+                    <tr><td><b>Elapsed time</b>:</td> <td>{{ stats['elapsed_time'][2] }} hours</td></tr>
+                    <tr><td><b>Calories</b>:</td> <td>{{ stats['cal'][2] }}</td></tr>
+                    <tr><td><b>Maximum speed</b>:</td> <td>{{ ms }} {{ speed_unit }}</td></tr>
+                    <tr><td><b>Earliest ride</b>:</td> <td>{{ stats['min_dt'] }}</td></tr>
+                    <tr><td><b>Recent ride</b>:</td> <td>{{ stats['max_dt'] }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-1">
+        </div>
+    </div>
+    <div class="row">
+        <p></p>
+        <p></p>
+    </div>
+
+    <!-- Table with the parts -->
+    <div class="row">
+        <div class="col-sm-1">
+        </div>
+        <!-- Left column with table -->
+        <div class="col-sm-8">
+            <h4>Parts list</h4>
+            <table class="table table-hover">
+                <thead> <tr><th>Type</th><th>Added date</th><th>Brand</th><th>Price</th><th>Weight</th><th>Size</th><th>Model</th></tr>
+                </thead>
+                <tbody>
+                    {% for part in parts %}
+                    <tr><td><a href="/part?id={{ part[0] }}">{{ part[1] }}</a></td><td>{{ part[2]}}</td><td>{{ part[3] }}</td><td>{{ part[4] }}</td><td>{{ part[5] }}</td><td>{{ part[6] }}</td><td>{{ part[7] }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-1">
+        </div>
+    </div>
+
+    <!-- Table with the maintenance-->
+    <div class="row">
+        <div class="col-sm-1">
+        </div>
+        <!-- Left column with table -->
+        <div class="col-sm-8">
+            <table class="table table-hover">
+                <thead> <tr><th>Work</th><th>date</th></tr>
+                </thead>
+                <tbody>
+                    {% for m in maint %}
+                    <tr><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-1">
+        </div>
+    </div>
+</div>
+<!-- Buttons at bottom -->
+<div class="row" style="margin-top:.5cm;">
+    <div class="col-sm-1">
+    </div>
+    <div class="col col-sm-8 text-center">
+        <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_details[0] }}"> Add new part</a>
+    </div>
+    <div class="col-sm-1">
+    </div>
+</div>
+<div class="row" style="margin-top:.5cm;">
+    <div class="col-sm-1">
+    </div>
+    <div class="col col-sm-8 text-center">
+        <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_bike?id={{ bike_details[0] }}"> Edit bike</a>
+    </div>
+    <div class="col-sm-1">
+    </div>
+</div>
+
+{% endblock %}

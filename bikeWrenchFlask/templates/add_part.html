@@ -1,97 +1,24 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="../static/css/bootstrap.css">
-        <link rel="stylesheet" href="../static/css/bootstrap.min.css">
-
-        
-        <!-- <link href="../static/cover.css" rel="stylesheet"> -->
-        <title>Bike Wrench</title>
-    </head>
-    <body>
-        <!-- Page Content -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand">Bike Wrench</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarColor01">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <!-- Rider dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Rider</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/rider">Rider Info</a>
-                            <a class="dropdown-item" href="/edit_rider">Edit Rider</a>
-                        </div>
-                    </li>
-                    <!-- Bike dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Bikes</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/bikes">Bike list</a>
-                            <div class="dropdown-divider"></div>
-                            {% for b in bike_menu_list %}
-                            <a class="dropdown-item" href="/bike?id={{ b[0] }}">{{ b[1] }}</a>
-                            {% endfor %}
-                        </div>
-                    </li>
-                    <!-- Parts dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Parts</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Parts by bike</a>
-                            <a class="dropdown-item" href="#">Parts by type</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Part stats by part</a>
-                            <a class="dropdown-item" href="#">Part stats by type</a>
-                        </div>
-                    </li>
-                    <!-- Strava dropdown menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                           aria-expanded="false">Strava</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/fetch_rides">Fetch new rides</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/strava_funcs">Strava app credentials</a>
-                        </div>
-                    </li>
-                </ul>
+{% extends 'layout.html' %}
+{% block content %}
+<div>
+    <div class="jumbotron">
+        <h1>Add part</h1>
+        <p class="lead">Add a new part</p>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-2">
             </div>
-        </nav>
-        <!-- Page Features -->
-        <div>
-            <div class="jumbotron">
-                <h1>Add part</h1>
-                <p class="lead">Add a new part</p>
-            </div>
-            <div>
-                <div class="row">
-                    <div class="col-sm-2">
+            <div class="col-sm-8">
+                <form action="{{ url_for('add_part') }}" method="POST" role="form">
+                    <!-- part type -->
+                    <div class="text-left form-group">
+                        <span class="lead">Part type:</span>
+                        <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_type }}">
                     </div>
-                    <div class="col-sm-8">
-                        <form action="{{ url_for('add_part') }}" method="POST" role="form">
-                            <!-- part type -->
-                            <div class="text-left form-group">
-                                <span class="lead">Part type:</span>
-                                <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_type }}">
-                            </div>
 
-                            <!-- added date -->
-                            <div class="text-left form-group">
+                    <!-- added date -->
+                    <div class="text-left form-group">
                         <span class="lead">Date added:</span>
                         <input class="form-control" type="text" for="added" name="added" destination="added" placeholder="{{ added }}">
                     </div>
@@ -160,34 +87,23 @@
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Add part</button>
-                        </form>
-                    </div>
-                    <div class="col-sm-2">
-                    </div>
-                </div>
+                </form>
             </div>
-
-            <!-- Buttons at bottom -->
-            <div class="row">
-                <div class="col-sm-2">
-                </div>
-                <div class="col text-center" style="margin-top:.5cm;">
-                    <a class="btn btn-secondary btn-lg btn-block" role="button" href="/bike?id={{ bike_id }}"> Cancel (return to bike list) </a>
-                </div>
-                <div class="col-sm-2">
-                </div>
+            <div class="col-sm-2">
             </div>
         </div>
+    </div>
 
-        <footer class="page-footer font-small">
-            <!-- Copyright -->
-            <div class="footer-copyright text-center py-3">© 2020 Copyright Brendan Apfeld<br>
-            </div>
-            <!-- Copyright -->
-        </footer>
+    <!-- Buttons at bottom -->
+    <div class="row">
+        <div class="col-sm-2">
+        </div>
+        <div class="col text-center" style="margin-top:.5cm;">
+            <a class="btn btn-secondary btn-lg btn-block" role="button" href="/bike?id={{ bike_id }}"> Cancel (return to bike list) </a>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>
 
-        <!-- Scripts -->
-        <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
-        <script src="../static/js/bootstrap.bundle.min.js"></script>
-    </body>
-</html>
+{% endblock %}
