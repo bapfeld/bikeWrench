@@ -10,28 +10,35 @@
             <div class="col-sm-2">
             </div>
             <div class="col-sm-8">
-                <form action="{{ url_for('add_maintenance') }}" method="POST" role="form">
-                    <!-- bike name -->
-                    <div class="text-left form-group">
-                        <span class="lead">Work performed:</span>
-                        <textarea class="form-control" for="work" name="work" destination="work" rows="3"> </textarea>
-                    </div>
+                <form action="{{ url_for('add_maintenance', part_id=part_id ) }}" method="POST" role="form">
+                    <!-- Work performed -->
+                    <fieldset class="form-field">
+                        {{ form.work.label }}
+                        {{ form.work }}
+                        {% if form.work.errors %}
+                        <ul class="errors">
+                            {% for error in form.work.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- purchase date -->
-                    <div class="text-left form-group">
-                        <span class="lead">Date maintaned:</span>
-                        <input class="form-control" type="text" for="dt" name="dt" destination="dt" placeholder="{{ dt }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.dt.label }}
+                        {{ form.dt }}
+                        {% if form.dt.errors %}
+                        <ul class="errors">
+                            {% for error in form.dt.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
-                    <!-- hidden label for bike id -->
-                    <div class="col text-center form-group">
-                        <input type="hidden" name="p_id" destination="p_id" value="{{ part_id }}">
-                    </div>
-                    
-                    
+                    {{ form.submit }}
 
-                    <!-- Submit button -->
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Add maintenance log</button>
                 </form>
             </div>
             <div class="col-sm-2">

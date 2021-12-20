@@ -10,46 +10,73 @@
             <div class="col-sm-2">
             </div>
             <div class="col-sm-8">
-                <form action="{{ url_for('edit_bike') }}" method="POST" role="form">
-                    <!-- rider name -->
-                    <div class="text-left form-group">
-                        <span class="lead">Bike name:</span>
-                        <input class="form-control" type="text" for="bike_name" name="bike_name" destination="bike_name" placeholder="{{ bike_details[1] }}">
-                    </div>
+                <form action="{{ url_for('edit_bike', bike_id=bike_id ) }}" method="POST" role="form">
+                    <!-- bike name -->
+                    <fieldset class="form-field">
+                        {{ form.nm.label }}
+                        {{ form.nm }}
+                        {% if form.nm.errors %}
+                        <ul class="errors">
+                            {% for error in form.nm.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- color -->
-                    <div class="text-left form-group">
-                        <span class="lead">Color:</span>
-                        <input class="form-control" type="text" for="color" name="color" destination="color" placeholder="{{ bike_details[2] }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.color.label }}
+                        {{ form.color }}
+                        {% if form.color.errors %}
+                        <ul class="errors">
+                            {% for error in form.color.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
-                    <!-- purchased -->
-                    <div class="text-left form-group">
-                        <span class="lead">Date purchased:</span>
-                        <input class="form-control" type="text" for="purchase" name="purchase" destination="purchase" placeholder="{{ bike_details[3] }}">
-                    </div>
+                    <!-- purchase date -->
+                    <fieldset class="form-field">
+                        {{ form.purchase.label }}
+                        {{ form.purchase }}
+                        {% if form.purchase.errors %}
+                        <ul class="errors">
+                            {% for error in form.purchase.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+
+                    <!-- brand -->
+                    <fieldset class="form-field">
+                        {{ form.mfg.label }}
+                        {{ form.mfg }}
+                        {% if form.mfg.errors %}
+                        <ul class="errors">
+                            {% for error in form.mfg.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- price -->
-                    <div class="text-left form-group">
-                        <span class="lead">Price:</span>
-                        <input class="form-control" type="text" for="price" name="price" destination="price" placeholder="{{ bike_details[4] }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.price.label }}
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                        <ul class="errors">
+                            {% for error in form.price.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
-                    <!-- Manufacturer -->
-                    <div class="text-left form-group">
-                        <span class="lead">Manufacturer:</span>
-                        <input class="form-control" type="text" for="mfg" name="mfg" destination="mfg" placeholder="{{ bike_details[5] }}">
-                    </div>
-
-                    <!-- hidden label for bike id -->
-                    <div class="col text-center form-group">
-                        <input type="hidden" name="id" destination="id" value="{{ bike_details[0] }}">
-                    </div>
-                    
-                    
-
-                    <!-- Submit button -->
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Update bike info</button>
+                    {{ form.submit }}
                 </form>
             </div>
             <div class="col-sm-2">

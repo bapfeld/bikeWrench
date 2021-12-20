@@ -10,83 +10,114 @@
             <div class="col-sm-2">
             </div>
             <div class="col-sm-8">
-                <form action="{{ url_for('add_part') }}" method="POST" role="form">
+                <form action="{{ url_for('add_part', bike_id=bike_id ) }}" method="POST" role="form">
+                    
                     <!-- part type -->
-                    <div class="text-left form-group">
-                        <span class="lead">Part type:</span>
-                        <input class="form-control" type="text" for="p_type" name="p_type" destination="p_type" placeholder="{{ part_type }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.p_type.label }}
+                        {{ form.p_type }}
+                        {% if form.p_type.errors %}
+                        <ul class="errors">
+                            {% for error in form.p_type.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- added date -->
-                    <div class="text-left form-group">
-                        <span class="lead">Date added:</span>
-                        <input class="form-control" type="text" for="added" name="added" destination="added" placeholder="{{ added }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.dt.label }}
+                        {{ form.dt }}
+                        {% if form.dt.errors %}
+                        <ul class="errors">
+                            {% for error in form.dt.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- brand -->
-                    <div class="text-left form-group">
-                        <span class="lead">Brand:</span>
-                        <input class="form-control" type="text" for="brand" name="brand" destination="brand" placeholder="{{ brand }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.brand.label }}
+                        {{ form.brand }}
+                        {% if form.brand.errors %}
+                        <ul class="errors">
+                            {% for error in form.brand.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- price -->
-                    <div class="text-left form-group">
-                        <span class="lead">Price:</span>
-                        <input class="form-control" type="text" for="price" name="price" destination="price" placeholder="">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.price.label }}
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                        <ul class="errors">
+                            {% for error in form.price.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- weight -->
-                    <div class="text-left form-group">
-                        <span class="lead">Weight:</span>
-                        <input class="form-control" type="text" for="weight" name="weight" destination="weight" placeholder="{{ weight }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.weight.label }}
+                        {{ form.weight }}
+                        {% if form.weight.errors %}
+                        <ul class="errors">
+                            {% for error in form.weight.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- size -->
-                    <div class="text-left form-group">
-                        <span class="lead">Size:</span>
-                        <input class="form-control" type="text" for="size" name="size" destination="size" placeholder="{{ size }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.size.label }}
+                        {{ form.size }}
+                        {% if form.size.errors %}
+                        <ul class="errors">
+                            {% for error in form.size.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- model -->
-                    <div class="text-left form-group">
-                        <span class="lead">Model:</span>
-                        <input class="form-control" type="text" for="model" name="model" destination="model" placeholder="{{ model }}">
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.model.label }}
+                        {{ form.model }}
+                        {% if form.model.errors %}
+                        <ul class="errors">
+                            {% for error in form.model.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
                     <!-- Virtual -->
-                    <div class="form-group">
-                        <span class="lead">Part used for virtual rides?</span>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="virtual" id="virtual" value="1" {% if virt == 1 %} checked {% endif %}>
-                            <label class="form-check-label" for="virtual">
-                                Yes
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="virtual" id="virtual" value="0" {% if virt == 0 %} checked {% endif %}>
-                            <label class="form-check-label" for="virtual">
-                                No
-                            </label>
-                        </div>
-                    </div>
+                    <fieldset class="form-field">
+                        {{ form.virt.label }}
+                        {{ form.virt }}
+                        {% if form.virt.errors %}
+                        <ul class="errors">
+                            {% for error in form.virt.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
 
-                    <!-- hidden label for bike id -->
-                    <div class="col text-center form-group">
-                        <input type="hidden" name="bike_id" destination="bike_id" value="{{ bike_id }}">
-                    </div>
-                    <!-- hidden label for retire -->
-                    <div class="col text-center form-group">
-                        <input type="hidden" name="retire" destination="retire" value="{{ retire }}">
-                    </div>
-                    <!-- hidden label for retired part -->
-                    <div class="col text-center form-group">
-                        <input type="hidden" name="retired_part" destination="retired_part" value="{{ retired_part }}">
-                    </div>
-                    
-                    
+                    {{ form.submit }}
 
-                    <!-- Submit button -->
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Add part</button>
                 </form>
             </div>
             <div class="col-sm-2">

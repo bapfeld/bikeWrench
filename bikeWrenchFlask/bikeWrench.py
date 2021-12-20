@@ -9,6 +9,7 @@ from stravalib.client import Client
 #                      validators, StringField, SubmitField)
 from bikeWrench import database as db
 from bikeWrench.strava_funcs import stravaConnection, generate_auth_url
+from bikeWrench.forms import PartForm, MaintenanceForm, BikeForm, DateLimitForm, RiderForm
 
 
 ###########################################################################
@@ -21,6 +22,7 @@ schema_path = os.environ.get('SCHEMA_PATH')
 client_id = os.environ.get('STRAVA_CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
 app_code = keyring.get_password('bikeWrench', 'code')
+app.config['WTF_CSRF_ENABLED'] = False
 
 
 ###########################################################################
@@ -68,12 +70,8 @@ def rider():
 @app.route('/edit_rider', methods=['GET', 'POST'])
 def edit_rider():
     bike_list = db.get_all_bikes(db_path)
-    if request.method == 'GET':
-        res = db.get_rider_info(db_path)
-        speed_unit, dist_unit, elev_unit = units_text(res[1])
-        return render_template('edit_rider.html', rider=res[0], units=res[1],
-                               bike_menu_list=bike_list)
-    elif request.method == 'POST':
+    fm = RiderForm()
+    if fm.validate_on_submit():
         res = db.get_rider_info(db_path)
         current_nm = res[0]
         nm = request.form.get('rider_name')
@@ -84,21 +82,19 @@ def edit_rider():
             units = res[1]
         db.update_rider(current_nm, nm, units, db_path)
         return rider()
+    else:
+        res = db.get_rider_info(db_path)
+        speed_unit, dist_unit, elev_unit = units_text(res[1])
+        return render_template('edit_rider.html', rider=res[0], units=res[1],
+                               bike_menu_list=bike_list)        
 
 
 @app.route('/edit_bike', methods=['GET', 'POST'])
 def edit_bike():
     bike_list = db.get_all_bikes(db_path)
-    if request.method == 'GET':
-        if 'id' in request.args:
-            b_id = request.args['id']
-            bike_details = db.get_bike_details(db_path, b_id)
-            return render_template('edit_bike.html', bike_details=bike_details,
-                                   bike_menu_list=bike_list)
-        else:
-            return render_template('404.html')
-    elif request.method == 'POST':
-        bike_details = db.get_bike_details(db_path, request.form.get('id'))
+    fm = BikeForm()
+    if fm.validate_on_submit():
+        bike_details = db.get_bike_details(db_path, request.args['id'])
         nm = request.form.get('bike_name')
         color = request.form.get('color')
         purchase = request.form.get('purchase')
@@ -119,23 +115,22 @@ def edit_bike():
         db.update_bike(bike_details[0], nm, color, purchase, price,
                        mfg, db_path)
         return bike(bike_details[0])
-        
+    else:
+        if 'id' in request.args:
+            b_id = request.args['id']
+            bike_details = db.get_bike_details(db_path, b_id)
+            return render_template('edit_bike.html', bike_details=bike_details,
+                                   bike_menu_list=bike_list)
+        else:
+            return render_template('404.html')        
 
 
 @app.route('/edit_part', methods=['GET', 'POST'])
 def edit_part():
     bike_list = db.get_all_bikes(db_path)
-    if request.method == 'GET':
-        if 'id' in request.args:
-            p_id = request.args['id']
-            part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
-            return render_template('edit_part.html', part_details=part_details,
-                                   part_id=p_id, bike_name=b_nm,
-                                   bike_menu_list=bike_list)
-        else:
-            return render_template('404.html')
-    elif request.method == 'POST':
-        p_id = request.form.get('id')
+    fm = PartForm()
+    if fm.validate_on_submit():
+        p_id = request.args['id']
         part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
         p_type = request.form.get('p_type')
         added = request.form.get('added')
@@ -168,6 +163,16 @@ def edit_part():
         db.update_part(p_id, p_type, added, brand, price, weight,
                        size, model, virtual, db_path)
         return part(p_id, edit=True)
+    else:
+        if 'id' in request.args:
+            p_id = request.args['id']
+            part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
+            return render_template('edit_part.html', part_details=part_details,
+                                   part_id=p_id, bike_name=b_nm,
+                                   bike_menu_list=bike_list)
+        else:
+            return render_template('404.html')
+    
 
 
 @app.route('/bikes', methods=['GET', 'POST'])
@@ -180,15 +185,9 @@ def bikes():
 def bike(b_id=None):
     rdr = db.get_rider_info(db_path)
     bike_list = db.get_all_bikes(db_path)
-    if b_id is not None:
-        start_date = None
-        end_date = None
-    elif request.method == 'GET':
+    fm = DateLimitForm()
+    if fm.validate_on_submit():
         b_id = request.args['id']
-        start_date = None
-        end_date = None
-    elif request.method == 'POST':
-        b_id = request.form.get('bike_id')
         start_date = request.form.get('start_date')
         if start_date in ['None', '']:
             start_date = None
@@ -200,6 +199,7 @@ def bike(b_id=None):
         else:
             end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
     else:
+        b_id = request.args['id']
         start_date = None
         end_date = None
     res = db.get_rider_info(db_path)
@@ -221,13 +221,12 @@ def bike(b_id=None):
 def part(p_id=None, end_date=None, start_date=None, edit=False):
     rdr = db.get_rider_info(db_path)
     bike_list = db.get_all_bikes(db_path)
-    if request.method == 'GET':
-        p_id = request.args['id']
-    elif request.method == 'POST':
+    fm = DateLimitForm()
+    if fm.validate_on_submit():
         if edit:
             pass
         else:
-            p_id = request.form.get('part_id')
+            p_id = request.args['id']
             start_date = request.form.get('start_date')
             if start_date in ['None', ''] or start_date is None:
                 start_date = None
@@ -238,6 +237,9 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
                 end_date = None
             else:
                 end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
+    else:
+        p_id = request.args['id']
+        
     part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
     virt = bool(part_details[10] == 1)
     early_date = part_details[2]
@@ -261,65 +263,13 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
 @app.route('/add_part', methods=['GET', 'POST'])
 def add_part():
     bike_list = db.get_all_bikes(db_path)
-    if request.method == 'GET':
-        if 'bike_id' in request.args:
-            b_id = request.args['bike_id']
-            try:
-                part_type = request.args['tp']
-                if part_type in ['None', '']:
-                    part_type = None
-            except:
-                part_type = None
-            try:
-                brand = request.args['brand']
-                if brand in ['None', '']:
-                    brand = None
-            except:
-                brand = None
-            try:
-                weight = request.args['weight']
-                if weight in ['None', '']:
-                    weight = None
-            except:
-                weight = None
-            try:
-                size = request.args['size']
-                if size in ['None', '']:
-                    size = None
-            except:
-                size = None
-            try:
-                model = request.args['model']
-                if model in ['None', '']:
-                    model = None
-            except:
-                model = None
-            try:
-                retire = int(request.args['retire'])
-                retired_part = request.args['part_id']
-            except:
-                retire = 0
-                retired_part = None
-            try:
-                virt = int(request.args['virtual'])
-            except:
-                virt = 0
-            added = datetime.datetime.today().strftime('%Y-%m-%d')
-            return render_template('add_part.html', bike_id=b_id,
-                                   part_type=part_type, brand=brand, weight=weight,
-                                   size=size, model=model, added=added, retire=retire,
-                                   retired_part=retired_part,
-                                   bike_menu_list=bike_list, virtual=virt)
-        else:
-            return render_template('404.html')
-    elif request.method == 'POST':
-        retire = request.form.get('retire')
-        retired_part = request.form.get('retired_part')
+    fm = PartForm()
+    if fm.validate_on_submit():
         part_type = request.form.get('p_type')
-        b_id = request.form.get('bike_id')
+        b_id = request.args['bike_id']
         if part_type in ['None', '']:
             part_type = None
-        added = request.form.get('added')
+        added = request.form.get('dt')
         if added in ['None', '']:
             added = None
         else:
@@ -339,7 +289,7 @@ def add_part():
         model = request.form.get('model')
         if model in ['None', '']:
             model = None
-        virtual = request.form.get('virtual')
+        virtual = request.form.get('virt')
         if virtual in ['0', 0]:
             virtual = 0
         else:
@@ -347,19 +297,54 @@ def add_part():
         vals = (part_type, added, brand, price, weight, size,
                 model, b_id, virtual)
         db.add_part(db_path, vals)
-        if int(retire) == 1:
-            db.retire(db_path, retired_part, added)
         return bike(b_id)
+    else:
+        b_id = request.args['bike_id']
+        try:
+            part_type = request.args['tp']
+            if part_type in ['None', '']:
+                part_type = None
+        except:
+            part_type = None
+        try:
+            brand = request.args['brand']
+            if brand in ['None', '']:
+                brand = None
+        except:
+            brand = None
+        try:
+            weight = request.args['weight']
+            if weight in ['None', '']:
+                weight = None
+        except:
+            weight = None
+        try:
+            size = request.args['size']
+            if size in ['None', '']:
+                size = None
+        except:
+            size = None
+        try:
+            model = request.args['model']
+            if model in ['None', '']:
+                model = None
+        except:
+            model = None
+        try:
+            virt = int(request.args['virtual'])
+        except:
+            virt = 0
+        added = datetime.datetime.today().strftime('%Y-%m-%d')
+        return render_template('add_part.html', bike_id=b_id,
+                               part_type=part_type, brand=brand, weight=weight,
+                               size=size, model=model, added=added,
+                               bike_menu_list=bike_list, virtual=virt, form=fm)
 
 
 @app.route('/add_bike', methods=['GET', 'POST'])
 def add_bike():
-    if request.method == 'GET':
-        b_id = request.args['id']
-        bike_list = db.get_all_bikes(db_path)
-        return render_template('add_bike.html', bike_id=b_id,
-                               bike_menu_list=bike_list)
-    elif request.method == 'POST':
+    fm = BikeForm()
+    if fm.validate_on_submit():
         nm = request.form.get('nm')
         if nm in ['None', '']:
             nm = None
@@ -382,17 +367,19 @@ def add_bike():
             b_id = None
         db.add_new_bike(db_path, b_id, nm, color, purchase, price, mfg)
         return bikes()        
+    else:
+        b_id = request.args['id']
+        bike_list = db.get_all_bikes(db_path)
+        return render_template('add_bike.html', bike_id=b_id,
+                               bike_menu_list=bike_list)
 
 
 @app.route('/add_maintenance', methods=['GET', 'POST'])
 def add_maintenance():
     dt = datetime.datetime.today().strftime('%Y-%m-%d')
     bike_list = db.get_all_bikes(db_path)
-    if request.method == 'GET':
-        p_id = request.args['id']
-        return render_template('add_maintenance.html', part_id=p_id, dt=dt,
-                               bike_menu_list=bike_list)
-    elif request.method == 'POST':
+    fm = MaintenanceForm()
+    if fm.validate_on_submit():
         p_id = request.form.get('p_id')
         new_dt = request.form.get('dt')
         work = request.form.get('work')
@@ -404,6 +391,10 @@ def add_maintenance():
             work = None
         db.add_maintenance(db_path, p_id, work, new_dt)
         return part(p_id)
+    else:
+        p_id = request.args['id']
+        return render_template('add_maintenance.html', part_id=p_id, dt=dt,
+                               bike_menu_list=bike_list)
 
 
 @app.route('/fetch_rides', methods=['GET'])

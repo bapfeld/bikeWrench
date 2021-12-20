@@ -31,22 +31,32 @@
         <div class="col-sm-2">
             <h4>Update stats</h4>
             <p>Use these input boxes to change the date range used to compile part statistics </p>
-            <form action="{{ url_for('part') }}" method="POST" role="form">
+            <form action="{{ url_for('part', part_id=part_id ) }}" method="POST" role="form">
                 <!-- start date -->
-                <div class="text-left form-group">
-                    <span class="lead">Start Date:</span>
-                    <input class="form-control" type="text" for="start_date" name="start_date" destination="start_date">
-                </div>
+                <fieldset class="form-field">
+                    {{ form.start_date.label }}
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}
+                    <ul class="errors">
+                        {% for error in form.start_date.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </fieldset>
                 <!-- end date -->
-                <div class="text-left form-group">
-                    <span class="lead">End Date:</span>
-                    <input class="form-control" type="text" for="end_date" name="end_date" destination="end_date">
-                </div>
-                <!-- hidden label for bike id -->
-                <div class="col text-center form-group">
-                    <input type="hidden" name="part_id" destination="part_id" value="{{ part_details[0] }}">
-                </div>
-
+                <fieldset class="form-field">
+                    {{ form.end_date.label }}
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}
+                    <ul class="errors">
+                        {% for error in form.end_date.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </fieldset>
+                
                 <!-- Submit button -->
                 <button type="submit" class="btn btn-primary btn-lg btn-block">Refresh Details</button>
             </form>
