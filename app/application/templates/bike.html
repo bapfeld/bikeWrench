@@ -140,7 +140,31 @@
                 </thead>
                 <tbody>
                     {% for part in parts %}
-                    <tr><td><a href="/part?id={{ part[0] }}">{{ part[1] }}</a></td><td>{{ part[2]}}</td><td>{{ part[3] }}</td><td>{{ part[4] }}</td><td>{{ part[5] }}</td><td>{{ part[6] }}</td><td>{{ part[7] }}</td></tr>
+                    <tr>
+                        <td>
+                            <a
+                                href="{{ url_for('part', id=part[0] }}">{{ part[1] }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ part[2]}}
+                        </td>
+                        <td>
+                            {{ part[3] }}
+                        </td>
+                        <td>
+                            {{ part[4] }}
+                        </td>
+                        <td>
+                            {{ part[5] }}
+                        </td>
+                        <td>
+                            {{ part[6] }}
+                        </td>
+                        <td>
+                            {{ part[7] }}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -174,7 +198,11 @@
     <div class="col-sm-1">
     </div>
     <div class="col col-sm-8 text-center">
-        <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_details[0] }}"> Add new part</a>
+        <a
+            class="btn btn-primary btn-lg btn-block"
+            role="button"
+            href="{{ url_for('add_part', bike_id=bike_details[0]) }}"> Add new part
+        </a>
     </div>
     <div class="col-sm-1">
     </div>
@@ -183,7 +211,11 @@
     <div class="col-sm-1">
     </div>
     <div class="col col-sm-8 text-center">
-        <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_bike?id={{ bike_details[0] }}"> Edit bike</a>
+        <a
+            class="btn btn-secondary btn-lg btn-block"
+            role="button"
+            href="{{ url_for('edit_bike', id=bike_details[0] ) }}"> Edit bike
+        </a>
     </div>
     <div class="col-sm-1">
     </div>

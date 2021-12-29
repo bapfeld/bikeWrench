@@ -89,7 +89,12 @@
         <div class="col-sm-2">
         </div>
         <div class="col col-sm-8 text-center" style="margin-top:.5cm;">
-            <a class="btn btn-secondary btn-lg btn-block" role="button" href="/bike?id={{ bike_details[0] }}"> Cancel (return to bike info) </a>
+            <a
+                class="btn btn-secondary btn-lg btn-block"
+                role="button"
+                href="{{ url_for('bike', id=bike_details[0] ) }}">
+                Cancel (return to bike info)
+            </a>
         </div>
         <div class="col-sm-2">
         </div>

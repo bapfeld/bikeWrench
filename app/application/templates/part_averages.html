@@ -17,7 +17,26 @@
                 </thead>
                 <tbody>
                     {% for avg in avgs %}
-                    <tr><td>{{ avg[0] }}</a></td><td>{{ avg[1]}}</td><td>{{ avg[2] }}</td><td>{{ avg[3] }}</td><td>{{ avg[4] }}</td><td>{{ avg[5] }}</td></tr>
+                    <tr>
+                        <td>
+                            {{ avg[0] }}
+                        </td>
+                        <td>
+                            {{ avg[1]}}
+                        </td>
+                        <td>
+                            {{ avg[2] }}
+                        </td>
+                        <td>
+                            {{ avg[3] }}
+                        </td>
+                        <td>
+                            {{ avg[4] }}
+                        </td>
+                        <td>
+                            {{ avg[5] }}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

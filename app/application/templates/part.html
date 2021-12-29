@@ -175,7 +175,12 @@
     <div class="col-sm-2">
     </div>
     <div class="col col-sm-8 text-center">
-        <a class="btn btn-primary btn-lg btn-block" role="button" href="/add_maintenance?id={{ part_details[0] }}"> Maintain current part</a>
+        <a
+            class="btn btn-primary btn-lg btn-block"
+            role="button"
+            href="{{ url_for('add_maintenance', id=part_details[0] ) }}">
+            Maintain current part
+        </a>
     </div>
     <div class="col-sm-2">
     </div>
@@ -184,7 +189,12 @@
     <div class="col-sm-2">
     </div>
     <div class="col col-sm-8 text-center">
-        <a class="btn btn-secondary btn-lg btn-block" role="button" href="/edit_part?id={{ part_details[0] }}"> Edit current part</a>
+        <a
+            class="btn btn-secondary btn-lg btn-block"
+            role="button"
+            href="{{ url_for('edit_part', id=part_detials[0]) }}">
+            Edit current part
+        </a>
     </div>
     <div class="col-sm-2">
     </div>
@@ -193,7 +203,20 @@
     <div class="col-sm-2">
     </div>
     <div class="col col-sm-8 text-center">
-        <a class="btn btn-secondary btn-lg btn-block" role="button" href="/add_part?bike_id={{ bike_id }}&tp={{ part_details[1] }}&brand={{ part_details[3] }}&weight={{ part_details[5] }}&size={{ part_details[6] }}&model={{ part_details[7] }}&retire=1&part_id={{ part_details[0] }}" ="> Replace current part</a>
+        <a
+            class="btn btn-secondary btn-lg btn-block"
+            role="button"
+            href="{{ url_for('add_part', 
+                             bike_id=bike_id,
+                             tp=part_details[1],
+                             brand=part_details[3],
+                             weight=part_details[5],
+                             size=part_details[6],
+                             model=part_details[7],
+                             retire=1,
+                             part_id=part_details[0]) }}"> 
+            Replace current part
+        </a>
     </div>
     <div class="col-sm-2">
     </div>

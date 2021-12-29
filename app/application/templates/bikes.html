@@ -17,7 +17,22 @@
                 </thead>
                 <tbody>
                     {% for bike in bikes %}
-                    <tr><td><a href="/bike?id={{ bike[0] }}">{{ bike[1] }}</a></td><td>{{ bike[5]}}</td><td>{{ bike[2] }}</td><td>{{ bike[3] }}</td></tr>
+                    <tr>
+                        <td>
+                            <a
+                                href="{{ url_for('bike', id=bike[0] ) }}">{{ bike[1] }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ bike[5]}}
+                        </td>
+                        <td>
+                            {{ bike[2] }}
+                        </td>
+                        <td>
+                            {{ bike[3] }}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

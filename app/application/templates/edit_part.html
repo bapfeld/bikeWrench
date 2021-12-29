@@ -126,7 +126,12 @@
         <div class="col-sm-2">
         </div>
         <div class="col col-sm-8 text-center" style="margin-top:.5cm;">
-            <a class="btn btn-secondary btn-lg btn-block" role="button" href="/part?id={{ part_id }}"> Cancel (return to part info) </a>
+            <a
+                class="btn btn-secondary btn-lg btn-block"
+                role="button"
+                href="{{ url_for('part', id=part_id ) }}">
+                Cancel (return to part info)
+            </a>
         </div>
         <div class="col-sm-2">
         </div>
