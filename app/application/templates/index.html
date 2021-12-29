@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'layout.jinja' %}
 {% block content %}
 <div>
     {% if msg %}
@@ -13,7 +13,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Bikes</h5>
                         <p class="card-text">Access list of bikes in garage and functions to add and update bikes as well as view bike statistics and summaries.</p>
-                        <a href="/bikes" class="btn btn-primary">Bikes!</a>
+                        <a href="{{ url_for('bikes') }}" class="btn btn-primary">Bikes!</a>
                     </div>
                 </div>
             </div>
