@@ -9,6 +9,7 @@ from flask import current_app as app
 from . import database as db
 from .strava_funcs import stravaConnection, generate_auth_url
 from .forms import PartForm, MaintenanceForm, BikeForm, DateLimitForm, RiderForm
+from .helpers import units_text
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
@@ -21,21 +22,6 @@ schema_path = os.environ.get('SCHEMA_PATH')
 client_id = os.environ.get('STRAVA_CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
 app_code = keyring.get_password('bikeWrench', 'code')
-
-
-###########################################################################
-# App helper funcs                                                        #
-###########################################################################
-def units_text(unit_type):
-    if unit_type == 'imperial':
-        speed_unit = 'MPH'
-        dist_unit = 'miles'
-        elev_unit = 'feet'
-    else:
-        speed_unit = 'KPH'
-        dist_unit = 'kilometers'
-        elev_unit = 'meters'
-    return (speed_unit, dist_unit, elev_unit)
 
 
 ###########################################################################
