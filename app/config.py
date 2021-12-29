@@ -13,6 +13,7 @@ class Config:
     WTF_CSRF_ENABLED = False
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
+    SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')
 
     # Database
     DB_PATH = os.environ.get('STRAVA_DB_PATH')
