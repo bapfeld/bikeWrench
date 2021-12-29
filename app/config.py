@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import keyring
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '.env'))
+load_dotenv(os.path.join(basedir, '../.env'))
 
 
 class Config:
@@ -33,7 +33,7 @@ class DevConfig(Config):
     TESTING = True
 
     # Database modifications
-    SQLALCHEMY_DATABASE_URI = ''
+    SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite:///' + os.environ.get('STRAVA_DB_PATH')
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
