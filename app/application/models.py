@@ -11,7 +11,7 @@ class Riders(db.Model):
                       index=False,
                       unique=False,
                       nullable=True)
-    r_ktn = db.Column(db.String,
+    r_tkn = db.Column(db.String,
                       index=False,
                       unique=False,
                       nullable=True)
