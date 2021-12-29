@@ -58,6 +58,6 @@ class RiderForm(FlaskForm):
     rider = StringField('Rider Name', [DataRequired()])
     units = SelectField(
         'Unit type preference',
-        choices=[('imperial', 'Imperial'), ('metric', 'metric'))]
+        choices=[('imperial', 'Imperial'), ('metric', 'metric')]
     )
     submit = SubmitField('Update rider info')
