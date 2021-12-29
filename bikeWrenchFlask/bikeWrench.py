@@ -1,9 +1,9 @@
 import os
 import datetime
 import dateparser
+from dotenv import load_dotenv
 import keyring
 from flask import Flask, render_template, request, url_for, make_response
-from dotenv import load_dotenv, find_dotenv
 from stravalib.client import Client
 # from wtforms import (Form, TextField, TextAreaField,
 #                      validators, StringField, SubmitField)
@@ -16,18 +16,19 @@ from bikeWrench.forms import PartForm, MaintenanceForm, BikeForm, DateLimitForm,
 # Initial Setup                                                           #
 ###########################################################################
 app = Flask(__name__)
-load_dotenv(find_dotenv())
+app.config.from_object('config.DevConfig')
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
+
+# Database
 db_path = os.environ.get('STRAVA_DB_PATH')
 schema_path = os.environ.get('SCHEMA_PATH')
+
+# Strava secrets
 client_id = os.environ.get('STRAVA_CLIENT_ID')
 client_secret = os.environ.get('CLIENT_SECRET')
 app_code = keyring.get_password('bikeWrench', 'code')
-app.config['WTF_CSRF_ENABLED'] = False
-
-
-###########################################################################
-# Database functions                                                      #
-###########################################################################
 
 
 ###########################################################################
