@@ -74,11 +74,11 @@ class Rides(db.Model):
                      index=False,
                      unique=False,
                      nullable=True)
-    moving_time = db.Column(db.BigInteger,
+    moving_time = db.Column(db.Integer,
                             index=False,
                             unique=False,
                             nullable=True)
-    elapsed_time = db.Column(db.BigInteger,
+    elapsed_time = db.Column(db.Integer,
                              index=False,
                              unique=False,
                              nullable=True)
