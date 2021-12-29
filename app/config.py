@@ -32,6 +32,11 @@ class DevConfig(Config):
     DEBUG = True
     TESTING = True
 
+    # Database modifications
+    SQLALCHEMY_DATABASE_URI = ''
+    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class ProdConfig(Config):
     """Production configuration"""
@@ -39,3 +44,8 @@ class ProdConfig(Config):
     FLASK_ENV = 'production'
     DEBUG = False
     TESTING = False
+
+    # Database modifications
+    SQLALCHEMY_DATABASE_URI = ''
+    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
