@@ -47,23 +47,6 @@ CREATE TABLE parts (
     virtual      INTEGER
 );
 
--- Record retired parts separately
-CREATE TABLE retired_parts (
-    part_id      INTEGER REFERENCES parts(part_id),
-    type         TEXT,
-    added        DATE,
-    brand        TEXT,
-    price        REAL,
-    weight       REAL,
-    size         TEXT,
-    model        TEXT,
-    bike         TEXT NOT NULL REFERENCES bikes(bike_id),
-    retired      DATE,
-    dist         REAL,
-    elev         REAL,
-    virtual      INTEGER
-);
-
 -- Maintenance tasks record things that happen to parts
 CREATE TABLE maintenance (
     maint_id     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

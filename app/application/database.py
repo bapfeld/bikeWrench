@@ -156,7 +156,7 @@ def update_bike(b_id, nm, color, purchase, price, mfg, db_path):
 def update_part(p_id, p_type, added, brand, price, weight,
                 size, model, virtual, db_path):
     q = f"""UPDATE parts
-            SET type = '{p_type}',
+            SET tp = '{p_type}',
                 added = '{added}',
                 brand = '{brand}',
                 price = '{price}',
@@ -219,7 +219,7 @@ def get_all_ride_ids(db_path):
 def add_part(db_path, part_values):
     with sqlite3.connect(db_path) as conn:
         conn.execute("""INSERT INTO parts (
-                            type,
+                            tp,
                             added,
                             brand,
                             price,
@@ -281,7 +281,7 @@ def get_ride_data_for_bike(db_path, bike_id, units, start_date=None,
                     SUM(calories) AS calories
                 FROM rides
                 WHERE bike = '{bike_id}'"""
-    query_virt = query + " AND type = 'VirtualRide'"
+    query_virt = query + " AND tp = 'VirtualRide'"
     if start_date is not None:
         query += f" AND date >= '{start_date}'"
     if end_date is not None:
@@ -310,7 +310,7 @@ def get_ride_data_for_part(db_path, bike_id, units, early_date, late_date):
                 WHERE bike = '{bike_id}'
                   AND date >= '{early_date}'
                   AND date <= '{late_date}'"""
-    query_virt = query + " AND type = 'VirtualRide'"
+    query_virt = query + " AND tp = 'VirtualRide'"
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(query)
@@ -352,7 +352,7 @@ def add_multiple_rides(db_path, activity_list):
     with sqlite3.connect(db_path) as conn:
         sql = """INSERT INTO rides
                  (ride_id, bike, distance, name, date, moving_time,
-                  elapsed_time, elev, type, avg_speed, max_speed,
+                  elapsed_time, elev, tp, avg_speed, max_speed,
                   calories)
                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"""
         conn.executemany(sql, a_list)
@@ -426,9 +426,10 @@ def get_part_details(db_path, part_id):
 
 
 def get_part_averages(db_path):
-    q = f"""SELECT type, AVG(price), AVG(weight),
+    q = f"""SELECT tp, AVG(price), AVG(weight),
                    AVG(dist), AVG(elev), AVG(retired - added)
-            FROM retired_parts
+            FROM parts
+            WHERE retired = 1
             GROUP BY 1
          """
     with sqlite3.connect(db_path) as conn:
@@ -458,9 +459,4 @@ def retire(db_path, retired_part, date_retired):
         c.execute(q3)
         part_summary = c.fetchone()
         res_out = list(p) + list(part_summary)
-        q4 = """INSERT INTO retired_parts
-                    (part_id, type, added, brand, price, weight,
-                     size, model, bike, retired, virtual, dist, elev)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-             """
-        c.execute(q4, res_out)
+
