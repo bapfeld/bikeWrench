@@ -1,22 +1,14 @@
 import os
 import datetime
 import dateparser
-from dotenv import load_dotenv
 import keyring
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, url_for, make_response
-from stravalib.client import Client
-# from wtforms import (Form, TextField, TextAreaField,
-#                      validators, StringField, SubmitField)
-from bikeWrench import database as db
-from bikeWrench.strava_funcs import stravaConnection, generate_auth_url
-from bikeWrench.forms import PartForm, MaintenanceForm, BikeForm, DateLimitForm, RiderForm
-
-
-###########################################################################
-# Initial Setup                                                           #
-###########################################################################
-app = Flask(__name__)
-app.config.from_object('config.DevConfig')
+from flask import current_app as app
+# from stravalib.client import Client
+from . import database as db
+from .strava_funcs import stravaConnection, generate_auth_url
+from .forms import PartForm, MaintenanceForm, BikeForm, DateLimitForm, RiderForm
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
@@ -447,9 +439,3 @@ def not_found():
     """Page not found."""
     return make_response(render_template("404.html"), 404)
 
-
-###########################################################################
-# Run the app                                                             #
-###########################################################################
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5002)

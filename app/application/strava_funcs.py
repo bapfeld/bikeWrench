@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 import requests
 from stravalib.client import Client
-from bikeWrench.database import get_all_ride_ids
+from .database import get_all_ride_ids
 
 
 class stravaConnection():
