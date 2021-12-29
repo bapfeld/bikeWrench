@@ -79,7 +79,7 @@ def edit_rider():
         res = db.get_rider_info(db_path)
         speed_unit, dist_unit, elev_unit = units_text(res[1])
         return render_template('edit_rider.html', rider=res[0], units=res[1],
-                               bike_menu_list=bike_list)        
+                               bike_menu_list=bike_list, form=fm)
 
 
 @app.route('/edit_bike', methods=['GET', 'POST'])
@@ -113,7 +113,7 @@ def edit_bike():
             b_id = request.args['id']
             bike_details = db.get_bike_details(db_path, b_id)
             return render_template('edit_bike.html', bike_details=bike_details,
-                                   bike_menu_list=bike_list)
+                                   bike_menu_list=bike_list, form=fm)
         else:
             return render_template('404.html')        
 
@@ -162,7 +162,7 @@ def edit_part():
             part_details, b_id, b_nm = db.get_part_details(db_path, p_id)
             return render_template('edit_part.html', part_details=part_details,
                                    part_id=p_id, bike_name=b_nm,
-                                   bike_menu_list=bike_list)
+                                   bike_menu_list=bike_list, form=fm)
         else:
             return render_template('404.html')
     
@@ -207,7 +207,7 @@ def bike(b_id=None):
     return render_template('bike.html', parts=parts, bike_details=deets,
                            stats=stats, speed_unit=speed_unit, ms=ms,
                            dist_unit=dist_unit, elev_unit=elev_unit,
-                           maint=maint, bike_menu_list=bike_list)
+                           maint=maint, bike_menu_list=bike_list, form=fm)
 
 
 @app.route('/part', methods=['GET', 'POST'])
@@ -250,7 +250,7 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,
                            stats=stats, bike_id=b_id, virtual=virt,
-                           bike_menu_list=bike_list)
+                           bike_menu_list=bike_list, form=fm)
 
 
 @app.route('/add_part', methods=['GET', 'POST'])
@@ -364,7 +364,7 @@ def add_bike():
         b_id = request.args['id']
         bike_list = db.get_all_bikes(db_path)
         return render_template('add_bike.html', bike_id=b_id,
-                               bike_menu_list=bike_list)
+                               bike_menu_list=bike_list, form=fm)
 
 
 @app.route('/add_maintenance', methods=['GET', 'POST'])
@@ -387,7 +387,7 @@ def add_maintenance():
     else:
         p_id = request.args['id']
         return render_template('add_maintenance.html', part_id=p_id, dt=dt,
-                               bike_menu_list=bike_list)
+                               bike_menu_list=bike_list, form=fm)
 
 
 @app.route('/fetch_rides', methods=['GET'])
