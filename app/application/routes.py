@@ -3,7 +3,6 @@ import dateparser
 import keyring
 from flask import Flask, render_template, request, url_for, make_response
 from flask import current_app as app
-# from stravalib.client import Client
 from . import database as dtb
 from .strava_funcs import stravaConnection, generate_auth_url
 from .forms import (PartForm, MaintenanceForm, BikeForm,
