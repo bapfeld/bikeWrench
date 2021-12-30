@@ -9,6 +9,7 @@ from .strava_funcs import stravaConnection, generate_auth_url
 from .forms import (PartForm, MaintenanceForm, BikeForm,
                     DateLimitForm, RiderForm)
 from .helpers import units_text
+from .models import db, Riders, Bikes, Rides, Parts, Maintenance
 
 
 ###########################################################################
@@ -175,7 +176,7 @@ def bike(b_id=None):
     res = db.get_rider_info(app.config['DB_PATH'])
     deets = db.get_bike_details(app.config['DB_PATH'], b_id)
     parts = db.get_all_bike_parts(app.config['DB_PATH'], b_id)
-    part_ids = [p[0] for p in parts]
+    part_ids = (p[0] for p in parts)
     maint = db.get_maintenance(app.config['DB_PATH'], part_ids)
     stats = db.get_ride_data_for_bike(app.config['DB_PATH'], b_id, rdr[1],
                                       start_date, end_date)
