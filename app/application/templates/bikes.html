@@ -20,17 +20,17 @@
                     <tr>
                         <td>
                             <a
-                                href="{{ url_for('bike', id=bike[0] ) }}">{{ bike[1] }}
+                                href="{{ url_for('bike', id=bike.bike_id ) }}">{{ bike.name }}
                             </a>
                         </td>
                         <td>
-                            {{ bike[5]}}
+                            {{ bike.mfg}}
                         </td>
                         <td>
-                            {{ bike[2] }}
+                            {{ bike.color }}
                         </td>
                         <td>
-                            {{ bike[3] }}
+                            {{ bike.purchased }}
                         </td>
                     </tr>
                     {% endfor %}

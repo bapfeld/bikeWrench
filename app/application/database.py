@@ -87,7 +87,7 @@ def get_all_bike_ids():
 
 def get_all_bikes():
     bikes = Bikes.query.all()
-    return res
+    return bikes
 
 
 def get_bike_details(bike_id):
