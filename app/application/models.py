@@ -15,7 +15,7 @@ class Riders(db.Model):
                       index=False,
                       unique=False,
                       nullable=True)
-    tkn_exp = db.Column(db.DateTime,
+    tkn_exp = db.Column(db.String,
                         index=False,
                         unique=False,
                         nullable=True)
