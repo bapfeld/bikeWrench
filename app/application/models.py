@@ -58,10 +58,10 @@ class Rides(db.Model):
                         primary_key=True,
                         unique=True)
     bike = db.Column(db.String,
+                     db.ForeignKey('bikes.bike_id'),
                      index=False,
                      unique=False,
-                     nullable=True,
-                     foreign_key='bikes.bike_id')
+                     nullable=True)
     distance = db.Column(db.BigInteger,
                          index=False,
                          unique=False,
@@ -142,10 +142,10 @@ class Parts(db.Model):
                       unique=False,
                       nullable=True)
     bike = db.Column(db.String,
+                     db.ForeignKey('bikes.bike_id'),
                      index=False,
                      unique=False,
-                     nullable=True,
-                     foreign_key='bikes.bike_id')
+                     nullable=True)
     retired = db.Column(db.Date,
                         index=False,
                         unique=False,
@@ -164,10 +164,10 @@ class Maintenance(db.Model):
                          primary_key=True, 
                          nullable=False)
     part = db.Column(db.Integer,
+                     db.ForeignKey('parts.part_id'),
                      index=False,
                      unique=False,
-                     nullable=False,
-                     foreign_key='parts.part_id')
+                     nullable=False)
     work = db.Column(db.String,
                      index=False,
                      unique=False,
