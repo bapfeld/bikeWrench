@@ -271,7 +271,7 @@ def get_part_details(part_id):
     return (res, b_id, b_nm)
 
 
-def get_part_averages(db_path):
+def get_part_averages():
     averages = (db.session
                 .query(Parts.tp,
                        func.avg(Parts.price),
