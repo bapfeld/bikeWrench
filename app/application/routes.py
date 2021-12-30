@@ -4,7 +4,7 @@ import keyring
 from flask import Flask, render_template, request, url_for, make_response
 from flask import current_app as app
 # from stravalib.client import Client
-from . import database as db
+from . import database as dtb
 from .strava_funcs import stravaConnection, generate_auth_url
 from .forms import (PartForm, MaintenanceForm, BikeForm,
                     DateLimitForm, RiderForm)
@@ -19,14 +19,14 @@ from .models import db, Riders, Bikes, Rides, Parts, Maintenance
 @app.route('/index', methods=['GET'])
 @app.route('/home', methods=['GET'])
 def index():
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
     return render_template('index.html', bike_menu_list=bike_list)
 
 
 @app.route('/rider', methods=['GET', 'POST'])
 def rider():
-    res = db.get_rider_info(app.config['DB_PATH'])
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    res = dtb.get_rider_info()
+    bike_list = dtb.get_all_bikes()
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('rider.html', rider=res[0], max_speed=res[4],
                            avg_speed=res[5], tot_dist=res[6], tot_climb=res[7],
@@ -36,10 +36,10 @@ def rider():
 
 @app.route('/edit_rider', methods=['GET', 'POST'])
 def edit_rider():
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
     fm = RiderForm()
     if fm.validate_on_submit():
-        res = db.get_rider_info(app.config['DB_PATH'])
+        res = dtb.get_rider_info()
         current_nm = res[0]
         nm = request.form.get('rider_name')
         units = request.form.get('units')
@@ -47,10 +47,10 @@ def edit_rider():
             nm = current_nm
         if (units in ['None', '']) or units is None:
             units = res[1]
-        db.update_rider(current_nm, nm, units, app.config['DB_PATH'])
+        dtb.update_rider(current_nm, nm, units)
         return rider()
     else:
-        res = db.get_rider_info(app.config['DB_PATH'])
+        res = dtb.get_rider_info()
         speed_unit, dist_unit, elev_unit = units_text(res[1])
         return render_template('edit_rider.html', rider=res[0], units=res[1],
                                bike_menu_list=bike_list, form=fm)
@@ -58,11 +58,10 @@ def edit_rider():
 
 @app.route('/edit_bike', methods=['GET', 'POST'])
 def edit_bike():
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
     fm = BikeForm()
     if fm.validate_on_submit():
-        bike_details = db.get_bike_details(app.config['DB_PATH'],
-                                           request.args['id'])
+        bike_details = dtb.get_bike_details(request.args['id'])
         nm = request.form.get('bike_name')
         color = request.form.get('color')
         purchase = request.form.get('purchase')
@@ -80,14 +79,12 @@ def edit_bike():
             price = bike_details[4]
         if (mfg in ['None', '']) or mfg is None:
             mfg = bike_details[1]
-        db.update_bike(bike_details[0], nm, color, purchase, price,
-                       mfg, app.config['DB_PATH'])
+        dtb.update_bike(bike_details[0], nm, color, purchase, price, mfg)
         return bike(bike_details[0])
     else:
         if 'id' in request.args:
             b_id = request.args['id']
-            bike_details = db.get_bike_details(app.config['DB_PATH'],
-                                               b_id)
+            bike_details = dtb.get_bike_details(b_id)
             return render_template('edit_bike.html', bike_details=bike_details,
                                    bike_menu_list=bike_list, form=fm)
         else:
@@ -96,12 +93,11 @@ def edit_bike():
 
 @app.route('/edit_part', methods=['GET', 'POST'])
 def edit_part():
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
     fm = PartForm()
     if fm.validate_on_submit():
         p_id = request.args['id']
-        part_details, b_id, b_nm = db.get_part_details(app.config['DB_PATH'],
-                                                       p_id)
+        part_details, b_id, b_nm = dtb.get_part_details(p_id)
         p_type = request.form.get('p_type')
         added = request.form.get('added')
         brand = request.form.get('brand')
@@ -130,14 +126,13 @@ def edit_part():
             virtual = part_details[10]
         else:
             virtual = int(virtual)
-        db.update_part(p_id, p_type, added, brand, price, weight,
-                       size, model, virtual, app.config['DB_PATH'])
+        dtb.update_part(p_id, p_type, added, brand, price, weight,
+                        size, model, virtual)
         return part(p_id, edit=True)
     else:
         if 'id' in request.args:
             p_id = request.args['id']
-            part_details, b_id, b_nm = db.get_part_details(app.config['DB_PATH'],
-                                                           p_id)
+            part_details, b_id, b_nm = dtb.get_part_details(p_id)
             return render_template('edit_part.html', part_details=part_details,
                                    part_id=p_id, bike_name=b_nm,
                                    bike_menu_list=bike_list, form=fm)
@@ -148,14 +143,14 @@ def edit_part():
 
 @app.route('/bikes', methods=['GET', 'POST'])
 def bikes():
-    res = db.get_all_bikes(app.config['DB_PATH'])
+    res = dtb.get_all_bikes()
     return render_template('bikes.html', bikes=res, bike_menu_list=res)
 
 
 @app.route('/bike', methods=['GET', 'POST'])
 def bike(b_id=None):
-    rdr = db.get_rider_info(app.config['DB_PATH'])
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    rdr = dtb.get_rider_info()
+    bike_list = dtb.get_all_bikes()
     fm = DateLimitForm()
     if fm.validate_on_submit():
         b_id = request.args['id']
@@ -173,13 +168,12 @@ def bike(b_id=None):
         b_id = request.args['id']
         start_date = None
         end_date = None
-    res = db.get_rider_info(app.config['DB_PATH'])
-    deets = db.get_bike_details(app.config['DB_PATH'], b_id)
-    parts = db.get_all_bike_parts(app.config['DB_PATH'], b_id)
+    res = dtb.get_rider_info()
+    deets = dtb.get_bike_details(b_id)
+    parts = dtb.get_all_bike_parts(b_id)
     part_ids = (p[0] for p in parts)
-    maint = db.get_maintenance(app.config['DB_PATH'], part_ids)
-    stats = db.get_ride_data_for_bike(app.config['DB_PATH'], b_id, rdr[1],
-                                      start_date, end_date)
+    maint = dtb.get_maintenance(part_ids)
+    stats = dtb.get_ride_data_for_bike(b_id, rdr[1], start_date, end_date)
     ms = max(stats['max_speed'])
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('bike.html', parts=parts, bike_details=deets,
@@ -190,8 +184,8 @@ def bike(b_id=None):
 
 @app.route('/part', methods=['GET', 'POST'])
 def part(p_id=None, end_date=None, start_date=None, edit=False):
-    rdr = db.get_rider_info(app.config['DB_PATH'])
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    rdr = dtb.get_rider_info()
+    bike_list = dtb.get_all_bikes()
     fm = DateLimitForm()
     if fm.validate_on_submit():
         if edit:
@@ -211,7 +205,7 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
     else:
         p_id = request.args['id']
         
-    part_details, b_id, b_nm = db.get_part_details(app.config['DB_PATH'], p_id)
+    part_details, b_id, b_nm = dtb.get_part_details(tuple(p_id))
     virt = bool(part_details[10] == 1)
     early_date = part_details[2]
     late_date = part_details[9]
@@ -221,12 +215,11 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
         late_date = min([max([end_date, early_date]), late_date])
     if start_date is not None:
         early_date = max([min([start_date, late_date]), early_date])
-    stats = db.get_ride_data_for_part(app.config['DB_PATH'],
-                                      b_id,
-                                      units=rdr[1],
-                                      early_date=early_date,
-                                      late_date=late_date)
-    maint = db.get_maintenance(app.config['DB_PATH'], list(p_id))
+    stats = dtb.get_ride_data_for_part(b_id,
+                                       units=rdr[1],
+                                       early_date=early_date,
+                                       late_date=late_date)
+    maint = dtb.get_maintenance(tuple(p_id))
     return render_template('part.html', bike_name=b_nm,
                            part_details=part_details, maint=maint,
                            stats=stats, bike_id=b_id, virtual=virt,
@@ -235,7 +228,7 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
 
 @app.route('/add_part', methods=['GET', 'POST'])
 def add_part():
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
     fm = PartForm()
     if fm.validate_on_submit():
         part_type = request.form.get('p_type')
@@ -269,7 +262,7 @@ def add_part():
             virtual = 1
         vals = (part_type, added, brand, price, weight, size,
                 model, b_id, virtual)
-        db.add_part(app.config['DB_PATH'], vals)
+        dtb.add_part(vals)
         return bike(b_id)
     else:
         b_id = request.args['bike_id']
@@ -338,17 +331,16 @@ def add_bike():
         b_id = request.form.get('bike_id')
         if b_id in ['None', '']:
             b_id = None
-        db.add_new_bike(app.config['DB_PATH'],
-                        b_id,
-                        nm,
-                        color,
-                        purchase,
-                        price,
-                        mfg)
+        dtb.add_new_bike(b_id,
+                         nm,
+                         color,
+                         purchase,
+                         price,
+                         mfg)
         return bikes()        
     else:
         b_id = request.args['id']
-        bike_list = db.get_all_bikes(app.config['DB_PATH'])
+        bike_list = dtb.get_all_bikes()
         return render_template('add_bike.html', bike_id=b_id,
                                bike_menu_list=bike_list, form=fm)
 
@@ -356,7 +348,7 @@ def add_bike():
 @app.route('/add_maintenance', methods=['GET', 'POST'])
 def add_maintenance():
     dt = datetime.datetime.today().strftime('%Y-%m-%d')
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
     fm = MaintenanceForm()
     if fm.validate_on_submit():
         p_id = request.form.get('p_id')
@@ -368,7 +360,7 @@ def add_maintenance():
             new_dt = dateparser.parse(new_dt)
         if work in ['None', '']:
             work = None
-        db.add_maintenance(app.config['DB_PATH'], p_id, work, new_dt)
+        dtb.add_maintenance(p_id, work, new_dt)
         return part(p_id)
     else:
         p_id = request.args['id']
@@ -379,7 +371,7 @@ def add_maintenance():
 @app.route('/fetch_rides', methods=['GET'])
 def fetch_rides():
     # get rider info
-    res = db.get_rider_info(app.config['DB_PATH'])
+    res = dtb.get_rider_info()
 
     # run updater
     s = stravaConnection(app.config['CLIENT_ID'],
@@ -390,28 +382,28 @@ def fetch_rides():
     new_activities = s.fetch_new_activities()
 
     if new_activities is not None:
-        db.add_multiple_rides(app.config['DB_PATH'], new_activities)
+        dtb.add_multiple_rides(new_activities)
         msg = f'{len(new_activities)} new activities added!'
     else:
         msg = "No new activities found. Go ride your bike!"
 
     # check for new bikes
-    db.find_new_bikes(app.config['DB_PATH'])
+    dtb.find_new_bikes()
 
     return render_template('index.html', msg=msg)
 
 
 @app.route('/part_averages', methods=['GET', 'POST'])
 def part_averages():
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
-    avgs = db.get_part_averages(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
+    avgs = dtb.get_part_averages()
     return render_template('part_averages.html', avgs=avgs,
                            bike_menu_list=bike_list)
 
 
 @app.route('/strava_funcs', methods=['GET', 'POST'])
 def strava_funcs():
-    bike_list = db.get_all_bikes(app.config['DB_PATH'])
+    bike_list = dtb.get_all_bikes()
     auth_url = generate_auth_url(app.config['CLIENT_ID'])
     return render_template('strava_funcs.html', auth_url=auth_url,
                            bike_menu_list=bike_list)
