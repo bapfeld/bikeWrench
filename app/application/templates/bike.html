@@ -14,12 +14,24 @@
             <h4>Bike details</h4>
             <table class="table table-hover table-sm">
                 <tbody>
-                    <tr><td><b>Bike id</b>:</td> <td>{{ bike_details[0] }}</td></tr>
-                    <tr><td><b>Name</b>:</td> <td>{{ bike_details[1] }}</td></tr>
-                    <tr><td><b>Manufacturer</b>:</td> <td>{{ bike_details[5] }}</td></tr>
-                    <tr><td><b>Color</b>:</td> <td>{{ bike_details[2] }}</td></tr>
-                    <tr><td><b>Purchase date</b>:</td> <td>{{ bike_details[3] }}</td></tr>
-                    <tr><td><b>Purchase price</b>:</td> <td>{{ bike_details[4] }}</td></tr>
+                    <tr>
+                        <td><b>Bike id</b>:</td> <td>{{ bike_details.bike_id }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Name</b>:</td> <td>{{ bike_details.name }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Manufacturer</b>:</td> <td>{{ bike_details.mfg }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Color</b>:</td> <td>{{ bike_details.color }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Purchase date</b>:</td> <td>{{ bike_details.purchased }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Purchase price</b>:</td> <td>{{ bike_details.price }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -143,26 +155,27 @@
                     <tr>
                         <td>
                             <a
-                                href="{{ url_for('part', id=part[0]) }}">{{ part[1] }}
+                                href="{{ url_for('part', id=part.part_id) }}">
+                                {{ part.tp }}
                             </a>
                         </td>
                         <td>
-                            {{ part[2]}}
+                            {{ part.added}}
                         </td>
                         <td>
-                            {{ part[3] }}
+                            {{ part.brand }}
                         </td>
                         <td>
-                            {{ part[4] }}
+                            {{ part.price }}
                         </td>
                         <td>
-                            {{ part[5] }}
+                            {{ part.weight }}
                         </td>
                         <td>
-                            {{ part[6] }}
+                            {{ part.size }}
                         </td>
                         <td>
-                            {{ part[7] }}
+                            {{ part.model }}
                         </td>
                     </tr>
                     {% endfor %}

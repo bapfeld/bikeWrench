@@ -3,8 +3,8 @@ import dateparser
 from stravalib import unithelper
 from sqlalchemy import func
 from .models import db, Riders, Bikes, Rides, Parts, Maintenance
-from .helpers import (convert_rider_info, none_or_zero,
-                      convert_summary_units, combine_res, summary_stats_combo)
+from .helpers import (convert_rider_info, convert_summary_units,
+                      combine_res, summary_stats_combo)
 
 
 def get_rider_info():
@@ -124,10 +124,8 @@ def add_part(part_values):
 def get_all_bike_parts(current_bike):
     current_bike_parts_list = (Parts
                                .query
-                               .filter(
-                                   and_(Parts.bike == current_bike,
-                                        Parts.retired.is_(None))
-                                       )
+                               .filter(Parts.bike == current_bike)
+                               .filter(Parts.retired is None)
                                .all())
     return current_bike_parts_list
 

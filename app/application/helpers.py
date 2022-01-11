@@ -24,54 +24,53 @@ def convert_rider_info(units, max_speed, avg_speed, tot_dist, tot_climb):
     return (max_speed, avg_speed, tot_dist, tot_climb)
 
 
-def none_or_zero(z):
-    if z:
-        return 0
-
-
 def convert_summary_units(units, res, zeros=False):
     if units == 'imperial':
         try:
             dist = round(res[0] / 1.609, 2)
         except TypeError:
-            dist = none_or_zero(zeros)
+            dist = 0
         try:
             climb = round(res[3] * 3.281, 2)
         except TypeError:
-            climb = none_or_zero(zeros)
+            climb = 0
         try:
             mx_speed = round(res[6] / 1.609, 2)
         except TypeError:
-            mx_speed = none_or_zero(zeros)
+            mx_speed = 0
     else:
         try:
             dist = round(res[0], 2)
         except TypeError:
-            dist = none_or_zero(zeros)
+            dist = 0
         try:
             climb = round(res[3], 2)
         except TypeError:
-            climb = none_or_zero(zeros)
+            climb = 0
         try:
             mx_speed = round(res[6], 2)
         except TypeError:
-            mx_speed = none_or_zero(zeros)
+            mx_speed = 0
     try:
         mv_time = round(res[4], 1)
     except TypeError:
-        mv_time = none_or_zero(zeros)
+        mv_time = 0
     try:
         s_time = round(res[5], 1)
     except TypeError:
-        s_time = none_or_zero(zeros)
+        s_time = 0
     try:
         cal = round(res[7], 2)
     except TypeError:
-        cal = none_or_zero(zeros)
+        cal = 0
     return (dist, res[1], res[2], climb, mv_time, s_time, mx_speed, cal)
 
 
 def combine_res(n_all, n_virt):
+    if n_virt is None:
+        n_virt = 0
+    if n_all is None:
+        n_all = 0
     return (round(n_all - n_virt, 1), n_virt, n_all)
 
 

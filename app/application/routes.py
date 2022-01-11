@@ -173,6 +173,7 @@ def bike(b_id=None):
     part_ids = (p[0] for p in parts)
     maint = dtb.get_maintenance(part_ids)
     stats = dtb.get_ride_data_for_bike(b_id, rdr[1], start_date, end_date)
+    print(stats)
     ms = max(stats['max_speed'])
     speed_unit, dist_unit, elev_unit = units_text(res[1])
     return render_template('bike.html', parts=parts, bike_details=deets,
