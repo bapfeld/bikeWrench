@@ -120,7 +120,7 @@ def get_all_bike_parts(current_bike):
     current_bike_parts_list = (Parts
                                .query
                                .filter(Parts.bike == current_bike)
-                               .filter(Parts.retired is None)
+                               .filter(Parts.retired.is_(None))
                                .all())
     return current_bike_parts_list
 

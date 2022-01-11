@@ -170,7 +170,7 @@ def bike(b_id=None):
     res = dtb.get_rider_info()
     deets = dtb.get_bike_details(b_id)
     parts = dtb.get_all_bike_parts(b_id)
-    part_ids = (p[0] for p in parts)
+    part_ids = [p.part_id for p in parts]
     maint = dtb.get_maintenance(part_ids)
     stats = dtb.get_ride_data_for_bike(b_id, rdr[1], start_date, end_date)
     print(stats)
