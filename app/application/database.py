@@ -80,11 +80,6 @@ def update_part(p_id, p_type, added, brand, price, weight,
     db.session.commit()
 
 
-def get_all_bike_ids():
-    bikes = Bikes.query(Bikes.bike_id).all()
-    return all_bike_ids
-
-
 def get_all_bikes():
     bikes = Bikes.query.all()
     return bikes
