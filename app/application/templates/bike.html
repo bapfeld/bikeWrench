@@ -193,11 +193,11 @@
         <!-- Left column with table -->
         <div class="col-sm-8">
             <table class="table table-hover">
-                <thead> <tr><th>Work</th><th>date</th></tr>
+                <thead> <tr><th>Work</th><th>Date</th></tr>
                 </thead>
                 <tbody>
                     {% for m in maint %}
-                    <tr><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
+                    <tr><td>{{ m.work }}</td><td>{{ m.date }}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
