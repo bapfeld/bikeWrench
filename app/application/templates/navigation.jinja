@@ -39,7 +39,7 @@
                             <div class="dropdown-divider"></div>
                             {% for b in bike_menu_list %}
                               <a class="dropdown-item"
-                                 href="{{ url_for('bike', id=bike_id) }}">
+                                 href="{{ url_for('bike', id=b.bike_id) }}">
                                  {{ b.name }}
                               </a>
                             {% endfor %}
