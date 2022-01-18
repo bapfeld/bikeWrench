@@ -1,3 +1,7 @@
+def num_pprint(s):
+    return f'{s:,.2f}'
+
+
 def units_text(unit_type):
     if unit_type == 'imperial':
         speed_unit = 'MPH'
@@ -21,7 +25,7 @@ def convert_rider_info(units, max_speed, avg_speed, tot_dist, tot_climb):
         avg_speed = round(avg_speed, 2)
         tot_dist = round(tot_dist, 2)
         tot_climb = round(tot_climb, 2)
-    return (max_speed, avg_speed, tot_dist, tot_climb)
+    return (num_pprint(s) for s in [max_speed, avg_speed, tot_dist, tot_climb])
 
 
 def convert_summary_units(units, res, zeros=False):
@@ -71,7 +75,8 @@ def combine_res(n_all, n_virt):
         n_virt = 0
     if n_all is None:
         n_all = 0
-    return (round(n_all - n_virt, 1), n_virt, n_all)
+    n_real = round(n_all - n_virt, 2)
+    return (num_pprint(n_real), num_pprint(n_virt), num_pprint(n_all))
 
 
 def summary_stats_combo(r_all, r_virt, u):
