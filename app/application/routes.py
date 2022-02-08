@@ -160,12 +160,12 @@ def bike(b_id=None):
     if fm.validate_on_submit():
         b_id = request.args['bike_id']
         start_date = request.form.get('start_date')
-        if start_date in ['None', '']:
+        if start_date in ['None', ''] or start_date is None:
             start_date = None
         else:
             start_date = dateparser.parse(start_date).strftime('%Y-%m-%d')
         end_date = request.form.get('end_date')
-        if end_date in ['None', '']:
+        if end_date in ['None', ''] or end_date is None:
             end_date = None
         else:
             end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
