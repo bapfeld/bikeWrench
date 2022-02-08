@@ -41,6 +41,8 @@ class BikeForm(FlaskForm):
         super().__init__(*args, **kwargs)
         if 'edit' in kwargs:
             self.submit.label.text = 'Edit bike'
+        # if 'bike_name' in kwargs:
+        #     self.nm.default = kwargs['bike_name']
         
     nm = StringField('Name', [DataRequired(), Length(min=3,
                                                      message='Longer name needed')])

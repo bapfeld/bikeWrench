@@ -60,32 +60,38 @@ def edit_bike():
     bike_list = dtb.get_all_bikes()
     fm = BikeForm(edit=True)
     if fm.validate_on_submit():
-        bike_details = dtb.get_bike_details(request.args['id'])
+        bike_details = dtb.get_bike_details(request.args['bike_id'])
         nm = request.form.get('bike_name')
         color = request.form.get('color')
         purchase = request.form.get('purchase')
         price = request.form.get('price')
         mfg = request.form.get('mfg')
         if (nm in ['None', '']) or nm is None:
-            nm = bike_details[1]
+            nm = bike_details.name
         if (color in ['None', '']) or color is None:
-            color = bike_details[2]
+            color = bike_details.color
         if (purchase in ['None', '']) or purchase is None:
-            purchase = bike_details[3]
+            purchase = bike_details.purchased
         else:
-            purchase = dateparser.parse(purchase).strftime("%Y-%m-%d")
+            purchase = dateparser.parse(purchase)
         if (price in ['None', '']) or price is None:
-            price = bike_details[4]
+            price = bike_details.price
         if (mfg in ['None', '']) or mfg is None:
-            mfg = bike_details[1]
-        dtb.update_bike(bike_details[0], nm, color, purchase, price, mfg)
-        return bike(bike_details[0])
+            mfg = bike_details.mfg
+        dtb.update_bike(bike_details.bike_id, nm, color, purchase, price, mfg)
+        return bike(bike_details.bike_id)
     else:
         if 'id' in request.args:
             b_id = request.args['id']
             bike_details = dtb.get_bike_details(b_id)
+            fm_with_defaults = BikeForm(edit=True,
+                                        nm=bike_details.name,
+                                        color=bike_details.color,
+                                        purchase=bike_details.purchased,
+                                        mfg=bike_details.mfg,
+                                        price=bike_details.price)
             return render_template('edit_bike.html', bike_details=bike_details,
-                                   bike_menu_list=bike_list, form=fm)
+                                   bike_menu_list=bike_list, form=fm_with_defaults)
         else:
             return render_template('404.html')
 
@@ -152,7 +158,7 @@ def bike(b_id=None):
     bike_list = dtb.get_all_bikes()
     fm = DateLimitForm()
     if fm.validate_on_submit():
-        b_id = request.args['id']
+        b_id = request.args['bike_id']
         start_date = request.form.get('start_date')
         if start_date in ['None', '']:
             start_date = None
