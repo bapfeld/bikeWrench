@@ -37,6 +37,11 @@ class MaintenanceForm(FlaskForm):
 
 class BikeForm(FlaskForm):
     """Form to add a new bike"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'edit' in kwargs:
+            self.submit.label.text = 'Edit bike'
+        
     nm = StringField('Name', [DataRequired(), Length(min=3,
                                                      message='Longer name needed')])
     color = StringField('Color')

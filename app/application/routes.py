@@ -58,7 +58,7 @@ def edit_rider():
 @app.route('/edit_bike', methods=['GET', 'POST'])
 def edit_bike():
     bike_list = dtb.get_all_bikes()
-    fm = BikeForm()
+    fm = BikeForm(edit=True)
     if fm.validate_on_submit():
         bike_details = dtb.get_bike_details(request.args['id'])
         nm = request.form.get('bike_name')
@@ -87,7 +87,7 @@ def edit_bike():
             return render_template('edit_bike.html', bike_details=bike_details,
                                    bike_menu_list=bike_list, form=fm)
         else:
-            return render_template('404.html')        
+            return render_template('404.html')
 
 
 @app.route('/edit_part', methods=['GET', 'POST'])
