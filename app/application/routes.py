@@ -36,11 +36,11 @@ def rider():
 @app.route('/edit_rider', methods=['GET', 'POST'])
 def edit_rider():
     bike_list = dtb.get_all_bikes()
-    fm = RiderForm()
+    res = dtb.get_rider_info()
+    fm = RiderForm(rider=res[0], units=res[1])
     if fm.validate_on_submit():
-        res = dtb.get_rider_info()
         current_nm = res[0]
-        nm = request.form.get('rider_name')
+        nm = request.form.get('rider')
         units = request.form.get('units')
         if (nm in ['None', '']) or nm is None:
             nm = current_nm
@@ -49,7 +49,6 @@ def edit_rider():
         dtb.update_rider(current_nm, nm, units)
         return rider()
     else:
-        res = dtb.get_rider_info()
         speed_unit, dist_unit, elev_unit = units_text(res[1])
         return render_template('edit_rider.html', rider=res[0], units=res[1],
                                bike_menu_list=bike_list, form=fm)
