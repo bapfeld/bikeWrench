@@ -69,14 +69,14 @@ def update_part(p_id, p_type, added, brand, price, weight,
     (db.session
      .query(Parts)
      .filter(Parts.part_id == p_id)
-     .update({tp: p_type,
-              added: added,
-              brand: brand,
-              price: price,
-              weight: weight,
-              size: size,
-              model: model,
-              virtual: virtual}))
+     .update({Parts.tp: p_type,
+              Parts.added: added,
+              Parts.brand: brand,
+              Parts.price: price,
+              Parts.weight: weight,
+              Parts.size: size,
+              Parts.model: model,
+              Parts.virtual: virtual}))
     db.session.commit()
 
 
@@ -91,9 +91,9 @@ def get_bike_details(bike_id):
 
 
 def get_all_ride_ids():
-    rides = Rides.query(Rides.ride_id).all()
+    rides = [x[0] for x in db.session.query(Rides.ride_id).all()]
     if len(rides) > 0:
-        max_dt = dateparser.parse(db.session.query(func.max(Rides.date)).first())
+        max_dt = db.session.query(func.max(Rides.date)).first()[0]
         max_dt = max_dt - datetime.timedelta(days=1)
         max_dt = max_dt.strftime('%Y-%m-%d')
     else:
@@ -204,7 +204,7 @@ def add_multiple_rides(activity_list):
                     bike=gear_try(a),
                     distance=unit_try(a.distance, 'long_dist'),
                     name=a.name,
-                    date=a.start_date.strftime("%Y-%m-%d"),
+                    date=a.start_date,
                     moving_time=a.moving_time.seconds / 3600,
                     elapsed_time=a.elapsed_time.seconds / 3600,
                     elev=unit_try(a.total_elevation_gain, 'short_dist'),
@@ -243,9 +243,9 @@ def find_new_bikes():
        that haven't been added
      """
 
-    all_bike_ids = get_all_bike_ids(db_path)
+    all_bike_ids = [x[0] for x in db.session.query(Bikes.bike_id).distinct().all()]
     res = db.session.query(Rides.bike).distinct().all()
-    new_bikes = [x for x in res if x not in all_bike_ids]
+    new_bikes = [x[0] for x in res if x[0] not in all_bike_ids]
     if len(new_bikes) > 0:
         b_list = [Bikes(bike_id=b,
                         name=f'tmp_nm_{b}')

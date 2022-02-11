@@ -33,9 +33,9 @@ class Bikes(db.Model):
                      unique=True,
                      nullable=True)
     color = db.Column(db.String,
-                     index=False,
-                     unique=False,
-                     nullable=True)
+                      index=False,
+                      unique=False,
+                      nullable=True)
     purchased = db.Column(db.Date,
                           index=False,
                           unique=False,
@@ -45,15 +45,15 @@ class Bikes(db.Model):
                       unique=False,
                       nullable=True)
     mfg = db.Column(db.String,
-                     index=False,
-                     unique=False,
-                     nullable=True)
+                    index=False,
+                    unique=False,
+                    nullable=True)
 
 
 class Rides(db.Model):
     """Data model for rides"""
     __tablename__ = 'rides'
-    
+
     ride_id = db.Column(db.Integer,
                         primary_key=True,
                         unique=True)
@@ -161,7 +161,7 @@ class Maintenance(db.Model):
     __table_args__ = {'sqlite_autoincrement': True}
 
     maint_id = db.Column(db.Integer,
-                         primary_key=True, 
+                         primary_key=True,
                          nullable=False)
     part = db.Column(db.Integer,
                      db.ForeignKey('parts.part_id'),

@@ -382,7 +382,6 @@ def fetch_rides():
     s = stravaConnection(app.config['CLIENT_ID'],
                          app.config['CLIENT_SECRET'],
                          app.config['APP_CODE'],
-                         app.config['DB_PATH'],
                          res)
     new_activities = s.fetch_new_activities()
 
