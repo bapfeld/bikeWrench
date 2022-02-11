@@ -11,7 +11,8 @@ class PartForm(FlaskForm):
         choices=[('Front Wheel', 'Front Wheel'), ('Rear Wheel', 'Rear Wheel'),
                  ('Chain', 'Chain'), ('Front Tire', 'Front Tire'), ('Rear Tire', 'Rear Tire'),
                  ('Brake Cables', 'Brake Cables'), ('Shifter Cables', 'Shifter Cables'),
-                 ('Cassette', 'Cassette'), ('Front Brake Caliper', 'Front Brake Caliper')]
+                 ('Cassette', 'Cassette'), ('Front Brake Caliper', 'Front Brake Caliper'),
+                 ('Bar Tape', 'Bar Tape')]
     )
     dt = StringField(
         'Date Added',

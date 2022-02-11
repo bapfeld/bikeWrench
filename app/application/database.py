@@ -110,7 +110,7 @@ def add_part(part_values):
                      weight=weight,
                      size=size,
                      model=model,
-                     b_id=b_id,
+                     bike=b_id,
                      virtual=virtual)
     db.session.add(new_part)
     db.session.commit()
