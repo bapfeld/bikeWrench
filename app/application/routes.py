@@ -209,11 +209,11 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
                 end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
     else:
         p_id = request.args['id']
-        
-    part_details, b_id, b_nm = dtb.get_part_details(tuple(p_id))
-    virt = bool(part_details[10] == 1)
-    early_date = part_details[2]
-    late_date = part_details[9]
+
+    part_details, b_id, b_nm = dtb.get_part_details(p_id)
+    virt = bool(part_details.virtual == 1)
+    early_date = part_details.added
+    late_date = part_details.retired
     if (late_date in ['None', '']) or late_date is None:
         late_date = datetime.datetime.today().strftime("%Y-%m-%d")
     if end_date is not None:

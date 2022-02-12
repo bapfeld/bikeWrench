@@ -14,15 +14,15 @@
             <h4>Part details</h4>
             <table class="table table-hover table-sm">
                 <tbody>
-                    <tr><td><b>Part id</b>:</td> <td>{{ part_details[0] }}</td></tr>
-                    <tr><td><b>Added date</b>:</td> <td>{{ part_details[2] }}</td></tr>
-                    <tr><td><b>Type</b>:</td> <td>{{ part_details[1] }}</td></tr>
-                    <tr><td><b>Brand</b>:</td> <td>{{ part_details[3] }}</td></tr>
-                    <tr><td><b>Model</b>:</td> <td>{{ part_details[7] }}</td></tr>
-                    <tr><td><b>Size</b>:</td> <td>{{ part_details[6] }}</td></tr>
-                    <tr><td><b>Weight</b>:</td> <td>{{ part_details[5] }}</td></tr>
-                    <tr><td><b>Price</b>:</td> <td>{{ part_details[4] }}</td></tr>
-                    <tr><td><b>Virtual</b>:</td> <td>{{ part_details[10] }}</td></tr>
+                    <tr><td><b>Part id</b>:</td> <td>{{ part_details.part_id }}</td></tr>
+                    <tr><td><b>Added date</b>:</td> <td>{{ part_details.added }}</td></tr>
+                    <tr><td><b>Type</b>:</td> <td>{{ part_details.tp }}</td></tr>
+                    <tr><td><b>Brand</b>:</td> <td>{{ part_details.brand }}</td></tr>
+                    <tr><td><b>Model</b>:</td> <td>{{ part_details.model }}</td></tr>
+                    <tr><td><b>Size</b>:</td> <td>{{ part_details.size }}</td></tr>
+                    <tr><td><b>Weight</b>:</td> <td>{{ part_details.weight }}</td></tr>
+                    <tr><td><b>Price</b>:</td> <td>{{ part_details.price }}</td></tr>
+                    <tr><td><b>Virtual</b>:</td> <td>{{ part_details.virtual }}</td></tr>
                     <tr><td><b>Bike</b>:</td> <td>{{ bike_name }}</td></tr>
                 </tbody>
             </table>
@@ -160,7 +160,7 @@
                 </thead>
                 <tbody>
                     {% for m in maint %}
-                    <tr><td>{{ m[2] }}</td><td>{{ m[3] }}</td></tr>
+                    <tr><td>{{ m.work }}</td><td>{{ m.date }}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -178,7 +178,7 @@
         <a
             class="btn btn-primary btn-lg btn-block"
             role="button"
-            href="{{ url_for('add_maintenance', id=part_details[0] ) }}">
+            href="{{ url_for('add_maintenance', id=part_details.part_id ) }}">
             Maintain current part
         </a>
     </div>
@@ -192,7 +192,7 @@
         <a
             class="btn btn-secondary btn-lg btn-block"
             role="button"
-            href="{{ url_for('edit_part', id=part_details[0]) }}">
+            href="{{ url_for('edit_part', id=part_details.part_id) }}">
             Edit current part
         </a>
     </div>
@@ -208,13 +208,13 @@
             role="button"
             href="{{ url_for('add_part', 
                              bike_id=bike_id,
-                             tp=part_details[1],
-                             brand=part_details[3],
-                             weight=part_details[5],
-                             size=part_details[6],
-                             model=part_details[7],
+                             tp=part_details.tp,
+                             brand=part_details.brand,
+                             weight=part_details.weight,
+                             size=part_details.size,
+                             model=part_details.model,
                              retire=1,
-                             part_id=part_details[0]) }}"> 
+                             part_id=part_details.part_id) }}"> 
             Replace current part
         </a>
     </div>

@@ -1,7 +1,7 @@
 import datetime
 import dateparser
 from stravalib import unithelper
-from sqlalchemy import func
+from sqlalchemy import func, and_, or_
 from .models import db, Riders, Bikes, Rides, Parts, Maintenance
 from .helpers import (convert_rider_info, convert_summary_units,
                       combine_res, summary_stats_combo)
@@ -166,7 +166,7 @@ def get_ride_data_for_bike(bike_id, units, start_date=None,
 
 def get_ride_data_for_part(bike_id, units, early_date, late_date):
     query = (db.session
-             .query(func.sum(Rides.dist).label('dist'),
+             .query(func.sum(Rides.distance).label('dist'),
                     func.min(Rides.date).label('earliest_date'),
                     func.max(Rides.date).label('recent_ride'),
                     func.sum(Rides.elev).label('climb'),
@@ -256,7 +256,7 @@ def find_new_bikes():
 
 def get_part_details(part_id):
     res = Parts.query.filter(Parts.part_id == part_id).first()
-    b_id, b_nm = (Bikes
+    b_id, b_nm = (db.session
                   .query(Bikes.bike_id, Bikes.name)
                   .filter(Bikes.bike_id == res.bike)
                   .first())
