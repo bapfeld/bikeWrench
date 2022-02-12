@@ -98,9 +98,9 @@ def edit_bike():
 @app.route('/edit_part', methods=['GET', 'POST'])
 def edit_part():
     bike_list = dtb.get_all_bikes()
-    fm = PartForm()
+    fm = PartForm(edit=True)
     if fm.validate_on_submit():
-        p_id = request.args['id']
+        p_id = request.args['part_id']
         part_details, b_id, b_nm = dtb.get_part_details(p_id)
         p_type = request.form.get('p_type')
         added = request.form.get('added')
@@ -111,35 +111,45 @@ def edit_part():
         model = request.form.get('model')
         virtual = request.form.get('virtual')
         if (p_type in ['None', '']) or p_type is None:
-            p_type = part_details[1]
+            p_type = part_details.tp
         if (added in ['None', '']) or added is None:
-            added = part_details[2]
+            added = part_details.added
         else:
             added = dateparser.parse(added).strftime('%Y-%m-%d')
         if (brand in ['None', '']) or brand is None:
-            brand = part_details[3]
+            brand = part_details.brand
         if (price in ['None', '']) or price is None:
-            price = part_details[4]
+            price = None
         if (weight in ['None', '']) or weight is None:
-            weight = part_details[5]
+            weight = None
         if (size in ['None', '']) or size is None:
-            size = part_details[6]
+            size = part_details.size
         if (model in ['None', '']) or model is None:
-            model = part_details[7]
+            model = part_details.model
         if (virtual in ['None', '']) or virtual is None:
-            virtual = part_details[10]
+            virtual = 0
         else:
             virtual = int(virtual)
         dtb.update_part(p_id, p_type, added, brand, price, weight,
                         size, model, virtual)
         return part(p_id, edit=True)
     else:
-        if 'id' in request.args:
-            p_id = request.args['id']
+        if 'part_id' in request.args:
+            p_id = request.args['part_id']
             part_details, b_id, b_nm = dtb.get_part_details(p_id)
+            fm_with_defaults = PartForm(edit=True,
+                                        p_type=part_details.tp,
+                                        dt=part_details.added,
+                                        brand=part_details.brand,
+                                        price=part_details.price,
+                                        weight=part_details.weight,
+                                        size=part_details.size,
+                                        model=part_details.model,
+                                        virt=part_details.virtual)
             return render_template('edit_part.html', part_details=part_details,
                                    part_id=p_id, bike_name=b_nm,
-                                   bike_menu_list=bike_list, form=fm)
+                                   bike_menu_list=bike_list,
+                                   form=fm_with_defaults)
         else:
             return render_template('404.html')
     

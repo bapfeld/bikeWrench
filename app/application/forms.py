@@ -1,11 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, StringField, HiddenField,
-                     SelectField, SubmitField, TextField)
+                     SelectField, SubmitField, TextField, FloatField)
 from wtforms.validators import DataRequired, Length
 
 
 class PartForm(FlaskForm):
     """Form to add parts"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'edit' in kwargs:
+            self.submit.label.text = 'Edit part'
+            
     p_type = SelectField(
         'Type',
         choices=[('Front Wheel', 'Front Wheel'), ('Rear Wheel', 'Rear Wheel'),
@@ -18,11 +23,11 @@ class PartForm(FlaskForm):
         'Date Added',
         [DataRequired()]
     )
-    brand = StringField('Brand')
-    price = StringField('Price')
-    weight = StringField('Weight')
-    size = StringField('Size')
-    model = StringField('Model')
+    brand = StringField('Brand', [DataRequired(False)])
+    price = FloatField('Price', [DataRequired(False)])
+    weight = FloatField('Weight', [DataRequired(False)])
+    size = StringField('Size', [DataRequired(False)])
+    model = StringField('Model', [DataRequired(False)])
     virt = BooleanField('Virtual')
     submit = SubmitField("Add part")
 

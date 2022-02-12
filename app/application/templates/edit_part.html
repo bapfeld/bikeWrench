@@ -3,7 +3,7 @@
 <div>
     <div class="jumbotron">
         <h1>Edit part</h1>
-        <p class="lead">Edit details for {{ part_details[1] }} on bike {{ bike_name }}:</p>
+        <p class="lead">Edit details for {{ part_details.tp }} on bike {{ bike_name }}:</p>
     </div>
     <div>
         <div class="row">
@@ -129,7 +129,7 @@
             <a
                 class="btn btn-secondary btn-lg btn-block"
                 role="button"
-                href="{{ url_for('part', id=part_id ) }}">
+                href="{{ url_for('part', part_id=part_id ) }}">
                 Cancel (return to part info)
             </a>
         </div>
