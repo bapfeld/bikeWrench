@@ -196,7 +196,7 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
         if edit:
             pass
         else:
-            p_id = request.args['id']
+            p_id = request.args['part_id']
             start_date = request.form.get('start_date')
             if start_date in ['None', ''] or start_date is None:
                 start_date = None
@@ -208,7 +208,7 @@ def part(p_id=None, end_date=None, start_date=None, edit=False):
             else:
                 end_date = dateparser.parse(end_date).strftime('%Y-%m-%d')
     else:
-        p_id = request.args['id']
+        p_id = request.args['part_id']
 
     part_details, b_id, b_nm = dtb.get_part_details(p_id)
     virt = bool(part_details.virtual == 1)
@@ -356,7 +356,7 @@ def add_maintenance():
     bike_list = dtb.get_all_bikes()
     fm = MaintenanceForm()
     if fm.validate_on_submit():
-        p_id = request.form.get('p_id')
+        p_id = request.args['part_id']
         new_dt = request.form.get('dt')
         work = request.form.get('work')
         if new_dt in ['None', '']:
@@ -368,7 +368,7 @@ def add_maintenance():
         dtb.add_maintenance(p_id, work, new_dt)
         return part(p_id)
     else:
-        p_id = request.args['id']
+        p_id = request.args['part_id']
         return render_template('add_maintenance.html', part_id=p_id, dt=dt,
                                bike_menu_list=bike_list, form=fm)
 
