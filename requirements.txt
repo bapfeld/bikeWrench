@@ -17,6 +17,6 @@ six==1.15.0
 stravalib==0.10.2
 tzlocal==2.1
 units==0.7
-urllib3==1.25.10
+urllib3==1.26.5
 Werkzeug==2.2.3
 WTForms==2.3.3
