@@ -1,6 +1,6 @@
 [tool.black]
 # https://github.com/psf/black
-target-version = ["py38"]
+target-version = ["py310"]
 line-length = 89
 color = true
 
@@ -22,7 +22,7 @@ exclude = '''
 
 [tool.isort]
 # https://github.com/timothycrosley/isort/
-py_version = 38
+py_version = 310
 line_length = 89
 
 known_typing = ["typing", "types", "typing_extensions", "mypy", "mypy_extensions"]
@@ -35,7 +35,7 @@ color_output = true
 
 [tool.mypy]
 # https://mypy.readthedocs.io/en/latest/config_file.html#using-a-pyproject-toml-file
-python_version = "3.8"
+python_version = "3.10"
 pretty = true
 show_traceback = true
 color_output = true
