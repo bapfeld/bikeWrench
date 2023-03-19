@@ -5,7 +5,7 @@ from wtforms import (
     HiddenField,
     SelectField,
     SubmitField,
-    TextField,
+    StringField,
     FloatField,
 )
 from wtforms.validators import DataRequired, Length
@@ -47,7 +47,7 @@ class PartForm(FlaskForm):
 class MaintenanceForm(FlaskForm):
     """Form to add maintenance"""
 
-    work = TextField(
+    work = StringField(
         "Work performed",
         [DataRequired(), Length(min=5, message="Maintenance log too short")],
     )
