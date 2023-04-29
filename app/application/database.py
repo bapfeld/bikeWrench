@@ -292,8 +292,8 @@ def get_part_averages():
             Parts.tp,
             func.avg(Parts.price),
             func.avg(Parts.weight),
-            func.avg(Parts.dist),
-            func.avg(Parts.elev),
+            # func.avg(Parts.dist),
+            # func.avg(Parts.elev),
             func.avg(Parts.retired - Parts.added),
         )
         .filter(Parts.retired == 1)
